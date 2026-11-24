@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Lignée — planche d'icônes</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/kit.css">
+  <style>
+    .planche { position: relative; z-index: 1; max-width: 1000px; margin: 0 auto; padding: 20px; }
+    .grille { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 10px; }
+    .case { text-align: center; padding: 12px 6px; background: var(--panel); border: 1px solid var(--border); }
+    .case .tailles { display: flex; align-items: flex-end; justify-content: center; gap: 10px; color: var(--accent); margin-bottom: 6px; }
+    .case .tailles .muted { color: var(--muted); }
+    .case code { font-size: 11px; color: var(--muted); }
+  </style>
+</head>
+<body>
+  <div class="planche">
+    <h2 style="color:var(--accent)">Icônes de l'interface</h2>
+    <p class="muted small">Sprite <code>img/icones.svg</code> · dans le jeu : <code>icone('nom')</code> (js/ui.js). Tailles 16, 24 et 48 px, en or et en gris.</p>
+    <div class="grille" id="grille"></div>
+  </div>
+  <script>
+    // Liste lue dans le sprite lui-même : une icône ajoutée au sprite apparaît ici sans rien changer.
+    fetch('../img/icones.svg').then(r => r.text()).then(txt => {
+      const ids = [...txt.matchAll(/id="i-([a-z-]+)"/g)].map(m => m[1]);
+      const g = document.getElementById('grille');
+      for (const id of ids) {
+        const svg = (px, cls) => `<svg class="icone ${cls}" style="width:${px}px;height:${px}px"><use href="../img/icones.svg#i-${id}"/></svg>`;
+        g.insertAdjacentHTML('beforeend',
+          `<div class="case"><div class="tailles">${svg(16, '')}${svg(24, '')}${svg(48, '')}${svg(24, 'muted')}</div><code>${id}</code></div>`);
+      }
+    });
+  </script>
+</body>
+</html>

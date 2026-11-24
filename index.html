@@ -4,32 +4,65 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Lignée</title>
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#14100d">
   <link rel="stylesheet" href="css/style.css">
+  <link rel="stylesheet" href="css/kit.css">
+  <link rel="stylesheet" href="css/ambiance.css">
+  <link rel="stylesheet" href="css/accueil.css">
+  <link rel="stylesheet" href="css/rituel.css">
+  <link rel="stylesheet" href="css/heritage.css">
+  <link rel="stylesheet" href="css/colonne.css">
+  <link rel="stylesheet" href="css/registres.css">
+  <link rel="stylesheet" href="css/boutique.css">
+  <link rel="stylesheet" href="css/secondaires.css">
+  <link rel="stylesheet" href="css/finitions.css">
+  <link rel="stylesheet" href="css/scene.css">
 </head>
 <body>
+  <div id="ambiance" aria-hidden="true"></div>
   <header class="topbar">
     <div class="brand">Lignée</div>
     <div class="age-box">
-      <div class="age-line"><span id="ageText">14 ans</span><span class="muted"><span id="lifeText">70 ans</span></span></div>
+      <div class="age-line"><span><b id="identite" class="identite"></b> <span id="ageText">14 ans</span></span><span class="muted"><span id="lifeText">70 ans</span></span></div>
       <div class="bar age-bar"><div id="ageFill"></div></div>
     </div>
-    <div class="stat"><label>Écus</label><b id="coinsText">0</b></div>
-    <div class="stat"><label>Net / jour</label><b id="netText">0</b></div>
-    <div class="stat"><label>Bonheur</label><b id="happyText">×1</b></div>
-    <button id="pauseBtn" class="btn">⏸ Pause</button>
+    <div class="ressources">
+      <span class="inscription"><small><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-ecus"/></svg>Écus</small><b id="coinsText">0</b></span>
+      <span class="brin"></span>
+      <span class="inscription"><small><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-revenu"/></svg>Par jour</small><b id="netText">0</b></span>
+      <span class="brin"></span>
+      <span class="inscription"><small><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-bonheur"/></svg>Bonheur</small><b id="happyText">×1</b></span>
+      <span id="ressources-modules"></span>
+    </div>
+    <button id="pauseBtn" class="btn">Pause</button>
   </header>
 
   <div class="layout">
     <aside class="sidebar">
-      <section class="card" id="nowCard">
-        <div id="traitLine" class="trait-line"></div>
-        <div class="now">
-          <div class="now-head"><span id="curJobName"></span><span class="muted small" id="curJobInfo"></span></div>
-          <div class="bar"><div id="curJobFill"></div></div>
+      <section class="card cadre-noble" id="nowCard">
+        <span class="lanterne" aria-hidden="true"></span>
+        <div class="portrait">
+          <div id="portraitNom" class="portrait-nom"></div>
+          <div id="portraitSous" class="muted small"></div>
+          <div id="traitLine" class="trait-badge hidden"></div>
         </div>
-        <div class="now">
-          <div class="now-head"><span id="curSkillName"></span><span class="muted small" id="curSkillInfo"></span></div>
-          <div class="bar"><div id="curSkillFill"></div></div>
+        <div class="sep"></div>
+        <div id="jauges"></div>
+        <div class="colonne-lbl">Occupations</div>
+        <div class="occ">
+          <span id="curJobMed" class="occ-med" aria-hidden="true"></span>
+          <div class="now">
+            <div class="now-head"><span id="curJobName"></span><span class="muted small" id="curJobInfo"></span></div>
+            <div class="bar"><div id="curJobFill"></div></div>
+          </div>
+        </div>
+        <div class="occ">
+          <span id="curSkillMed" class="occ-med" aria-hidden="true"></span>
+          <div class="now">
+            <div class="now-head"><span id="curSkillName"></span><span class="muted small" id="curSkillInfo"></span></div>
+            <div class="bar"><div id="curSkillFill"></div></div>
+          </div>
         </div>
         <div id="challengeBox" class="challenge-active hidden">
           <b id="chName"></b>
@@ -37,94 +70,138 @@
           <button id="abandonBtn" class="btn small ghost">Abandonner</button>
         </div>
         <div id="corruptionBox" class="hidden">
-          <div class="age-line small"><span>Corruption</span><span id="corrText"></span></div>
+          <div class="now-head"><span><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-lune"/></svg> Corruption</span><span id="corrText" class="muted small"></span></div>
           <div class="bar"><div id="corrFill" class="corr"></div></div>
         </div>
         <ul id="buffs" class="buffs"></ul>
       </section>
 
-      <section class="card event-card hidden" id="eventCard">
+      <section class="card cadre-noble event-card hidden" id="eventCard">
+        <span class="lanterne" aria-hidden="true"></span>
         <h3 id="eventTitle"></h3>
         <p id="eventText"></p>
         <div id="eventChoices" class="choices"></div>
-        <div class="bar thin"><div id="eventTimer"></div></div>
+        <div class="meche" title="Temps restant pour décider"><div id="eventTimer"></div></div>
       </section>
 
-      <section class="card hidden" id="autoCard">
-        <h3>Automatisation</h3>
+      <section class="card cadre hidden" id="autoCard">
+        <h3>Serviteurs de la maison</h3>
         <div id="promoteRow" class="auto-row">
-          <label class="toggle"><input type="checkbox" id="autoPromote"> Promotion</label>
+          <label class="toggle" title="Promotion automatique des métiers"><input type="checkbox" id="autoPromote"><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-cle"/></svg> Intendant</label>
           <select id="promoteMode">
             <option value="categorie">même catégorie</option>
             <option value="revenu">meilleur revenu</option>
           </select>
         </div>
         <div id="learnRow" class="auto-row">
-          <label class="toggle"><input type="checkbox" id="autoLearn"> Apprentissage</label>
+          <label class="toggle" title="Apprentissage automatique des compétences"><input type="checkbox" id="autoLearn"><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-livre"/></svg> Précepteur</label>
           <select id="learnMode">
             <option value="lowest">plus bas niveau</option>
             <option value="fastest">plus rapide</option>
           </select>
         </div>
         <div id="buyRow" class="auto-row">
-          <label class="toggle"><input type="checkbox" id="autoBuy"> Achats</label>
+          <label class="toggle" title="Achats automatiques en boutique"><input type="checkbox" id="autoBuy"><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-cloche"/></svg> Majordome</label>
           <div class="keep-line small muted">garder <input type="range" id="buyKeep" min="0" max="90" step="5"> <b id="buyKeepText">30 %</b></div>
         </div>
       </section>
     </aside>
 
     <main>
+      <div id="scene" aria-hidden="true"></div>
       <nav class="tabs">
-        <button data-tab="jobs" class="active">Métiers</button>
-        <button data-tab="skills">Compétences</button>
-        <button data-tab="shop">Boutique</button>
-        <button data-tab="legacy">Héritage</button>
-        <button data-tab="challenges">Défis</button>
-        <button data-tab="achievements">Hauts faits</button>
-        <button data-tab="journal">Journal</button>
-        <button data-tab="stats">Statistiques</button>
-        <button data-tab="options">Options</button>
+        <button data-tab="jobs" class="active"><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-marteau"/></svg>Métiers</button>
+        <button data-tab="skills"><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-livre"/></svg>Compétences</button>
+        <button data-tab="shop"><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-revenu"/></svg>Boutique</button>
+        <button data-tab="legacy"><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-lignee"/></svg>Héritage</button>
+        <button data-tab="challenges"><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-etendard"/></svg>Défis</button>
+        <button data-tab="achievements"><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-etoile"/></svg>Hauts faits</button>
+        <button data-tab="journal"><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-parchemin"/></svg>Journal</button>
+        <button data-tab="stats"><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-balance"/></svg>Statistiques</button>
+        <button data-tab="options"><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-cle"/></svg>Options</button>
       </nav>
 
       <section id="tab-jobs" class="tab active"></section>
       <section id="tab-skills" class="tab"></section>
 
       <section id="tab-shop" class="tab">
-        <p class="muted" id="shopSummary"></p>
-        <div id="housingTable"></div>
-        <div id="itemsTable"></div>
+        <div class="bourse cadre-noble">
+          <span class="bourse-titre"><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-balance"/></svg> La bourse de la maison</span>
+          <span class="inscription"><small>Revenus</small><b id="bourseRevenus" class="pos">0</b></span>
+          <span class="brin"></span>
+          <span class="inscription"><small>Dépenses</small><b id="bourseDepenses" class="neg">0</b></span>
+          <span class="brin"></span>
+          <span class="inscription"><small>Il reste</small><b id="bourseReste">0</b></span>
+        </div>
+        <p class="muted hidden" id="shopSummary"></p>
+        <h3 class="boutique-titre">Logis <span>bonheur et coût par jour · cliquez pour emménager</span></h3>
+        <div id="housingTable" class="chemin"></div>
+        <h3 class="boutique-titre">Possessions <span>cliquez pour acheter ou revendre</span></h3>
+        <div id="itemsTable" class="objets"></div>
+        <p class="muted small boutique-note">Ce que vous possédez apparaît dans la scène.</p>
       </section>
 
       <section id="tab-legacy" class="tab">
-        <div class="legacy-head card">
-          <div class="stat"><label>Points</label><b id="lpPoints">0</b></div>
-          <div class="stat"><label>Gain à la transmission</label><b id="lpPreview" class="gold">0</b></div>
-          <div class="reb">
-            <button id="rebirthBtn" class="btn danger">Transmettre l'héritage</button>
-            <span id="rebirthHint" class="muted small"></span>
+        <div class="maison cadre-noble">
+          <div class="maison-infos">
+            <h2 id="maisonNom" class="maison-nom">Maison sans nom</h2>
+            <p id="maisonGen" class="muted"></p>
+            <div class="maison-ins">
+              <span class="inscription"><small><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-lignee"/></svg>Points d'héritage</small><b id="lpPoints">0</b></span>
+              <span class="brin"></span>
+              <span class="inscription"><small><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-etoile"/></svg>Gain à la transmission</small><b id="lpPreview" class="gold">0</b></span>
+              <span class="brin"></span>
+              <span class="inscription"><small><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-age"/></svg>Vies transmises</small><b id="lpVies">0</b></span>
+            </div>
+            <div class="reb">
+              <button id="rebirthBtn" class="btn btn-noble">Transmettre l'héritage</button>
+              <span id="rebirthHint" class="muted small"></span>
+            </div>
           </div>
+          <div id="arbreLignee" class="maison-arbre" aria-hidden="true"></div>
         </div>
-        <p class="muted small">À chaque nouvelle vie, vos meilleurs niveaux deviennent des bonus d'XP permanents.</p>
-        <div id="perkGrid" class="grid-cards"></div>
+        <div class="heritage-cols">
+          <div>
+            <h3>Serviteurs de la maison</h3>
+            <div id="perkGridAuto" class="vertus"></div>
+            <h3>Vertus de la lignée</h3>
+            <div id="perkGrid" class="vertus"></div>
+            <p class="muted small">À chaque nouvelle vie, vos meilleurs niveaux deviennent des bonus d'XP permanents.</p>
+          </div>
+          <aside class="chronique cadre">
+            <h3>Chronique</h3>
+            <ol id="chronique"></ol>
+          </aside>
+        </div>
       </section>
 
       <section id="tab-challenges" class="tab">
+        <h3 class="onglet-titre">Les épreuves</h3>
         <p class="muted small">Un défi termine votre vie (vous gardez vos points) et en commence une nouvelle avec des règles spéciales. Réussissez-le pour un bonus permanent.</p>
-        <div id="challengeGrid" class="grid-cards"></div>
+        <div id="challengeGrid" class="epreuves"></div>
       </section>
 
       <section id="tab-achievements" class="tab">
-        <p class="muted small" id="achCount"></p>
-        <div id="achGrid" class="grid-cards"></div>
+        <h3 class="onglet-titre">Hauts faits</h3>
+        <p class="hf-compte"><b id="achNombre"></b> <span class="muted small" id="achCount"></span></p>
+        <div id="achGrid" class="medailles"></div>
       </section>
 
-      <section id="tab-journal" class="tab"><ul id="journal" class="journal"></ul></section>
+      <section id="tab-journal" class="tab">
+        <h3 class="onglet-titre">Journal</h3>
+        <p class="muted small">Du plus récent au plus ancien.</p>
+        <ol id="journal" class="frise"></ol>
+      </section>
 
-      <section id="tab-stats" class="tab"><div id="statsBox"></div></section>
+      <section id="tab-stats" class="tab">
+        <h3 class="onglet-titre">Registre de la maison</h3>
+        <p class="muted small">Toutes vies confondues.</p>
+        <div id="statsBox" class="registre-maison"></div>
+      </section>
 
       <section id="tab-options" class="tab">
-        <div class="card">
-          <h3>Sauvegarde</h3>
+        <div class="card cadre">
+          <h3><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-parchemin"/></svg> Sauvegarde</h3>
           <div class="row-btns">
             <button id="saveBtn" class="btn">Sauvegarder</button>
             <button id="exportBtn" class="btn">Exporter</button>
@@ -133,18 +210,26 @@
           </div>
           <textarea id="saveText" placeholder="Collez une sauvegarde ici puis cliquez sur Importer"></textarea>
         </div>
-        <div class="card">
-          <h3>Préférences</h3>
+        <div class="card cadre">
+          <h3><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-lignee"/></svg> Lignée</h3>
+          <p class="muted small" id="ligneeInfo"></p>
+          <div class="row-btns maison-ligne">
+            <input id="maisonInput" type="text" maxlength="24" placeholder="Nom de la maison" autocomplete="off">
+            <button id="maisonBtn" class="btn">Nommer la maison</button>
+          </div>
+        </div>
+        <div class="card cadre">
+          <h3><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-sablier"/></svg> Préférences</h3>
           <label class="toggle"><input type="checkbox" id="optOffline"> Progression hors-ligne</label>
           <div class="row-btns"><button id="tutoReplay" class="btn small">Revoir le tutoriel</button></div>
-          <p class="muted small">Espace : pause · 1 à 9 : onglets</p>
+          <p class="muted small raccourcis"><kbd>Espace</kbd> pause · <kbd>1</kbd> à <kbd>9</kbd> onglets</p>
         </div>
       </section>
     </main>
   </div>
 
-  <div id="tuto" class="tuto hidden">
-    <div class="tuto-step muted small" id="tutoStep"></div>
+  <div id="tuto" class="tuto cadre-noble hidden">
+    <div class="tuto-tete"><span class="tuto-step" id="tutoStep"></span><span class="pips tuto-pips" id="tutoPips" aria-hidden="true"></span></div>
     <p id="tutoText"></p>
     <div class="tuto-wait small" id="tutoWait"></div>
     <div class="row-btns">
@@ -153,12 +238,24 @@
     </div>
   </div>
 
-  <div id="modal" class="modal hidden"><div class="modal-box" id="modalBox"></div></div>
+  <div id="accueil" class="accueil hidden" role="dialog" aria-modal="true" aria-label="Lignée — accueil"></div>
+  <div id="rituel" class="rituel hidden" role="dialog" aria-modal="true" aria-label="Naissance et mort"></div>
+  <div id="modal" class="modal hidden"><div class="modal-box cadre-noble" id="modalBox"></div></div>
   <div id="toasts"></div>
 
   <script src="js/data.js"></script>
   <script src="js/game.js"></script>
+  <script src="js/emblemes.js"></script>
   <script src="js/ui.js"></script>
+  <script src="js/lignee.js"></script>
+  <script src="js/accueil.js"></script>
+  <script src="js/rituel.js"></script>
+  <script src="js/heritage.js"></script>
+  <script src="js/sante.js"></script>
+  <script src="js/saisons.js"></script>
+  <script src="js/ambiance.js"></script>
+  <script src="js/scene.js"></script>
   <script>main();</script>
+  <script src="js/debug.js"></script>
 </body>
 </html>

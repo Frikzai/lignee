@@ -10,6 +10,40 @@ function el(tag, cls, text) {
   if (text != null) e.textContent = text;
   return e;
 }
+// Icône du sprite img/icones.svg (style gravé au trait, couleur = currentColor).
+const ICONES = 'img/icones.svg';
+const LOGIS = 'img/logis.svg';
+function icone(nom, cls = '') {
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('class', cls ? 'icone ' + cls : 'icone');
+  svg.setAttribute('aria-hidden', 'true');
+  const use = document.createElementNS(NS, 'use');
+  use.setAttribute('href', `${ICONES}#i-${nom}`);
+  svg.appendChild(use);
+  return svg;
+}
+
+// Registre de déclarations des modules : avant demarrer(), on mémorise ; après, on rend tout de suite.
+// Un id redéclaré remplace l'ancien (le rendu remplace alors l'élément affiché).
+function creerRegistre(rendre) {
+  const defs = new Map();
+  let demarre = false;
+  return {
+    ajouter(def) {
+      if (!def || !def.id) throw new Error('UI : une déclaration doit avoir un id');
+      defs.set(def.id, def);
+      if (demarre) rendre(def);
+    },
+    demarrer() { demarre = true; for (const d of defs.values()) rendre(d); },
+    liste: () => [...defs.values()],
+  };
+}
+const valeur = v => (typeof v === 'function' ? v() : v);
+// Texte venu d'une sauvegarde (prénoms, nom de maison) inséré dans du HTML.
+const echapper = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const TONS = { bon: 'var(--good)', moyen: 'var(--accent)', mauvais: 'var(--bad)' };
+
 // Barre de progression : quand un niveau est franchi entre deux rafraîchissements,
 // on la remplit jusqu'au bout avant de repartir de zéro (sans animation à l'envers).
 function setProgress(bar, level, pct) {
@@ -67,6 +101,7 @@ const UI = {
   jobRows: {}, skillRows: {}, catParts: {},
   housingRows: {}, itemRows: {}, perkCards: {}, achCards: {}, challengeCards: {},
   eventUid: null, logKey: null, modalKind: null, tutoShown: null, focusEls: [],
+  vues: new Map(), alertes: {},
 
   init() {
     this.jobRows = this.buildTables('tab-jobs', JOB_CATS, JOBS, 'job', ['', 'Niveau', 'Revenu / jour', 'Prochain niveau']);
@@ -76,6 +111,9 @@ const UI = {
     this.buildChallenges();
     this.buildAchievements();
     this.bind();
+    this.ressources.demarrer();
+    this.jauges.demarrer();
+    this.marques.demarrer();
     this.ready = true;
     this.update();
   },
@@ -90,8 +128,8 @@ const UI = {
       const table = el('table', 'grid');
       const hr = el('tr');
       cols.forEach((c, i) => {
-        const th = el('th', null, i === 0 ? cat.name : c);
-        if (i === 0) th.style.color = cat.color;
+        const th = el('th', null, i === 0 ? null : c);
+        if (i === 0) { th.style.color = cat.color; th.append(icone(ICONES_CATEGORIES[catId] || 'etoile'), cat.name); }
         hr.appendChild(th);
       });
       const thead = el('thead'); thead.appendChild(hr); table.appendChild(thead);
@@ -100,10 +138,12 @@ const UI = {
         const tr = el('tr', 'row');
         tr.title = e.desc || '';
         const nameTd = el('td', 'name-cell');
-        const bar = el('div', 'row-bar'); bar.style.background = cat.color;
+        const bar = el('div', 'row-bar'); bar.style.background = bar.style.color = cat.color;
         const badge = el('span', 'legacy-badge');
         badge.title = 'Bonus d\'héritage (meilleur niveau des vies passées)';
-        nameTd.append(bar, el('span', 'row-name', e.name), badge);
+        const pastille = el('span', 'pastille');
+        pastille.append(icone((kind === 'job' ? ICONES_METIERS : ICONES_COMPETENCES)[e.id] || 'etoile'));
+        nameTd.append(bar, pastille, el('span', 'row-name', e.name), badge);
         tr.appendChild(nameTd);
         const cells = [];
         for (let i = 1; i < cols.length; i++) { const td = el('td'); tr.appendChild(td); cells.push(td); }
@@ -117,83 +157,102 @@ const UI = {
       const lock = el('tr', 'lock-row');
       const ltd = el('td'); ltd.colSpan = cols.length; lock.appendChild(ltd);
       tbody.appendChild(lock);
-      const wrap = el('div', 'table-wrap'); wrap.appendChild(table);
+      const wrap = el('div', 'table-wrap cadre'); wrap.appendChild(table);
       root.appendChild(wrap);
       this.catParts[kind + ':' + catId] = { thead, wrap, lockTr: lock, lockTd: ltd, cat };
     }
     return rows;
   },
 
+  // Boutique : le chemin des logis (silhouettes de img/logis.svg) et les possessions en cartes à emblème
   buildShop() {
-    const mk = (rootId, cols) => {
-      const table = el('table', 'grid');
-      const hr = el('tr');
-      cols.forEach(c => hr.appendChild(el('th', null, c)));
-      const thead = el('thead'); thead.appendChild(hr); table.appendChild(thead);
-      const tbody = el('tbody'); table.appendChild(tbody);
-      const wrap = el('div', 'table-wrap'); wrap.appendChild(table);
-      $(rootId).appendChild(wrap);
-      return tbody;
-    };
-    const hb = mk('housingTable', ['Logement', 'Bonheur', 'Coût / jour']);
+    const NS = 'http://www.w3.org/2000/svg';
     for (const h of HOUSING) {
-      const tr = el('tr', 'row');
-      const cells = [el('td', 'name-cell', h.name), el('td', null, '×' + fmtMult(h.happiness)), el('td')];
-      tr.append(...cells);
-      tr.addEventListener('click', () => { setHousing(h.id); this.update(); });
-      hb.appendChild(tr);
-      this.housingRows[h.id] = { tr, cells };
+      const carte = el('button', 'carte-logis');
+      carte.type = 'button';
+      const svg = document.createElementNS(NS, 'svg'), use = document.createElementNS(NS, 'use');
+      svg.setAttribute('class', 'sil'); svg.setAttribute('viewBox', '0 0 120 64'); svg.setAttribute('aria-hidden', 'true');
+      use.setAttribute('href', `${LOGIS}#l-${h.id}`);
+      svg.append(use);
+      const nom = el('span', 'l-nom'), info = el('span', 'l-info'), marques = el('span', 'l-marques');
+      carte.append(el('span', 'l-badge', 'Votre logis'), svg, nom, info, marques);
+      carte.addEventListener('click', () => { setHousing(h.id); this.update(); });
+      $('housingTable').append(carte);
+      this.housingRows[h.id] = { carte, nom, info, marques };
     }
-    const ib = mk('itemsTable', ['Possession', 'Effet', 'Coût / jour']);
     for (const it of ITEMS) {
-      const tr = el('tr', 'row');
-      const cells = [el('td', 'name-cell', it.name), el('td', null, it.effects.map(e => describeEffect(e)).join(', ')), el('td')];
-      tr.append(...cells);
-      tr.addEventListener('click', () => { toggleItem(it.id); this.update(); });
-      ib.appendChild(tr);
-      this.itemRows[it.id] = { tr, cells };
+      const carte = el('button', 'carte-objet');
+      carte.type = 'button';
+      const emb = el('span', 'o-emb');
+      emb.append(icone(ICONES_OBJETS[it.id] || 'etoile'));
+      const corps = el('span', 'o-corps'), tete = el('span', 'o-tete'), marques = el('span', 'o-marques'), prix = el('span', 'o-prix');
+      tete.append(el('b', null, it.name), marques);
+      corps.append(tete, el('span', 'o-eff', it.effects.map(e => describeEffect(e)).join(', ')), prix);
+      carte.append(emb, corps);
+      carte.addEventListener('click', () => { toggleItem(it.id); this.update(); });
+      $('itemsTable').append(carte);
+      this.itemRows[it.id] = { carte, prix, marques };
     }
   },
 
+  // Talents : « serviteurs de la maison » (automatisation) et « vertus de la lignée », emblème et rangs en lanternes
   buildPerks() {
-    const grid = $('perkGrid');
     for (const p of PERKS) {
-      const card = el('div', 'perk card' + (p.setting ? ' auto' : ''));
+      const card = el('div', 'perk vertu cadre' + (p.setting ? ' auto' : ''));
+      const emb = el('span', 'v-emb');
+      emb.append(icone((typeof EMBLEMES_TALENTS !== 'undefined' && EMBLEMES_TALENTS[p.id]) || 'etoile'));
       const rank = el('span', 'rank');
-      const head = el('div', 'perk-head'); head.append(el('h4', null, p.name), rank);
+      const head = el('div', 'perk-head'); head.append(emb, el('h4', null, p.name), rank);
       const btn = el('button', 'btn small');
       btn.addEventListener('click', () => { buyPerk(p.id); this.update(); });
-      card.append(head, el('p', 'muted small', p.desc), btn);
-      grid.appendChild(card);
-      this.perkCards[p.id] = { card, rank, btn };
+      card.append(head, el('p', 'muted small', p.desc));
+      let pips = null;
+      if (p.max > 1) {
+        pips = el('div', 'pips');
+        for (let k = 0; k < p.max; k++) pips.append(el('i'));
+        card.append(pips);
+      }
+      card.append(btn);
+      $(p.setting ? 'perkGridAuto' : 'perkGrid').appendChild(card);
+      this.perkCards[p.id] = { card, rank, btn, pips };
     }
   },
 
+  // Défis : « les épreuves », un sceau de cire sur celles qu'on a réussies
   buildChallenges() {
     const grid = $('challengeGrid');
     for (const c of CHALLENGES) {
-      const card = el('div', 'challenge card');
-      const status = el('span', 'rank');
-      const head = el('div', 'perk-head'); head.append(el('h4', null, c.name), status);
+      const card = el('div', 'epreuve cadre');
+      const sceau = el('span', 'sceau');
+      sceau.title = 'Défi réussi';
+      sceau.append(icone('acquis'));
+      const emb = el('span', 'e-emb');
+      emb.append(icone(ICONES_DEFIS[c.id] || 'etendard'));
+      const tete = el('div', 'e-tete');
+      tete.append(emb, el('h4', null, c.name));
+      const ligne = (nom, texte, cls) => {
+        const d = el('div', 'e-ligne' + (cls ? ' ' + cls : ''));
+        d.append(icone(nom), el('span', null, texte));
+        return d;
+      };
       const btn = el('button', 'btn small');
       btn.addEventListener('click', () => this.confirm(`Commencer le défi « ${c.name} » ?`,
         `Votre vie actuelle s'achève (+${legacyPointsPreview()} point(s) d'héritage) et une nouvelle commence.<br><br><b>Règles :</b> ${c.rules}<br><b>Objectif :</b> ${c.goalText}`,
         () => startChallenge(c.id)));
-      card.append(head,
-        el('p', 'small', c.rules),
-        el('p', 'small muted', 'Objectif : ' + c.goalText),
-        el('p', 'small gold', c.rewardText),
-        btn);
+      card.append(sceau, tete, ligne('cadenas', c.rules), ligne('etendard', 'Objectif : ' + c.goalText), ligne('etoile', c.rewardText, 'gold'), btn);
       grid.appendChild(card);
-      this.challengeCards[c.id] = { card, status, btn };
+      this.challengeCards[c.id] = { card, btn };
     }
   },
 
+  // Hauts faits : une médaille gravée par haut fait, en empreinte tant qu'il n'est pas obtenu
   buildAchievements() {
     const grid = $('achGrid');
     for (const a of ACHIEVEMENTS) {
-      const card = el('div', 'ach card');
-      card.append(el('h4', null, a.name), el('p', 'muted small', a.desc));
+      const card = el('div', 'medaille');
+      const rond = el('span', 'm-rond');
+      rond.append(icone(ICONES_HAUTS_FAITS[a.id] || 'etoile'));
+      card.append(rond, el('span', 'm-nom', a.name), el('span', 'm-desc', a.desc));
       grid.appendChild(card);
       this.achCards[a.id] = card;
     }
@@ -229,6 +288,7 @@ const UI = {
       this.confirm('Abandonner le défi ?', 'Les règles du défi sont levées, mais vous n\'obtiendrez pas la récompense.', () => abandonChallenge()));
     $('rebirthBtn').addEventListener('click', () => {
       if (ageYears() < 30) return;
+      if (typeof Rituel !== 'undefined') return Rituel.fin(false);
       this.confirm('Transmettre l\'héritage maintenant ?',
         `Votre vie actuelle s'achève et vous gagnez <b>${legacyPointsPreview()}</b> point(s) d'héritage.`,
         () => rebirth());
@@ -252,6 +312,13 @@ const UI = {
       try { importSave($('saveText').value); location.reload(); }
       catch (e) { this.toast('Sauvegarde invalide.', 'bad'); }
     });
+    const nommer = () => {
+      const n = Lignee.nommer($('maisonInput').value);
+      if (n) { $('maisonInput').value = ''; this.toast(`La maison ${n} est fondée.`, 'gold'); this.update(); }
+      else this.toast('Ce nom ne convient pas.', 'bad');
+    };
+    $('maisonBtn').addEventListener('click', nommer);
+    $('maisonInput').addEventListener('keydown', e => { if (e.key === 'Enter') nommer(); });
     $('resetBtn').addEventListener('click', () =>
       this.confirm('Tout effacer ?', 'Votre lignée entière, vos talents et vos hauts faits seront perdus. Action irréversible.', () => hardReset()));
   },
@@ -269,6 +336,8 @@ const UI = {
     this.updateTop();
     this.updateTabs();
     this.updateSidebar();
+    this.majModules();
+    for (const f of HOOKS.ui) f();
     switch (this.tab) {
       case 'jobs': this.updateJobs(); break;
       case 'skills': this.updateSkills(); break;
@@ -278,9 +347,13 @@ const UI = {
       case 'achievements': this.updateAchievements(); break;
       case 'stats': this.updateStats(); break;
       case 'journal': this.updateJournal(); break;
+      case 'options': this.updateOptions(); break;
     }
-    if (G.dead) { if (this.modalKind !== 'death') this.showDeath(); }
-    else if (G.pendingTraits && !this.modalKind) this.showTraits();
+    // naissance et mort : écrans plein écran du rituel (js/rituel.js), sinon les anciennes fenêtres
+    if (typeof Rituel !== 'undefined') Rituel.verifier();
+    else if (G.dead) { if (this.modalKind !== 'death') this.showDeath(); }
+    // la naissance attend que l'écran d'accueil soit refermé
+    else if (G.pendingTraits && !this.modalKind && !(typeof Accueil !== 'undefined' && Accueil.ouvert)) this.showTraits();
     this.updateTuto();
   },
 
@@ -301,6 +374,10 @@ const UI = {
 
   updateTop() {
     const life = lifespanYears();
+    if (G.lignee && typeof nomComplet === 'function') {
+      const nom = nomComplet(G.lignee);
+      if ($('identite').textContent !== nom) $('identite').textContent = nom;
+    }
     $('ageText').textContent = fmtAge(G.days);
     $('lifeText').textContent = `${Math.floor(life)} ans`;
     const pct = Math.min(100, ageYears() / life * 100);
@@ -311,23 +388,41 @@ const UI = {
     $('netText').textContent = (net >= 0 ? '+' : '') + fmt(net);
     $('netText').className = net >= 0 ? 'pos' : 'neg';
     $('happyText').textContent = '×' + fmtMult(happiness());
-    $('pauseBtn').textContent = G.paused ? '▶ Reprendre' : '⏸ Pause';
+    const pb = $('pauseBtn');
+    if (pb._enPause !== G.paused) {
+      pb._enPause = G.paused;
+      pb.replaceChildren(icone(G.paused ? 'reprendre' : 'pause'), G.paused ? 'Reprendre' : 'Pause');
+    }
     $('pauseBtn').classList.toggle('paused', G.paused);
     document.body.classList.toggle('is-paused', G.paused);
   },
 
   updateSidebar() {
-    const tr = currentTrait();
-    $('traitLine').classList.toggle('hidden', !tr);
-    if (tr) { $('traitLine').textContent = tr.name; $('traitLine').title = tr.desc; }
+    // Portrait : nom, âge, génération, trait de naissance gravé
+    if (G.lignee && typeof nomComplet === 'function') {
+      const l = G.lignee, gen = l.oublies + l.vies.length + 1;
+      const nom = nomComplet(l), sous = `${Math.floor(ageYears())} ans · génération ${typeof romain === 'function' ? romain(gen) : gen}`;
+      if ($('portraitNom').textContent !== nom) $('portraitNom').textContent = nom;
+      if ($('portraitSous').textContent !== sous) $('portraitSous').textContent = sous;
+    }
+    const tr = currentTrait(), badge = $('traitLine');
+    badge.classList.toggle('hidden', !tr);
+    if (tr && badge._id !== tr.id) {
+      badge._id = tr.id;
+      const d = typeof DESTINS !== 'undefined' && DESTINS[tr.id];
+      badge.replaceChildren(icone(d ? d.embleme : 'etoile'), tr.name);
+      badge.title = tr.desc;
+    }
 
     const j = JOB_BY_ID[G.currentJob], je = G.jobs[j.id];
+    this.medaillon($('curJobMed'), ICONES_METIERS[j.id]);
     $('curJobName').textContent = `${j.name} ${je.level}`;
     $('curJobInfo').textContent = `${fmt(jobIncome(j))} écus/j`;
     setProgress($('curJobFill'), je.level, je.xp / maxXp(j.xp, je.level) * 100);
     $('curJobFill').style.background = JOB_CATS[j.cat].color;
 
     const s = SKILL_BY_ID[G.currentSkill], se = G.skills[s.id];
+    this.medaillon($('curSkillMed'), ICONES_COMPETENCES[s.id]);
     $('curSkillName').textContent = `${s.name} ${se.level}`;
     $('curSkillInfo').textContent = s.effects.map(e => describeEffect(e, se.level)).join(', ');
     setProgress($('curSkillFill'), se.level, se.xp / maxXp(s.xp, se.level) * 100);
@@ -347,7 +442,9 @@ const UI = {
     }
     const bl = $('buffs'); bl.innerHTML = '';
     for (const b of G.buffs) {
-      bl.appendChild(el('li', null, `${b.name} : ×${fmtMult(b.mult)} ${STAT_LABELS[b.stat]} (${Math.ceil(b.until - G.days)} j)`));
+      const li = el('li', 'buff');
+      li.append(icone(iconeStat(b.stat)), `${b.name} : ×${fmtMult(b.mult)} ${STAT_LABELS[b.stat]} · ${Math.ceil(b.until - G.days)} j`);
+      bl.appendChild(li);
     }
 
     // Événement
@@ -391,6 +488,13 @@ const UI = {
     $('buyKeepText').textContent = G.settings.buyKeep + ' %';
   },
 
+  // médaillon d'occupation : l'icône ne change qu'avec le métier ou la compétence
+  medaillon(box, nom) {
+    if (box._nom === nom) return;
+    box._nom = nom;
+    box.replaceChildren(icone(nom || 'etoile'));
+  },
+
   updateEntityRows(kind, list, cats, rows, state, xpPerDay, col2) {
     const firstLocked = {}, anyUnlocked = {};
     for (const e of list) {
@@ -420,11 +524,16 @@ const UI = {
       P.lockTr.style.display = '';
       P.lockTd.innerHTML = '';
       if (!anyUnlocked[cat]) {
-        const n = el('b', 'lock-cat', P.cat.name); n.style.color = P.cat.color;
+        const n = el('b', 'lock-cat'); n.style.color = P.cat.color;
+        n.append(icone(ICONES_CATEGORIES[cat] || 'etoile'), P.cat.name);
         P.lockTd.appendChild(n);
       }
-      if (forbidden) { P.lockTd.appendChild(el('span', 'lock-title', '⛔ interdit par le défi')); continue; }
-      P.lockTd.appendChild(el('span', 'lock-title', `🔒 ${e.name}`));
+      if (forbidden) {
+        const t = el('span', 'lock-title'); t.append(icone('interdit'), ' interdit par le défi');
+        P.lockTd.appendChild(t); continue;
+      }
+      const t = el('span', 'lock-title'); t.append(icone('cadenas'), ' ' + e.name);
+      P.lockTd.appendChild(t);
       for (const r of e.req) {
         const p = reqProgress(r);
         P.lockTd.appendChild(el('span', p.cur >= p.need ? 'req ok' : 'req', `${p.label} ${Math.min(p.cur, p.need)}/${p.need}`));
@@ -440,27 +549,42 @@ const UI = {
   },
 
   updateShop() {
-    const em = getMult('expenses'), net = netIncome();
+    const em = getMult('expenses'), net = netIncome(), dep = expenses(), ferme = isForbidden('shop');
+    $('bourseRevenus').textContent = '+' + fmt(income()) + ' /j';
+    $('bourseDepenses').textContent = (dep > 0 ? '−' + fmt(dep) : '0') + ' /j';
+    $('bourseReste').textContent = (net >= 0 ? '+' : '−') + fmt(Math.abs(net)) + ' /j';
+    $('bourseReste').className = net >= 0 ? 'pos' : 'neg';
+    $('shopSummary').textContent = ferme ? 'Défi Ascète : la boutique est fermée.' : '';
+    $('shopSummary').classList.toggle('hidden', !ferme);
+
     const curH = HOUSING_BY_ID[G.housing];
     for (const h of HOUSING) {
-      const r = this.housingRows[h.id];
-      r.tr.style.display = G.unlocked['shop:' + h.id] ? '' : 'none';
-      const active = G.housing === h.id;
-      r.tr.classList.toggle('selected', active);
-      r.cells[2].textContent = fmt(h.cost * em);
-      r.tr.classList.toggle('unaffordable', !active && net + (curH.cost - h.cost) * em < 0);
+      const r = this.housingRows[h.id], ouvert = !!G.unlocked['shop:' + h.id], actuel = G.housing === h.id;
+      r.carte.classList.toggle('verrou', !ouvert);
+      r.carte.classList.toggle('actuel', actuel);
+      r.carte.classList.toggle('cher', ouvert && !actuel && net + (curH.cost - h.cost) * em < 0);
+      r.carte.disabled = !ouvert || ferme;
+      r.carte.setAttribute('aria-pressed', actuel);
+      // un logis pas encore débloqué ne montre que sa silhouette
+      const texte = ouvert ? `×${fmtMult(h.happiness)} · ${fmt(h.cost * em)}/j` : 'à découvrir';
+      if (r._ouvert !== ouvert) {
+        r._ouvert = ouvert;
+        r.nom.textContent = ouvert ? h.name : '???';
+        r.info.replaceChildren(icone(ouvert ? 'bonheur' : 'cadenas'), el('span'));
+      }
+      if (r.info.lastChild.textContent !== texte) r.info.lastChild.textContent = texte;
     }
     for (const it of ITEMS) {
-      const r = this.itemRows[it.id];
-      r.tr.style.display = G.unlocked['shop:' + it.id] ? '' : 'none';
-      const owned = !!G.items[it.id];
-      r.tr.classList.toggle('selected', owned);
-      r.cells[2].textContent = fmt(it.cost * em);
-      r.tr.classList.toggle('unaffordable', !owned && net - it.cost * em < 0);
+      const r = this.itemRows[it.id], pris = !!G.items[it.id];
+      r.carte.classList.toggle('hidden', !G.unlocked['shop:' + it.id]);
+      r.carte.classList.toggle('pris', pris);
+      r.carte.classList.toggle('cher', !pris && net - it.cost * em < 0);
+      r.carte.disabled = ferme;
+      r.carte.setAttribute('aria-pressed', pris);
+      const texte = pris ? `Possédé · ${fmt(it.cost * em)}/j` : `${fmt(it.cost * em)} / jour`;
+      if (r._pris !== pris) { r._pris = pris; r.prix.replaceChildren(icone(pris ? 'acquis' : 'ecus'), el('span')); }
+      if (r.prix.lastChild.textContent !== texte) r.prix.lastChild.textContent = texte;
     }
-    $('shopSummary').textContent = isForbidden('shop')
-      ? 'Défi Ascète : la boutique est fermée.'
-      : `Dépenses : ${fmt(expenses())} écus/jour · cliquez pour acheter ou revendre`;
   },
 
   updateLegacy() {
@@ -471,11 +595,14 @@ const UI = {
     $('rebirthHint').textContent = canReb ? '' : 'Possible dès 30 ans.';
     for (const p of PERKS) {
       const c = this.perkCards[p.id], r = perkRank(p.id), cost = perkCost(p);
-      c.rank.textContent = p.max > 1 ? `${r} / ${p.max}` : (r ? '✔' : '');
+      if (p.max > 1) c.rank.textContent = `${r} / ${p.max}`;
+      if (c.pips && c._r !== r) { c._r = r; [...c.pips.children].forEach((pip, k) => pip.classList.toggle('on', k < r)); }
+      else if (c.rank._acquis !== !!r) { c.rank._acquis = !!r; c.rank.replaceChildren(...(r ? [icone('acquis')] : [])); }
       if (r >= p.max) { c.btn.textContent = p.max > 1 ? 'Maximum' : 'Acquis'; c.btn.disabled = true; }
-      else { c.btn.textContent = `Acheter — ${cost} pt${cost > 1 ? 's' : ''}`; c.btn.disabled = G.legacy.points < cost; }
+      else { c.btn.textContent = `Accorder — ${cost} pt${cost > 1 ? 's' : ''}`; c.btn.disabled = G.legacy.points < cost; }
       c.card.classList.toggle('owned', r > 0);
     }
+    if (typeof Heritage !== 'undefined') Heritage.maj();
   },
 
   updateChallenges() {
@@ -484,8 +611,7 @@ const UI = {
       const done = !!G.challengesDone[c.id], active = G.challenge === c.id;
       r.card.classList.toggle('done', done);
       r.card.classList.toggle('active', active);
-      r.status.textContent = done ? '★' : '';
-      r.btn.textContent = done ? 'Réussi' : active ? 'En cours…' : 'Commencer';
+      r.btn.textContent = done ? 'Réussi' : active ? 'En cours…' : 'Relever le défi';
       r.btn.disabled = done || active || G.dead;
     }
   },
@@ -497,46 +623,147 @@ const UI = {
       if (got) n++;
       this.achCards[a.id].classList.toggle('unlocked', got);
     }
-    $('achCount').textContent = `${n} / ${ACHIEVEMENTS.length} — chaque haut fait donne +2 % d'XP.`;
+    $('achNombre').textContent = `${n} / ${ACHIEVEMENTS.length}`;
+    $('achCount').textContent = `· +${2 * Object.keys(G.achievements).length} % d'XP, pour toujours`;
   },
 
+  // Registre de la maison : de grands chiffres gravés, construits une fois
   updateStats() {
     const rows = [
-      ['Vies transmises', G.legacy.rebirths],
-      ['Meilleur âge atteint', `${Math.floor(Math.max(G.stats.bestAge, ageYears()))} ans`],
-      ['Écus gagnés (toutes vies)', fmt(G.stats.coinsEarned)],
-      ['Événements vécus', G.stats.events],
-      ['Défis réussis', `${Object.keys(G.challengesDone).length} / ${CHALLENGES.length}`],
-      ['Multiplicateur XP global', '×' + fmtMult(getMult('xp:all'))],
+      ['lignee', 'Vies transmises', G.legacy.rebirths],
+      ['sablier', 'Meilleur âge atteint', `${Math.floor(Math.max(G.stats.bestAge, ageYears()))} ans`],
+      ['ecus', 'Écus gagnés', fmt(G.stats.coinsEarned)],
+      ['parchemin', 'Événements vécus', G.stats.events],
+      ['etendard', 'Défis réussis', `${Object.keys(G.challengesDone).length} / ${CHALLENGES.length}`],
+      ['etoile', 'Multiplicateur d\'XP', '×' + fmtMult(getMult('xp:all'))],
     ];
-    const box = $('statsBox'); box.innerHTML = '';
-    const t = el('table', 'grid stats');
-    const tb = el('tbody');
-    for (const [k, v] of rows) {
-      const tr = el('tr'); tr.append(el('td', null, k), el('td', 'num', String(v))); tb.appendChild(tr);
+    if (!this.statVals) {
+      this.statVals = rows.map(([nom, libelle]) => {
+        const carte = el('div', 'stat-carte cadre'), small = el('small'), b = el('b');
+        small.append(icone(nom), libelle);
+        carte.append(small, b);
+        $('statsBox').append(carte);
+        return b;
+      });
     }
-    t.appendChild(tb);
-    const wrap = el('div', 'table-wrap'); wrap.appendChild(t);
-    box.appendChild(wrap);
+    rows.forEach(([, , v], i) => { if (this.statVals[i].textContent !== String(v)) this.statVals[i].textContent = v; });
   },
 
+  updateOptions() {
+    const l = G.lignee;
+    if (!l) return;
+    const gen = l.oublies + l.vies.length + 1;
+    const txt = `${l.maison ? 'Maison ' + l.maison : 'Maison sans nom'} · génération ${typeof romain === 'function' ? romain(gen) : gen} · ${nomComplet(l)}`;
+    if ($('ligneeInfo').textContent !== txt) $('ligneeInfo').textContent = txt;
+  },
+
+  // Journal : une frise, regroupée par âge, une icône par type d'entrée
   updateJournal() {
     const key = G.log.length + ':' + (G.log[0] ? G.log[0].msg : '');
     if (key === this.logKey) return;
     this.logKey = key;
-    const ul = $('journal'); ul.innerHTML = '';
+    const ol = $('journal');
+    ol.replaceChildren();
+    let age = null;
     for (const l of G.log) {
-      const li = el('li', l.type || '');
-      li.append(el('span', 'log-age', `${l.age} ans`), el('span', null, l.msg));
-      ul.appendChild(li);
+      if (l.age !== age) {
+        age = l.age;
+        const t = el('li', 'f-age');
+        t.append(el('span', 'f-point'), `${age} ans`);
+        ol.appendChild(t);
+      }
+      const li = el('li', 'f-entree ' + (l.type || ''));
+      li.append(icone(iconeJournal(l.type)), el('span', null, l.msg));
+      ol.appendChild(li);
     }
-    if (!G.log.length) ul.appendChild(el('li', 'muted', 'Rien à signaler pour l\'instant.'));
+    if (!G.log.length) ol.appendChild(el('li', 'muted', 'Rien à signaler pour l\'instant.'));
+  },
+
+  // ------------------------------------------------- API pour les modules
+  // Les modules (santé, saisons…) déclarent ce qu'ils veulent afficher ; le rendu reste ici.
+  ajouterRessource(def) { this.ressources.ajouter(def); },
+  ajouterJauge(def) { this.jauges.ajouter(def); },
+  ajouterMarque(def) { this.marques.ajouter({ ...def, id: `${def.cible}:${def.id}:${def.icone}`, cibleId: def.id }); },
+
+  rendreRessource(d) {
+    const box = $('ressources-modules');
+    const ancienne = this.vues.get('r:' + d.id);
+    const n = el('span', 'ressource-module');
+    const ins = el('span', 'inscription'), small = el('small'), lib = el('span'), b = el('b');
+    small.append(el('span'), lib);   // le premier enfant sera l'icône
+    ins.append(small, b);
+    n.append(el('span', 'brin'), ins);
+    if (ancienne) ancienne.n.replaceWith(n); else box.appendChild(n);
+    this.vues.set('r:' + d.id, { n, small, lib, b, icone: null });
+    this.majRessource(d);
+  },
+  majRessource(d) {
+    const v = this.vues.get('r:' + d.id);
+    const nom = valeur(d.icone);
+    if (nom !== v.icone) { v.icone = nom; v.small.firstChild.replaceWith(icone(nom)); }
+    v.lib.textContent = valeur(d.libelle);
+    v.b.textContent = valeur(d.valeur);
+    v.n.title = d.titre ? valeur(d.titre) : '';
+    const ton = d.ton ? valeur(d.ton) : null;
+    v.b.className = ton === 'bon' ? 'pos' : ton === 'mauvais' ? 'neg' : '';
+  },
+
+  rendreJauge(d) {
+    const box = $('jauges');
+    const ancienne = this.vues.get('j:' + d.id);
+    const n = el('div', 'jauge');
+    const tete = el('div', 'now-head'), nom = el('span'), texte = el('span', 'muted small');
+    nom.append(icone(valeur(d.icone)), ' ', valeur(d.libelle));
+    tete.append(nom, texte);
+    const bar = el('div', 'bar'), fill = el('div');
+    bar.appendChild(fill);
+    const info = el('div', 'muted small');
+    n.append(tete, bar, info);
+    if (ancienne) ancienne.n.replaceWith(n); else box.appendChild(n);
+    this.vues.set('j:' + d.id, { n, texte, fill, info });
+    this.majJauge(d);
+  },
+  majJauge(d) {
+    const v = this.vues.get('j:' + d.id), e = d.etat();
+    v.texte.textContent = e.texte || '';
+    v.fill.style.width = Math.max(0, Math.min(100, e.pct)) + '%';
+    v.fill.style.background = TONS[e.ton] || TONS.moyen;
+    v.info.textContent = e.info || '';
+    v.n.title = e.titre || '';
+  },
+
+  rendreMarque(d) {
+    const cellule = {
+      job: () => this.jobRows[d.cibleId] && this.jobRows[d.cibleId].tr.firstChild,
+      housing: () => this.housingRows[d.cibleId] && this.housingRows[d.cibleId].marques,
+      item: () => this.itemRows[d.cibleId] && this.itemRows[d.cibleId].marques,
+    }[d.cible];
+    const cell = cellule && cellule();
+    if (!cell) { console.warn(`[UI] marque « ${d.id} » : cible introuvable`); return; }
+    for (const m of cell.querySelectorAll('.marque')) if (m.dataset.cle === d.id) m.remove();
+    const m = el('span', 'marque marque-' + (d.ton || 'bon'));
+    m.dataset.cle = d.id;
+    m.title = d.titre || '';
+    for (let i = 0; i < (d.nombre || 1); i++) m.appendChild(icone(d.icone));
+    if (d.texte) m.append(' ' + d.texte);
+    cell.appendChild(m);
+  },
+
+  // Une valeur de module qui plante ne doit pas arrêter l'interface : on prévient une fois et on continue.
+  protege(d, f) {
+    try { f(d); } catch (e) {
+      if (!this.alertes[d.id]) { this.alertes[d.id] = true; console.warn(`[UI] « ${d.id} » :`, e); }
+    }
+  },
+  majModules() {
+    for (const d of this.ressources.liste()) if (this.vues.has('r:' + d.id)) this.protege(d, x => this.majRessource(x));
+    for (const d of this.jauges.liste()) if (this.vues.has('j:' + d.id)) this.protege(d, x => this.majJauge(x));
   },
 
   // ------------------------------------------------------------- Tutoriel
   updateTuto() {
     const box = $('tuto');
-    if (G.tutorial < 0 || G.tutorial >= TUTO.length || this.modalKind || G.dead) {
+    if (G.tutorial < 0 || G.tutorial >= TUTO.length || this.modalKind || G.dead || (typeof Rituel !== 'undefined' && Rituel.phase)) {
       box.classList.add('hidden');
       this.setFocus(null);
       this.tutoShown = null;
@@ -550,7 +777,9 @@ const UI = {
     box.classList.remove('hidden');
     if (this.tutoShown !== G.tutorial) {
       this.tutoShown = G.tutorial;
-      $('tutoStep').textContent = `Tutoriel ${G.tutorial + 1} / ${TUTO.length}`;
+      $('tutoStep').textContent = `Tutoriel · ${G.tutorial + 1} / ${TUTO.length}`;
+      // une petite lanterne par étape : allumées jusqu'à l'étape en cours
+      $('tutoPips').replaceChildren(...TUTO.map((_, i) => el('i', i < G.tutorial ? 'fait' : i === G.tutorial ? 'en-cours' : null)));
       $('tutoText').textContent = st.text;
       $('tutoWait').textContent = st.wait ? st.waitText : '';
       $('tutoNext').textContent = G.tutorial === TUTO.length - 1 ? 'Terminer' : 'Suivant';
@@ -569,6 +798,7 @@ const UI = {
     this.modalKind = kind;
     const box = $('modalBox');
     box.innerHTML = html;
+    box.prepend(el('span', 'lanterne'));
     if (buttons.length) {
       const row = el('div', 'row-btns');
       for (const b of buttons) {
@@ -593,7 +823,7 @@ const UI = {
     const pts = legacyPointsPreview();
     this.openModal('death', `
       <h2>Fin d'une vie</h2>
-      <p>Vous vous éteignez à <b>${Math.floor(ageYears())} ans</b>.</p>
+      <p>${G.lignee ? `<b>${echapper(G.lignee.courante.prenom)}</b> s'éteint` : 'Vous vous éteignez'} à <b>${Math.floor(ageYears())} ans</b>.</p>
       <p>Vous transmettez <b class="gold">${pts} point(s) d'héritage</b>, et vos niveaux deviennent des bonus d'XP pour la suite.</p>`,
       [{ label: 'Commencer une nouvelle vie', cls: 'primary', run: () => { rebirth(); this.setTab('legacy'); } }]);
   },
@@ -618,11 +848,18 @@ const UI = {
       [{ label: 'Continuer', cls: 'primary' }]);
   },
 
+  // Notification : cartouche gravé, une icône par type (les mêmes que le journal)
   toast(msg, type) {
-    const t = el('div', 'toast ' + (type || ''), msg);
+    const t = el('div', 'toast ' + (type || ''));
+    t.append(icone(typeof iconeJournal === 'function' ? iconeJournal(type) : 'etoile'), el('span', null, msg));
     $('toasts').appendChild(t);
     setTimeout(() => t.classList.add('out'), 3500);
     setTimeout(() => t.remove(), 4000);
     while ($('toasts').children.length > 4) $('toasts').firstChild.remove();
   },
 };
+UI.ressources = creerRegistre(d => UI.protege(d, x => UI.rendreRessource(x)));
+UI.jauges = creerRegistre(d => UI.protege(d, x => UI.rendreJauge(x)));
+UI.marques = creerRegistre(d => UI.protege(d, x => UI.rendreMarque(x)));
+
+if (typeof module !== 'undefined') module.exports = { creerRegistre };
