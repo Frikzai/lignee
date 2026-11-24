@@ -75,6 +75,17 @@
       <path class="sil-decor" d="M310 100 V46 L270 50 L256 58 L249 68 L242.5 79 L244.5 88 L240.5 100 Z"/>
       <path class="filon" d="M246 76 L256 72 L266 75 L276 70 M248 86 L258 84 L268 87"/>
     </g>
+    <!-- Glaneur : gerbes de blé (la main se pose vers 235,86) -->
+    <g class="element" data-element="gerbes">
+      <path class="sil-decor" d="M232 100 L234.5 93 L233 87 L237 89.5 L238.5 86.4 L240 89.5 L244 87 L242.5 93 L245 100 Z"/>
+      <path class="sil-decor" d="M247 100 L249 94.5 L247.8 90 L251 92 L252.2 89.5 L253.4 92 L256.6 90 L255.4 94.5 L257.4 100 Z"/>
+      <path class="ble-epis" d="M259 100 L262 95 M262 100 L263.5 94.6 M265 100 L264.6 95.4"/>
+    </g>
+    <!-- Bûcheron : billot et bûche (la hache tombe vers 244,82) -->
+    <g class="element" data-element="billot">
+      <path class="sil-decor" d="M236 100 V89.5 Q246 86.6 256 89.5 V100 Z"/>
+      <rect class="sil-decor" x="240.5" y="81" width="7" height="8" rx=".6"/>
+    </g>
   </g>
 
   <!-- derrière le personnage : fumée de corruption et halo de montée de niveau -->
@@ -94,7 +105,13 @@
         <path class="membre" d="M216 59 V69" stroke-width="3.4"/>
         <g class="avant-bras-arriere">
           <path class="membre" d="M216 69 V77.4" stroke-width="3"/>
-          <g class="main-arriere"><circle cx="216" cy="78" r="1.7"/></g>
+          <g class="main-arriere">
+            <circle cx="216" cy="78" r="1.7"/>
+            <g class="objet" data-objet="panier">
+              <path class="manche" d="M212.4 81 Q216 75.6 219.6 81"/>
+              <path d="M211.2 81 H220.8 L219.6 87.4 H212.4 Z"/>
+            </g>
+          </g>
         </g>
       </g>
       <g class="torse"><path d="M215.6 59.6 Q220 56.6 224.4 59.6 L223.8 70 L225.6 80 H214.4 L216.2 70 Z"/></g>
@@ -114,6 +131,11 @@
               <path class="manche" d="M224 78 V88.5"/>
               <rect x="220.4" y="87.6" width="7.2" height="3.8" rx=".5"/>
             </g>
+            <!-- tranchant vers l'arrière en pose de référence : il fait face au coup quand la hache s'abat -->
+            <g class="objet" data-objet="hache">
+              <path class="manche" d="M224 78 V90.5"/>
+              <path d="M224.6 87.6 L218.6 85.6 Q217 89.2 218.6 92.6 L224.6 90.6 Z M224 88 H226.2 V90.2 H224 Z"/>
+            </g>
             <g class="objet" data-objet="pioche">
               <path class="manche" d="M224 78 V90"/>
               <path d="M215.5 89 Q224 85.6 232.5 89 L232.8 90.4 Q224 88 215.2 90.4 Z"/>
@@ -125,6 +147,10 @@
   </g>
 
   <g id="effets">
+    <g class="copeaux" transform="translate(244 82)">
+      <rect width="1.6" height=".8" style="--dx:-10px;--dy:-9px"/><rect width="1.2" height=".7" style="--dx:9px;--dy:-11px"/>
+      <rect width="1.4" height=".8" style="--dx:13px;--dy:-3px"/><rect width="1.1" height=".6" style="--dx:-13px;--dy:-2px"/>
+    </g>
     <g class="impact" transform="translate(242 82)">
       <circle r=".9" style="--dx:11px;--dy:-12px"/><circle r=".7" style="--dx:-8px;--dy:-11px"/>
       <circle r=".8" style="--dx:15px;--dy:-4px"/><circle r=".6" style="--dx:-12px;--dy:-3px"/>

@@ -178,6 +178,54 @@
 #scene[data-geste="frapper"] .metal { animation: metal calc(1.1s * var(--tempo, 1)) infinite; }
 @keyframes metal { 0%, 60% { opacity: .7; } 68% { opacity: 1; } 85%, 100% { opacity: .7; } }
 
+/* ------------------------------------------- Geste : ramasser (2,4 s) */
+/* se penche (45°), la main avant touche les gerbes vers 235,86, puis dépose dans le panier */
+#scene .ble-epis { fill: none; stroke: var(--sil); stroke-width: .8; stroke-linecap: round; }
+#scene[data-geste="ramasser"] .haut { animation: ramasser-haut calc(2.4s * var(--tempo, 1)) ease-in-out infinite; }
+#scene[data-geste="ramasser"] .bras-avant { animation: ramasser-bras calc(2.4s * var(--tempo, 1)) ease-in-out infinite; }
+#scene[data-geste="ramasser"] .bras-arriere { transform: rotate(8deg); }
+@keyframes ramasser-haut {
+  0%, 100%  { transform: rotate(var(--penche, 0deg)); }
+  30%, 45%  { transform: rotate(calc(var(--penche, 0deg) + 45deg)); }
+  70%, 85%  { transform: rotate(var(--penche, 0deg)); }
+}
+@keyframes ramasser-bras {
+  0%, 100%  { transform: rotate(0deg); }
+  30%, 45%  { transform: rotate(-45deg); }
+  70%, 85%  { transform: rotate(20deg); }
+}
+
+/* ---------------------------------------------- Geste : hacher (1,3 s) */
+/* coup par-dessus la tête : de -210° à -40° (une interpolation 150° → -40° passerait sous le corps) ; impact à 60 % */
+#scene[data-geste="hacher"] .bras-avant { animation: hacher-bras calc(1.3s * var(--tempo, 1)) infinite; }
+#scene[data-geste="hacher"] .avant-bras-avant { animation: hacher-avant-bras calc(1.3s * var(--tempo, 1)) infinite; }
+#scene[data-geste="hacher"] .haut { animation: hacher-haut calc(1.3s * var(--tempo, 1)) infinite; }
+#scene[data-geste="hacher"] .bras-arriere { transform: rotate(-30deg); }
+#scene[data-geste="hacher"] .avant-bras-arriere { transform: rotate(-20deg); }
+@keyframes hacher-bras {
+  0%       { transform: rotate(-40deg); }
+  15%      { transform: rotate(-62deg); }
+  50%      { transform: rotate(-210deg); animation-timing-function: cubic-bezier(.55, 0, 1, .6); }
+  60%, 100% { transform: rotate(-40deg); }
+}
+@keyframes hacher-avant-bras {
+  0%, 60%, 100% { transform: rotate(-10deg); }
+  50%           { transform: rotate(25deg); animation-timing-function: cubic-bezier(.55, 0, 1, .6); }
+}
+@keyframes hacher-haut {
+  0%, 60%, 100% { transform: rotate(calc(var(--penche, 0deg) + 8deg)); }
+  50%           { transform: rotate(calc(var(--penche, 0deg) - 4deg)); animation-timing-function: cubic-bezier(.55, 0, 1, .6); }
+}
+#scene .copeaux { display: none; }
+#scene[data-geste="hacher"] .copeaux { display: inline; }
+#scene .copeaux rect { fill: #a0743c; opacity: 0; animation: copeaux calc(1.3s * var(--tempo, 1)) infinite; }
+@keyframes copeaux {
+  0%, 59% { opacity: 0; transform: translate(0, 0) rotate(0deg); }
+  60%     { opacity: 1; transform: translate(0, 0) rotate(0deg); }
+  88%     { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(160deg); }
+  100%    { opacity: 0; }
+}
+
 /* ------------------------------------------------- Moins d'animations */
 @media (prefers-reduced-motion: reduce) {
   #scene * { animation: none !important; transition: none !important; }
