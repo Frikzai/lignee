@@ -12,6 +12,10 @@ python -m http.server 8765
 
 Puis ouvrir <http://localhost:8765>.
 
+### Panneau de debug
+
+Pour tester rapidement : **Ctrl + Maj + D** en jeu, ou ouvrir <http://localhost:8765/?debug>. Il permet d'accélérer le temps (×10 à ×1000), de donner des écus ou des points d'héritage, de monter des niveaux, de tout débloquer, de vieillir, de mourir ou de lancer un événement. Le code est entièrement dans `js/debug.js`.
+
 ## Contenu
 
 - **4 voies de métiers** : Paysannerie, Milice, Arcanes et Ombre (avec sa jauge de corruption).
