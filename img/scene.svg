@@ -33,6 +33,16 @@
     <ellipse cx="230" cy="100" rx="200" ry="46" fill="url(#scene-lueur)"/>
   </g>
 
+  <!-- Logis : le logement acheté se dresse au loin sur l'horizon (x 314–376), derrière les collines du décor -->
+  <g id="logis">
+    <g class="logis" data-logis="cabane"><path class="logis-sil" d="M340 92 V84 H354 V92 Z M337.5 85 L347 77.5 L356.5 85 Z"/><rect class="fenetre" x="345.6" y="86.6" width="2.4" height="2.4"/></g>
+    <g class="logis" data-logis="chaumiere"><path class="logis-sil" d="M330 92 V81 H356 V92 Z M326 82 L343 71 L360 82 Z M350 74 H353 V79 H350 Z"/><rect class="fenetre" x="336" y="84" width="3" height="3"/><circle class="fumee-logis" cx="351.5" cy="71" r="1.6"/></g>
+    <g class="logis" data-logis="maison"><path class="logis-sil" d="M327 92 V73 H363 V92 Z M323.5 74 L345 62 L366.5 74 Z M356 64 H359.5 V70 H356 Z"/><rect class="fenetre" x="332" y="77" width="3" height="3.4"/><rect class="fenetre" x="343.5" y="77" width="3" height="3.4" style="animation-delay:-.8s"/><rect class="fenetre" x="355" y="77" width="3" height="3.4" style="animation-delay:-1.6s"/><rect class="fenetre" x="337.6" y="84.6" width="3" height="3.4" style="animation-delay:-2.1s"/></g>
+    <g class="logis" data-logis="manoir"><path class="logis-sil" d="M322 92 V71 H368 V92 Z M318 72 L345 58 L372 72 Z M313 92 V76 H322 V92 Z M368 92 V76 H377 V92 Z M311.5 77 L317.5 71 L323.5 77 Z M366.5 77 L372.5 71 L378.5 77 Z"/><rect class="fenetre" x="328" y="76" width="3" height="3.6"/><rect class="fenetre" x="343.5" y="74" width="3" height="4" style="animation-delay:-1s"/><rect class="fenetre" x="359" y="76" width="3" height="3.6" style="animation-delay:-1.7s"/><rect class="fenetre" x="316" y="82" width="2.6" height="3" style="animation-delay:-.4s"/><rect class="fenetre" x="371.4" y="82" width="2.6" height="3" style="animation-delay:-2.3s"/></g>
+    <g class="logis" data-logis="chateau"><path class="logis-sil" d="M314 92 V74 H320 V70 H324 V74 H328 V78 H360 V74 H364 V70 H368 V74 H374 V92 Z M334 78 V60 H337.5 V56.5 H341 V60 H347 V56.5 H350.5 V60 H354 V78 Z"/><path class="logis-sil" d="M344 56.5 V48 L351.5 50.6 L344 53.2"/><rect class="fenetre" x="342.6" y="64" width="2.6" height="3.6"/><rect class="fenetre" x="320.5" y="80" width="2.6" height="3" style="animation-delay:-1.2s"/><rect class="fenetre" x="364.5" y="80" width="2.6" height="3" style="animation-delay:-2s"/></g>
+    <g class="logis flotte" data-logis="palais"><ellipse class="halo-palais" cx="345" cy="72" rx="30" ry="20"/><path class="logis-sil" d="M326 82 H364 L358 88 H332 Z M330 82 L334 60 L338 82 Z M341 82 L345.5 50 L350 82 Z M352.5 82 L356.5 62 L360.5 82 Z"/><rect class="fenetre" x="344.4" y="66" width="2.4" height="4"/><rect class="fenetre" x="333.2" y="72" width="1.8" height="3" style="animation-delay:-1s"/><rect class="fenetre" x="355.8" y="73" width="1.8" height="3" style="animation-delay:-1.8s"/></g>
+  </g>
+
   <g id="decors">
     <g class="decor" data-voie="neutre">
       <path class="lointain" d="M0 100 V91 Q40 85 80 89 T170 88 T260 92 T350 86 T430 90 T480 87 V100 Z"/>
@@ -97,6 +107,22 @@
       <path class="toile" d="M238 61 H285 L284 66 Q281 68.4 278 66 Q275 68.4 272 66 Q269 68.4 266 66 Q263 68.4 260 66 Q257 68.4 254 66 Q251 68.4 248 66 Q245 68.4 242 66 Q240 67.4 239 66 Z"/>
       <path class="sil-decor" d="M248 85 V80.5 Q250 78.6 252 80.5 V85 Z M256 85 V79 H263 V85 Z M268 85 Q266.4 80 271 79.6 Q275.6 80 274 85 Z"/>
     </g>
+  </g>
+
+  <!-- Possessions (achats de la boutique) : à gauche du personnage (x 126–210) et à droite des éléments (x 334–390), là où le fond est clair -->
+  <g id="possessions">
+    <!-- belle étoile : feu de camp et paillasse -->
+    <g class="logis" data-logis="etoile"><path class="sil-poss" d="M150 100 Q152 97 162 97 Q170 97 171 100 Z M176 100 L184 96.4 L192 100 Z"/><circle class="halo-feu" cx="184" cy="95" r="8"/><path class="flamme-camp" d="M184 88.6 Q187.6 92.8 185.6 96 Q184 97.2 182.4 96 Q180.4 92.8 184 88.6 Z"/></g>
+    <g class="possession" data-item="cheval"><path class="sil-poss" d="M127 81 Q127 76 133 76 L153 76 Q159 76 159 81 L159 86 Q159 89 155 89 L131 89 Q127 89 127 85 Z M129 88 H131.4 V100 H129 Z M134 88 H136.4 V100 H134 Z M151 88 H153.4 V100 H151 Z M155.6 88 H158 V100 H155.6 Z M130 80 L123.5 69.5 L119.5 69 L116.5 72.6 L118 75 L122 74.6 L127.5 85 Z M123.5 69.5 L124.5 66.6 L125.6 69.4 Z"/><path class="queue-cheval" d="M159 80 Q164 84 162.6 94"/></g>
+    <g class="possession" data-item="pierres"><ellipse class="sil-poss" cx="166" cy="98.2" rx="5" ry="2.2"/><ellipse class="sil-poss" cx="165.4" cy="94.8" rx="3.8" ry="1.9"/><ellipse class="sil-poss" cx="166.2" cy="92" rx="2.6" ry="1.5"/></g>
+    <g class="possession" data-item="outils"><path class="sil-poss" d="M173 100 V86 H175 V100 Z M183 100 V86 H185 V100 Z M171 87 H187 V88.5 H171 Z M178 88.5 V96 H179 V88.5 Z M181 88.5 V93.6 H182 V88.5 Z M177.2 95.6 H180 V98 H177.2 Z"/></g>
+    <g class="possession" data-item="livre"><path class="sil-poss" d="M187 100 V97.4 H194.6 V100 Z M188 97.4 L191 96.4 L194 97.4 Z"/><rect class="lisere" x="187.4" y="98.4" width="6.8" height=".5"/></g>
+    <g class="possession" data-item="serviteur"><circle class="sil-poss" cx="200" cy="62.5" r="4.2"/><path class="sil-poss" d="M196.6 69 Q200 66.8 203.4 69 L203 80 L204.2 98 H196 L197.4 80 Z M196 98 H199.4 V100 H196 Z M200.8 98 H204.2 V100 H200.8 Z"/><path class="bras-serviteur" d="M203 72 L207.6 78.4"/><circle class="halo-feu" cx="208.4" cy="81" r="4.6"/><circle class="lumiere-poss" cx="208.4" cy="81" r="1.2"/></g>
+    <g class="possession flotte" data-item="grimoire"><circle class="halo-grimoire" cx="205" cy="47" r="7"/><path class="grimoire" d="M199 49 L205 46 L211 49 L211 52 L205 49.6 L199 52 Z"/></g>
+    <g class="possession" data-item="atelier"><path class="sil-poss" d="M334 100 V92 H350 V93.6 H348 V100 H346.6 V93.6 H337.4 V100 H336 V93.6 Z M339 92 Q338 87 341.6 86.4 V83 H343 V86.4 Q346.6 87 345.6 92 Z M343 84 L348.6 81 L349.2 82 L343.6 85 Z"/><circle class="bulle" cx="342.2" cy="82" r=".8"/><circle class="bulle" cx="342.8" cy="82" r=".6" style="animation-delay:-.7s"/><circle class="bulle" cx="341.6" cy="82" r=".7" style="animation-delay:-1.4s"/></g>
+    <g class="possession" data-item="jardin"><path class="tiges" d="M353 100 Q355 92 357 100 M359 100 Q360 90 363 100 M365 100 Q367 93 369 100 M371 100 Q372 91 375 100"/><g class="fleurs"><circle cx="357" cy="93" r="1.6"/><circle cx="362.6" cy="90.6" r="1.4"/><circle cx="368.2" cy="93.4" r="1.4"/><circle cx="373.6" cy="91.6" r="1.5"/></g></g>
+    <g class="possession" data-item="bibliotheque"><path class="sil-poss" d="M377 100 V80 H391 V100 Z"/><path class="rayons" d="M378.4 85 H389.6 M378.4 90 H389.6 M378.4 95 H389.6 M380 81.6 V84.4 M382 81.4 V84.4 M385.4 86.4 V89.4 M387.2 86.6 V89.4 M379.6 91.4 V94.4 M381.6 91.6 V94.4 M384 91.4 V94.4"/></g>
+    <g class="possession" data-item="observatoire"><path class="logis-sil" d="M438 92 V68 H452 V92 Z M436 69 Q445 57 454 69 Z"/><path class="lunette" d="M447 61 L458 54.6"/><rect class="fenetre" x="443.6" y="76" width="2.6" height="3.6"/></g>
   </g>
 
   <!-- derrière le personnage : fumée de corruption et halo de montée de niveau -->

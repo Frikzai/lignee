@@ -26,11 +26,13 @@
     <div class="card ctrl">
       <label>Métier <select id="job"></select></label>
       <label>Compétence <select id="skill"></select></label>
+      <label>Logement <select id="logis"></select></label>
       <label>Âge : <b id="ageTxt"></b><input type="range" id="age" min="14" max="100" step="0.5"></label>
       <label>Espérance de vie : <b id="lifeTxt"></b><input type="range" id="life" min="40" max="150"></label>
       <label>Corruption : <b id="corrTxt"></b><input type="range" id="corr" min="0" max="100"></label>
       <label class="toggle"><input type="checkbox" id="pause"> Pause</label>
       <label class="toggle"><input type="checkbox" id="dead"> Mort</label>
+      <div id="objets" style="grid-column:1/-1;display:flex;flex-wrap:wrap;gap:4px 14px"></div>
       <div class="row-btns">
         <button class="btn small" id="jobUp">Métier niv. +1</button>
         <button class="btn small" id="skillUp">Compétence niv. +1</button>
@@ -50,6 +52,7 @@
       currentJob: 'artisan', currentSkill: 'discipline',
       jobs: niveaux(JOBS.map(j => j.id)), skills: niveaux([...SKILLS.map(s => s.id), 'inconnu']),
       paused: false, dead: false, corruption: 0, days: 30 * DAYS_PER_YEAR, demoLifespan: 70,
+      housing: 'etoile', items: {},
     };
     const ageYears = () => G.days / DAYS_PER_YEAR;
     const lifespanYears = () => G.demoLifespan;
@@ -65,6 +68,14 @@
     options($('job'), Object.entries(JOB_CATS).map(([cat, c]) => [c.name, JOBS.filter(j => j.cat === cat).map(j => [j.id, j.name])]));
     options($('skill'), [...Object.entries(SKILL_CATS).map(([cat, c]) => [c.name, SKILLS.filter(s => s.cat === cat).map(s => [s.id, s.name])]), ['Test', [['inconnu', 'Compétence inconnue']]]]);
 
+    for (const h of HOUSING) $('logis').append(new Option(h.name, h.id));
+    $('logis').onchange = e => { G.housing = e.target.value; };
+    for (const it of ITEMS) {
+      const l = document.createElement('label'); l.className = 'toggle';
+      const c = document.createElement('input'); c.type = 'checkbox';
+      c.onchange = () => { G.items[it.id] = c.checked; };
+      l.append(c, ' ' + it.name); $('objets').append(l);
+    }
     $('job').onchange = e => { G.currentJob = e.target.value; };
     $('skill').onchange = e => { G.currentSkill = e.target.value; };
     $('age').oninput = e => { G.days = +e.target.value * DAYS_PER_YEAR; };

@@ -97,7 +97,7 @@ async function initScene() {
 }
 
 const REDUIT = typeof matchMedia !== 'undefined' ? matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
-const vu = { job: null, fondu: false, jobNiv: null, corruption: null, skill: null, skillNiv: null, med: null };   // dernières valeurs appliquées au bandeau
+const vu = { job: null, fondu: false, jobNiv: null, corruption: null, skill: null, skillNiv: null, med: null, boutique: null };   // dernières valeurs appliquées au bandeau
 const minuteurs = {};
 
 function setFlag(el, key, on) {
@@ -134,6 +134,12 @@ function applySkill(skillId) {
   med.title = nom;
 }
 
+// Achats de la boutique : le logis au loin, une possession par objet acheté.
+function applyBoutique(logement, objets) {
+  showOnly('logis', 'data-logis', logement);
+  for (const el of document.querySelectorAll('#scene .possession')) el.classList.toggle('actif', !!objets[el.getAttribute('data-item')]);
+}
+
 function updateScene() {
   if (typeof G === 'undefined' || !G) return;
   const scene = document.getElementById('scene');
@@ -163,6 +169,10 @@ function updateScene() {
     if (isLevelUp(vu.skillNiv, skill)) flash(vu.med, 'eclat-med');
     vu.skillNiv = skill;
   }
+
+  const objets = G.items || {};
+  const boutique = G.housing + '|' + Object.keys(objets).filter(k => objets[k]).sort().join(',');
+  if (boutique !== vu.boutique) { vu.boutique = boutique; applyBoutique(G.housing, objets); }
 
   const corruption = Math.min(100, Math.max(0, G.corruption || 0));
   if (corruption !== vu.corruption) {
