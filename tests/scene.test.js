@@ -67,3 +67,28 @@ test('chaque logement et chaque possession de data.js a son dessin dans scene.sv
   ];
   assert.deepEqual(manquants, []);
 });
+
+test('tout ce que SCENES référence est dessiné : décors, objets, éléments, gestes', () => {
+  const svg = fs.readFileSync(path.join(__dirname, '..', 'img', 'scene.svg'), 'utf8');
+  const css = fs.readFileSync(path.join(__dirname, '..', 'css', 'scene.css'), 'utf8');
+  const s = Object.values(SCENES);
+  const uniques = cle => [...new Set(s.map(x => x[cle]).filter(Boolean))];
+  const manquants = [
+    ...uniques('voie').filter(v => !svg.includes(`data-voie="${v}"`)).map(v => 'décor ' + v),
+    ...uniques('objet').filter(o => !svg.includes(`data-objet="${o}"`)).map(o => 'objet ' + o),
+    ...uniques('element').filter(e => !svg.includes(`data-element="${e}"`)).map(e => 'élément ' + e),
+    ...uniques('geste').filter(g => !css.includes(`[data-geste="${g}"]`)).map(g => 'geste ' + g),
+  ];
+  assert.deepEqual(manquants, []);
+});
+
+test('toutes les voies sont dessinées : aucun métier ne retombe au repos', () => {
+  for (const id of Object.keys(SCENES)) assert.notEqual(sceneFor(id).geste, 'repos', id);
+});
+
+test('chaque compétence de data.js a son médaillon', () => {
+  const med = fs.readFileSync(path.join(__dirname, '..', 'img', 'medaillons.svg'), 'utf8');
+  const src = fs.readFileSync(path.join(__dirname, '..', 'js', 'data.js'), 'utf8');
+  const skills = vm.runInNewContext(src + '\n;SKILLS.map(s => s.id)');
+  assert.deepEqual([...skills].filter(id => !med.includes(`data-skill="${id}"`)), []);
+});

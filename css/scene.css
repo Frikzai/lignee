@@ -321,3 +321,188 @@
 @media (prefers-reduced-motion: reduce) {
   #scene * { animation: none !important; transition: none !important; }
 }
+
+/* ------------------------------------------- Voies : ciel et décor propres */
+#scene[data-voie="milice"] { --ciel-bas: #4a1a10; --lueur: #9a3a12; }
+#scene[data-voie="arcanes"] { --ciel-haut: #0c0b18; --ciel-bas: #251a3e; --lueur: #5a3aa0; --lointain: #17132a; --lune: #cfd8ff; }
+#scene[data-voie="ombre"] { --ciel-haut: #07080c; --ciel-bas: #1b1d27; --lueur: #4a6478; --lointain: #12141b; --lune: #d8dde6; }
+#scene .drapeau { transform-box: fill-box; transform-origin: left center; animation: drapeau calc(1.6s * var(--tempo, 1)) ease-in-out infinite alternate; }
+@keyframes drapeau { from { transform: scaleX(1) skewY(0deg); } to { transform: scaleX(.9) skewY(4deg); } }
+#scene .etoile-ciel { fill: #e8e4ff; animation: scintille 2.4s ease-in-out infinite alternate; }
+@keyframes scintille { from { opacity: .25; } to { opacity: .9; } }
+#scene .fenetre-arcane { fill: #9fd8ff; animation: feu 1.8s ease-in-out infinite alternate; }
+#scene .rune { fill: #b9a4ff; transform-box: fill-box; animation: rune calc(4s * var(--tempo, 1)) ease-in-out infinite; }
+@keyframes rune { 0%, 100% { transform: translate(0, 0); opacity: .3; } 50% { transform: translate(1px, -5px); opacity: 1; } }
+#scene .cristal { fill: #4b3a86; animation: feu 2.6s ease-in-out infinite alternate; }
+#scene .nuage { fill: #0e1016; opacity: .9; animation: nuage 18s ease-in-out infinite alternate; }
+@keyframes nuage { to { transform: translateX(-14px); } }
+#scene .fenetre-ombre { fill: #d98a3a; opacity: .8; }
+#scene .reverbere-halo { animation: feu 2.2s ease-in-out infinite alternate; }
+#scene .corbeau { transform-box: fill-box; transform-origin: 30% 100%; animation: corbeau 5s ease-in-out infinite; }
+@keyframes corbeau { 0%, 80%, 100% { transform: rotate(0deg); } 85%, 92% { transform: rotate(-14deg); } }
+#scene .brume { fill: #8a96a8; opacity: .1; animation: brume 14s ease-in-out infinite alternate; }
+@keyframes brume { to { transform: translateX(26px); } }
+
+/* --------------------------------------- Voies : objets, éléments, effets */
+#scene { --magie: #ffd27a; }
+#scene[data-voie="arcanes"] { --magie: #9fd8ff; }
+#scene[data-voie="ombre"] { --magie: #9fe08a; }
+#scene .sil .lame { fill: none; stroke: #6b5a44; stroke-width: .35; }
+#scene .sil .corde, #scene .sil .crochet { fill: none; stroke: var(--sil); stroke-width: .7; stroke-linecap: round; }
+#scene .sil .bord-bouclier { fill: none; stroke: #8a6326; stroke-width: .5; }
+#scene .sil .liquide, #scene .liquide { fill: var(--magie); opacity: .85; }
+#scene .sil .lueur-baton, #scene .sil .orbe { fill: var(--magie); }
+#scene .sil .halo-orbe { fill: var(--magie); animation: halo-doux 1.8s ease-in-out infinite; }
+@keyframes halo-doux { 0%, 100% { opacity: .12; } 50% { opacity: .3; } }
+#scene .sil .sable-tenu { fill: var(--accent); }
+#scene .sil .yeux-crane { fill: var(--magie); animation: feu .8s ease-in-out infinite alternate; }
+#scene .sil .orbe-noir { fill: #0a0508; stroke: #9a5ad0; stroke-width: .5; }
+#scene .sil .halo-noir { fill: #7a3ab0; animation: halo-doux 2.2s ease-in-out infinite; }
+#scene .sil .drapeau-tenu { fill: #5a1a12; }
+#scene .sil .carte-tenue { fill: #8a6a3a; }
+#scene .sil .trace-carte { fill: none; stroke: #3a2414; stroke-width: .4; }
+#scene .capuche { display: none; }
+#scene[data-voie="ombre"] .capuche { display: inline; }
+#scene .flamme-torche { fill: var(--feu); transform-box: fill-box; transform-origin: 50% 100%; animation: camp .4s ease-in-out infinite alternate; }
+#scene .paille-corde { fill: none; stroke: #6b5030; stroke-width: .5; }
+#scene .carte-table { fill: #8a6a3a; opacity: .8; }
+#scene .pages { fill: #c9b48a; opacity: .75; }
+#scene .page { fill: #e2cf9f; opacity: 0; transform-origin: 241.4px 74.3px; }
+#scene .vapeur { fill: #6a5a7a; opacity: 0; transform-box: fill-box; transform-origin: center; animation: fumee-logis 2.6s linear infinite; }
+#scene .gravure { fill: none; stroke: #2a2f3a; stroke-width: .8; }
+#scene .ame { fill: var(--magie); opacity: 0; animation: ame 3.3s ease-out infinite; }
+@keyframes ame { 0% { opacity: 0; transform: translate(0, 0); } 20% { opacity: .8; } 100% { opacity: 0; transform: translate(2px, -18px); } }
+#scene .motes, #scene .paille { display: none; }
+#scene[data-geste="incanter"] .motes { display: inline; }
+#scene .motes circle { fill: var(--magie); opacity: 0; animation: motes calc(2.4s * var(--tempo, 1)) ease-out infinite; }
+@keyframes motes { 0% { opacity: 0; transform: translate(0, 0); } 20% { opacity: 1; } 100% { opacity: 0; transform: translate(1.5px, -12px); } }
+#scene .sablier-tenu { transform-box: fill-box; transform-origin: center; animation: med-sablier 3s ease-in-out infinite; }
+
+/* -------------------------------------------- Geste : veiller (Milice) */
+/* lance tenue droite devant soi : la main compense la rotation du bras ; le regard scrute l'horizon */
+#scene[data-geste="veiller"] .haut { animation: repos-souffle calc(3.2s * var(--tempo, 1)) ease-in-out infinite; }
+#scene[data-geste="veiller"] .bras-avant { transform: rotate(calc(-10deg - var(--penche, 0deg))); }
+#scene[data-geste="veiller"] .avant-bras-avant { transform: rotate(-60deg); }
+#scene[data-geste="veiller"] .main-avant { transform: rotate(70deg); }
+#scene[data-geste="veiller"] .bras-arriere { transform: rotate(6deg); }
+#scene[data-geste="veiller"] .tete { animation: veiller-regard calc(5s * var(--tempo, 1)) ease-in-out infinite; }
+@keyframes veiller-regard { 0%, 35%, 100% { transform: rotate(0deg); } 45%, 62% { transform: rotate(-9deg); } 72%, 85% { transform: rotate(4deg); } }
+
+/* ----------------------------------------- Geste : ferrailler (1,2 s) */
+/* garde, lame levée (pointe sous y = 38), taille sur le mannequin vers 255,78 à 55 % */
+#scene[data-geste="ferrailler"] .bras-avant { animation: ferrailler-bras calc(1.2s * var(--tempo, 1)) infinite; }
+#scene[data-geste="ferrailler"] .avant-bras-avant { animation: ferrailler-avant-bras calc(1.2s * var(--tempo, 1)) infinite; }
+#scene[data-geste="ferrailler"] .haut { animation: ferrailler-haut calc(1.2s * var(--tempo, 1)) infinite; }
+#scene[data-geste="ferrailler"] .bras-arriere { transform: rotate(-20deg); }
+#scene[data-geste="ferrailler"] .avant-bras-arriere { transform: rotate(-40deg); }
+#scene[data-geste="ferrailler"] .main-arriere { transform: rotate(60deg); }
+#scene[data-geste="ferrailler"] .jambe-avant { transform: rotate(-12deg); }
+#scene[data-geste="ferrailler"] .jambe-arriere { transform: rotate(10deg); }
+@keyframes ferrailler-bras {
+  0%, 100% { transform: rotate(calc(-70deg - var(--penche, 0deg))); }
+  35%      { transform: rotate(calc(-110deg - var(--penche, 0deg))); animation-timing-function: cubic-bezier(.55, 0, 1, .6); }
+  55%      { transform: rotate(calc(-50deg - var(--penche, 0deg))); }
+  70%      { transform: rotate(calc(-55deg - var(--penche, 0deg))); }
+}
+@keyframes ferrailler-avant-bras { 0%, 35%, 100% { transform: rotate(-20deg); } 55%, 70% { transform: rotate(-10deg); } }
+@keyframes ferrailler-haut {
+  0%, 35%, 100% { transform: rotate(calc(var(--penche, 0deg) - 2deg)); }
+  55%, 70%      { transform: rotate(calc(var(--penche, 0deg) + 6deg)); }
+}
+#scene[data-geste="ferrailler"] .cible { transform-origin: 256px 98px; animation: cible calc(1.2s * var(--tempo, 1)) infinite; }
+@keyframes cible { 0%, 54%, 100% { transform: rotate(0deg); } 62% { transform: rotate(5deg); } 76% { transform: rotate(-2deg); } }
+#scene[data-geste="ferrailler"] .paille { display: inline; }
+#scene .paille rect { fill: #a0743c; opacity: 0; animation: paille calc(1.2s * var(--tempo, 1)) infinite; }
+@keyframes paille {
+  0%, 54% { opacity: 0; transform: translate(0, 0) rotate(0deg); }
+  55%     { opacity: 1; transform: translate(0, 0) rotate(0deg); }
+  85%     { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(120deg); }
+  100%    { opacity: 0; }
+}
+
+/* ------------------------------------------- Geste : commander (3 s) */
+/* l'objet (épée, carte, étendard, dague) est dessiné vers le bas : la main le retourne (180°)
+   puis le pousse en avant (25°) quand le bras se lève — « En avant ! » */
+#scene[data-geste="commander"] .bras-avant { animation: commander-bras calc(3s * var(--tempo, 1)) ease-in-out infinite; }
+#scene[data-geste="commander"] .avant-bras-avant { transform: rotate(-30deg); }
+#scene[data-geste="commander"] .main-avant { animation: commander-main calc(3s * var(--tempo, 1)) ease-in-out infinite; }
+#scene[data-geste="commander"] .tete { animation: commander-tete calc(3s * var(--tempo, 1)) ease-in-out infinite; }
+#scene[data-geste="commander"] .bras-arriere { transform: rotate(18deg); }
+#scene[data-geste="commander"] .avant-bras-arriere { transform: rotate(-70deg); }
+@keyframes commander-bras {
+  0%, 15%, 75%, 100% { transform: rotate(calc(-60deg - var(--penche, 0deg))); }
+  30%, 60%           { transform: rotate(calc(-90deg - var(--penche, 0deg))); }
+}
+@keyframes commander-main { 0%, 15%, 75%, 100% { transform: rotate(270deg); } 30%, 60% { transform: rotate(325deg); } }
+@keyframes commander-tete { 0%, 15%, 75%, 100% { transform: rotate(0deg); } 30%, 60% { transform: rotate(-7deg); } }
+
+/* ------------------------------------------------ Geste : lire (4 s) */
+/* penché sur le pupitre, la main sur le grimoire (vers 236,75) ; tourne une page à 70 % */
+#scene[data-geste="lire"] .haut { transform: rotate(calc(var(--penche, 0deg) + 8deg)); }
+#scene[data-geste="lire"] .tete { transform: rotate(14deg); }
+#scene[data-geste="lire"] .bras-avant { animation: lire-bras calc(4s * var(--tempo, 1)) ease-in-out infinite; }
+#scene[data-geste="lire"] .bras-arriere { transform: rotate(-8deg); }
+@keyframes lire-bras {
+  0%, 62%, 88%, 100% { transform: rotate(calc(-40deg - var(--penche, 0deg))); }
+  72%                { transform: rotate(calc(-58deg - var(--penche, 0deg))); }
+  80%                { transform: rotate(calc(-34deg - var(--penche, 0deg))); }
+}
+#scene[data-geste="lire"] .page { animation: page calc(4s * var(--tempo, 1)) ease-in-out infinite; }
+@keyframes page { 0%, 64% { opacity: 0; transform: scaleX(1); } 66% { opacity: 1; transform: scaleX(1); } 80% { opacity: 1; transform: scaleX(-1); } 82%, 100% { opacity: 0; transform: scaleX(-1); } }
+
+/* ---------------------------------------------- Geste : incanter (2,6 s) */
+/* les deux mains levées ; l'objet reste droit (la main compense le bras) ; des lueurs montent */
+#scene[data-geste="incanter"] .bras-avant { animation: incanter-bras calc(2.6s * var(--tempo, 1)) ease-in-out infinite; }
+#scene[data-geste="incanter"] .avant-bras-avant { transform: rotate(-20deg); }
+#scene[data-geste="incanter"] .main-avant { animation: incanter-main calc(2.6s * var(--tempo, 1)) ease-in-out infinite; }
+#scene[data-geste="incanter"] .bras-arriere { animation: incanter-arriere calc(2.6s * var(--tempo, 1)) ease-in-out infinite; }
+#scene[data-geste="incanter"] .avant-bras-arriere { transform: rotate(-30deg); }
+#scene[data-geste="incanter"] .haut { animation: incanter-haut calc(2.6s * var(--tempo, 1)) ease-in-out infinite; }
+@keyframes incanter-bras { 0%, 100% { transform: rotate(calc(-80deg - var(--penche, 0deg))); } 50% { transform: rotate(calc(-100deg - var(--penche, 0deg))); } }
+@keyframes incanter-main { 0%, 100% { transform: rotate(100deg); } 50% { transform: rotate(120deg); } }
+@keyframes incanter-arriere { 0%, 100% { transform: rotate(calc(-70deg - var(--penche, 0deg))); } 50% { transform: rotate(calc(-92deg - var(--penche, 0deg))); } }
+@keyframes incanter-haut { 0%, 100% { transform: rotate(var(--penche, 0deg)); } 50% { transform: rotate(calc(var(--penche, 0deg) - 4deg)); } }
+
+/* --------------------------------------- Geste : se faufiler (1,8 s) */
+/* courbé, pas de loup sur place, l'arme en avant, le regard droit devant */
+#scene[data-geste="sefaufiler"] .haut { animation: faufiler-haut calc(1.8s * var(--tempo, 1)) ease-in-out infinite; }
+#scene[data-geste="sefaufiler"] .tete { transform: rotate(-16deg); }
+#scene[data-geste="sefaufiler"] .jambe-avant { animation: faufiler-jambe calc(1.8s * var(--tempo, 1)) ease-in-out infinite; }
+#scene[data-geste="sefaufiler"] .jambe-arriere { animation: faufiler-jambe calc(1.8s * var(--tempo, 1)) ease-in-out infinite reverse; }
+#scene[data-geste="sefaufiler"] .bras-avant { transform: rotate(calc(-45deg - var(--penche, 0deg))); }
+#scene[data-geste="sefaufiler"] .avant-bras-avant { transform: rotate(-25deg); }
+#scene[data-geste="sefaufiler"] .bras-arriere { transform: rotate(35deg); }
+#scene[data-geste="sefaufiler"] .avant-bras-arriere { transform: rotate(-20deg); }
+@keyframes faufiler-haut {
+  0%, 50%, 100% { transform: rotate(calc(var(--penche, 0deg) + 20deg)); }
+  25%, 75%      { transform: rotate(calc(var(--penche, 0deg) + 23deg)) translateY(.5px); }
+}
+@keyframes faufiler-jambe { 0%, 100% { transform: rotate(-12deg); } 50% { transform: rotate(8deg); } }
+
+/* ----------------------------------------- Médaillons des compétences */
+#scene .med .creux { fill: none; stroke: var(--panel); stroke-width: 1.1; stroke-linecap: round; }
+#scene .med .creux-plein { fill: var(--panel); }
+#scene .med .magie { fill: #9fd8ff; }
+#scene .med .vert { fill: #8fd18a; }
+#scene .med .sang { fill: #c8392b; }
+#scene .med .souffle { fill: var(--accent); }
+#scene .med .aiguille { fill: var(--accent); }
+#scene .poing { transform-origin: 20px 21px; animation: med-poing 1.2s ease-in infinite; }
+@keyframes med-poing { 0%, 60%, 100% { transform: scale(1); } 75% { transform: scale(1.14); } }
+#scene .pion-med { animation: med-pion 2s ease-in-out infinite; }
+@keyframes med-pion { 0%, 30%, 100% { transform: translateX(0); } 50%, 80% { transform: translateX(3px); } }
+#scene .bouclier-med { transform-origin: 20px 20px; animation: med-bouclier 1.6s ease-in-out infinite; }
+@keyframes med-bouclier { 0%, 100% { transform: scale(1); } 15% { transform: scale(.92); } 30% { transform: scale(1.04); } }
+#scene .souffle { animation: med-souffle 2.6s ease-out infinite; }
+@keyframes med-souffle { 0% { opacity: 0; transform: translateY(4px); } 30% { opacity: 1; } 100% { opacity: 0; transform: translateY(-3px); } }
+#scene .cristal-med { transform-origin: 20px 20px; animation: med-piece 3s linear infinite; }
+#scene .pousse { transform-origin: 20px 31px; animation: med-pousse 2.4s ease-in-out infinite alternate; }
+@keyframes med-pousse { from { transform: scale(.85, .8); } to { transform: scale(1, 1); } }
+#scene .cercle-med { transform-origin: 20px 20px; animation: ailes 9s linear infinite; }
+#scene .aiguille { transform-origin: 20px 21px; animation: ailes 3s linear infinite; }
+#scene .paupiere { transform-origin: 20px 20px; animation: med-paupiere 3.2s ease-in-out infinite; }
+@keyframes med-paupiere { 0%, 80%, 100% { transform: scaleY(1); } 88% { transform: scaleY(.1); } }
+#scene .goutte-med { animation: med-goutte 1.8s ease-in infinite; }
+@keyframes med-goutte { 0%, 30% { opacity: 0; transform: translateY(-2px); } 45% { opacity: 1; } 100% { opacity: 0; transform: translateY(4px); } }
+#scene .yeux-med { animation: feu .9s ease-in-out infinite alternate; }
+#scene .goutte-pacte { transform-origin: 24.4px 26px; animation: med-bouclier 1.4s ease-in-out infinite; }
