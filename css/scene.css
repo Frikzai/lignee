@@ -71,7 +71,7 @@
 
 /* ----------------------------------------------------------- Corruption */
 /* filtre statique (jamais animé) : le décor se refroidit avec la corruption */
-#scene #ciel, #scene #decors { filter: saturate(calc(1 - .6 * var(--corruption, 0))) hue-rotate(calc(-25deg * var(--corruption, 0))); }
+#scene #ciel, #scene #decors, #scene #logis { filter: saturate(calc(1 - .6 * var(--corruption, 0))) hue-rotate(calc(-25deg * var(--corruption, 0))); }
 #scene .fumee { opacity: var(--corruption, 0); }
 #scene .volute { fill: #060405; transform-box: fill-box; transform-origin: center; animation: volute calc(5s * var(--tempo, 1)) linear infinite; }
 @keyframes volute {
@@ -282,6 +282,40 @@
   90%  { opacity: 1; transform: translate(9.4px, -1px); }
   100% { opacity: 0; transform: translate(9.4px, -1px); }
 }
+
+/* ------------------------------------------ Boutique : logis et possessions */
+/* le logis acheté se dresse au loin ; chaque possession a son accessoire autour du personnage */
+#scene .logis:not(.actif), #scene .possession:not(.actif) { display: none; }
+#scene .logis-sil { fill: #2a1712; }
+#scene .sil-poss { fill: var(--sil); }
+#scene .fenetre, #scene .lumiere-poss { fill: #ffc861; animation: fenetre 2.6s ease-in-out infinite; }
+@keyframes fenetre { 0%, 100% { opacity: .6; } 50% { opacity: 1; } }
+#scene .fumee-logis { fill: #3a2a24; opacity: 0; transform-box: fill-box; transform-origin: center; animation: fumee-logis 3s linear infinite; }
+@keyframes fumee-logis {
+  0%   { opacity: 0; transform: translate(0, 0) scale(.6); }
+  20%  { opacity: .6; }
+  100% { opacity: 0; transform: translate(4px, -12px) scale(1.8); }
+}
+#scene .halo-palais { fill: rgba(255, 200, 120, .12); animation: fenetre 4s ease-in-out infinite; }
+#scene .flotte { animation: flotte 3.2s ease-in-out infinite; }
+@keyframes flotte { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-2.5px); } }
+#scene .halo-feu { fill: rgba(255, 170, 70, .28); animation: fenetre 1.6s ease-in-out infinite; }
+#scene .flamme-camp { fill: var(--feu); transform-box: fill-box; transform-origin: 50% 100%; animation: camp .45s ease-in-out infinite alternate; }
+@keyframes camp { from { transform: scale(1, 1); } to { transform: scale(.85, .78); } }
+#scene .queue-cheval { fill: none; stroke: var(--sil); stroke-width: 1.8; stroke-linecap: round; transform-origin: 159px 80px; animation: queue-cheval 2.2s ease-in-out infinite; }
+@keyframes queue-cheval { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(14deg); } }
+#scene .lisere { fill: #8a6326; }
+#scene .bras-serviteur { fill: none; stroke: var(--sil); stroke-width: 2.2; stroke-linecap: round; }
+#scene .halo-grimoire { fill: rgba(255, 190, 90, .22); animation: fenetre 3s ease-in-out infinite; }
+#scene .grimoire { fill: var(--sil); stroke: #d9973a; stroke-width: .5; }
+#scene .bulle { fill: #9fd08a; opacity: 0; animation: bulle 1.8s linear infinite; }
+@keyframes bulle { 0% { opacity: 0; transform: translate(0, 0); } 20% { opacity: .9; } 100% { opacity: 0; transform: translate(.6px, -7px); } }
+#scene .tiges { fill: none; stroke: var(--sil); stroke-width: 1.4; stroke-linecap: round; }
+#scene .fleurs { fill: var(--sil); }
+#scene [data-item="jardin"] { transform-origin: 364px 100px; animation: brise 4.5s ease-in-out infinite; }
+@keyframes brise { 0%, 100% { transform: rotate(-1.5deg); } 50% { transform: rotate(1.5deg); } }
+#scene .rayons { fill: none; stroke: #3a1a14; stroke-width: .7; }
+#scene .lunette { fill: none; stroke: #2a1712; stroke-width: 2; stroke-linecap: round; }
 
 /* ------------------------------------------------- Moins d'animations */
 @media (prefers-reduced-motion: reduce) {

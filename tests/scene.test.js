@@ -56,3 +56,14 @@ test('flash : un niveau gagné pendant un éclat ne le relance pas (pas d\'effet
   t.mock.timers.tick(900); flash(el, 'eclat');   // l'éclat précédent est fini : un nouveau peut partir
   assert.equal(ajouts.length, 2);
 });
+
+test('chaque logement et chaque possession de data.js a son dessin dans scene.svg', () => {
+  const svg = fs.readFileSync(path.join(__dirname, '..', 'img', 'scene.svg'), 'utf8');
+  const src = fs.readFileSync(path.join(__dirname, '..', 'js', 'data.js'), 'utf8');
+  const { logis, objets } = vm.runInNewContext(src + '\n;({ logis: HOUSING.map(h => h.id), objets: ITEMS.map(i => i.id) })');
+  const manquants = [
+    ...logis.filter(id => !svg.includes(`data-logis="${id}"`)).map(id => 'logis ' + id),
+    ...objets.filter(id => !svg.includes(`data-item="${id}"`)).map(id => 'possession ' + id),
+  ];
+  assert.deepEqual(manquants, []);
+});
