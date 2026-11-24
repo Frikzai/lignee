@@ -4,7 +4,7 @@ const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
-const { SCENES, REPOS, sceneFor, ageStage, isLevelUp, flash } = require('../js/scene.js');
+const { SCENES, REPOS, sceneFor, ageStage, isLevelUp, flash, etatSante } = require('../js/scene.js');
 
 test('sceneFor : artisan dans une voie dessinée', () =>
   assert.deepEqual(sceneFor('artisan', new Set(['paysannerie'])),
@@ -91,4 +91,14 @@ test('chaque compétence de data.js a son médaillon', () => {
   const src = fs.readFileSync(path.join(__dirname, '..', 'js', 'data.js'), 'utf8');
   const skills = vm.runInNewContext(src + '\n;SKILLS.map(s => s.id)');
   assert.deepEqual([...skills].filter(id => !med.includes(`data-skill="${id}"`)), []);
+});
+
+test('etatSante : la scène réagit sous 40 (faible) et sous 20 (critique)', () => {
+  assert.equal(etatSante(100), 'bonne');
+  assert.equal(etatSante(40), 'bonne');
+  assert.equal(etatSante(39.9), 'faible');
+  assert.equal(etatSante(20), 'faible');
+  assert.equal(etatSante(19.9), 'critique');
+  assert.equal(etatSante(0), 'critique');
+  assert.equal(etatSante(undefined), 'bonne');   // module santé absent
 });

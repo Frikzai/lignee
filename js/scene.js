@@ -51,6 +51,12 @@ function ageStage(age, lifespan) {
   return age < 25 ? 'jeune' : 'adulte';
 }
 
+// Santé (module sante.js) : sous 40 la scène ralentit et tousse, sous 20 elle bat comme un cœur
+function etatSante(h) {
+  if (h == null) return 'bonne';
+  return h < 20 ? 'critique' : h < 40 ? 'faible' : 'bonne';
+}
+
 function isLevelUp(prev, cur) {
   return !!prev && prev.id === cur.id && cur.level > prev.level;
 }
@@ -181,6 +187,12 @@ function updateScene() {
     setFlag(scene, 'corrompu', corruption >= 50);
   }
 
+  // saison (module saisons.js) et santé (module sante.js), s'ils sont chargés
+  const saison = typeof currentSeason === 'function' ? currentSeason().id : 'aucune';
+  if (scene.dataset.saison !== saison) scene.dataset.saison = saison;
+  const sante = etatSante(typeof healthOf === 'function' ? healthOf() : null);
+  if (scene.dataset.sante !== sante) scene.dataset.sante = sante;
+
   setFlag(scene, 'pause', !!(G.paused || G.dead));
   const age = ageStage(ageYears(), lifespanYears());
   if (scene.dataset.age !== age) scene.dataset.age = age;
@@ -188,4 +200,4 @@ function updateScene() {
 
 if (typeof document !== 'undefined') initScene();
 
-if (typeof module !== 'undefined') module.exports = { SCENES, REPOS, VOIES_DESSINEES, sceneFor, ageStage, isLevelUp, flash };
+if (typeof module !== 'undefined') module.exports = { SCENES, REPOS, VOIES_DESSINEES, sceneFor, ageStage, isLevelUp, flash, etatSante };
