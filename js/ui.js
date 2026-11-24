@@ -152,7 +152,7 @@ const UI = {
       const lock = el('tr', 'lock-row');
       const ltd = el('td'); ltd.colSpan = cols.length; lock.appendChild(ltd);
       tbody.appendChild(lock);
-      const wrap = el('div', 'table-wrap'); wrap.appendChild(table);
+      const wrap = el('div', 'table-wrap cadre'); wrap.appendChild(table);
       root.appendChild(wrap);
       this.catParts[kind + ':' + catId] = { thead, wrap, lockTr: lock, lockTd: ltd, cat };
     }
@@ -166,7 +166,7 @@ const UI = {
       cols.forEach(c => hr.appendChild(el('th', null, c)));
       const thead = el('thead'); thead.appendChild(hr); table.appendChild(thead);
       const tbody = el('tbody'); table.appendChild(tbody);
-      const wrap = el('div', 'table-wrap'); wrap.appendChild(table);
+      const wrap = el('div', 'table-wrap cadre'); wrap.appendChild(table);
       $(rootId).appendChild(wrap);
       return tbody;
     };
@@ -193,7 +193,7 @@ const UI = {
   buildPerks() {
     const grid = $('perkGrid');
     for (const p of PERKS) {
-      const card = el('div', 'perk card' + (p.setting ? ' auto' : ''));
+      const card = el('div', 'perk card cadre' + (p.setting ? ' auto' : ''));
       const rank = el('span', 'rank');
       const head = el('div', 'perk-head'); head.append(el('h4', null, p.name), rank);
       const btn = el('button', 'btn small');
@@ -207,7 +207,7 @@ const UI = {
   buildChallenges() {
     const grid = $('challengeGrid');
     for (const c of CHALLENGES) {
-      const card = el('div', 'challenge card');
+      const card = el('div', 'challenge card cadre');
       const status = el('span', 'rank');
       const head = el('div', 'perk-head'); head.append(el('h4', null, c.name), status);
       const btn = el('button', 'btn small');
@@ -227,8 +227,10 @@ const UI = {
   buildAchievements() {
     const grid = $('achGrid');
     for (const a of ACHIEVEMENTS) {
-      const card = el('div', 'ach card');
-      card.append(el('h4', null, a.name), el('p', 'muted small', a.desc));
+      const card = el('div', 'ach card cadre');
+      const titre = el('h4');
+      titre.append(icone('etoile', 'ach-etoile'), a.name);
+      card.append(titre, el('p', 'muted small', a.desc));
       grid.appendChild(card);
       this.achCards[a.id] = card;
     }
@@ -348,7 +350,11 @@ const UI = {
     $('netText').textContent = (net >= 0 ? '+' : '') + fmt(net);
     $('netText').className = net >= 0 ? 'pos' : 'neg';
     $('happyText').textContent = '×' + fmtMult(happiness());
-    $('pauseBtn').textContent = G.paused ? '▶ Reprendre' : '⏸ Pause';
+    const pb = $('pauseBtn');
+    if (pb._enPause !== G.paused) {
+      pb._enPause = G.paused;
+      pb.replaceChildren(icone(G.paused ? 'reprendre' : 'pause'), G.paused ? 'Reprendre' : 'Pause');
+    }
     $('pauseBtn').classList.toggle('paused', G.paused);
     document.body.classList.toggle('is-paused', G.paused);
   },
@@ -460,8 +466,12 @@ const UI = {
         const n = el('b', 'lock-cat', P.cat.name); n.style.color = P.cat.color;
         P.lockTd.appendChild(n);
       }
-      if (forbidden) { P.lockTd.appendChild(el('span', 'lock-title', '⛔ interdit par le défi')); continue; }
-      P.lockTd.appendChild(el('span', 'lock-title', `🔒 ${e.name}`));
+      if (forbidden) {
+        const t = el('span', 'lock-title'); t.append(icone('interdit'), ' interdit par le défi');
+        P.lockTd.appendChild(t); continue;
+      }
+      const t = el('span', 'lock-title'); t.append(icone('cadenas'), ' ' + e.name);
+      P.lockTd.appendChild(t);
       for (const r of e.req) {
         const p = reqProgress(r);
         P.lockTd.appendChild(el('span', p.cur >= p.need ? 'req ok' : 'req', `${p.label} ${Math.min(p.cur, p.need)}/${p.need}`));
@@ -508,7 +518,8 @@ const UI = {
     $('rebirthHint').textContent = canReb ? '' : 'Possible dès 30 ans.';
     for (const p of PERKS) {
       const c = this.perkCards[p.id], r = perkRank(p.id), cost = perkCost(p);
-      c.rank.textContent = p.max > 1 ? `${r} / ${p.max}` : (r ? '✔' : '');
+      if (p.max > 1) c.rank.textContent = `${r} / ${p.max}`;
+      else if (c.rank._acquis !== !!r) { c.rank._acquis = !!r; c.rank.replaceChildren(...(r ? [icone('acquis')] : [])); }
       if (r >= p.max) { c.btn.textContent = p.max > 1 ? 'Maximum' : 'Acquis'; c.btn.disabled = true; }
       else { c.btn.textContent = `Acheter — ${cost} pt${cost > 1 ? 's' : ''}`; c.btn.disabled = G.legacy.points < cost; }
       c.card.classList.toggle('owned', r > 0);
@@ -521,7 +532,7 @@ const UI = {
       const done = !!G.challengesDone[c.id], active = G.challenge === c.id;
       r.card.classList.toggle('done', done);
       r.card.classList.toggle('active', active);
-      r.status.textContent = done ? '★' : '';
+      if (r.status._fait !== done) { r.status._fait = done; r.status.replaceChildren(...(done ? [icone('etoile')] : [])); }
       r.btn.textContent = done ? 'Réussi' : active ? 'En cours…' : 'Commencer';
       r.btn.disabled = done || active || G.dead;
     }
@@ -553,7 +564,7 @@ const UI = {
       const tr = el('tr'); tr.append(el('td', null, k), el('td', 'num', String(v))); tb.appendChild(tr);
     }
     t.appendChild(tb);
-    const wrap = el('div', 'table-wrap'); wrap.appendChild(t);
+    const wrap = el('div', 'table-wrap cadre'); wrap.appendChild(t);
     box.appendChild(wrap);
   },
 
@@ -687,6 +698,7 @@ const UI = {
     this.modalKind = kind;
     const box = $('modalBox');
     box.innerHTML = html;
+    box.prepend(el('span', 'lanterne'));
     if (buttons.length) {
       const row = el('div', 'row-btns');
       for (const b of buttons) {

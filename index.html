@@ -15,16 +15,21 @@
       <div class="age-line"><span id="ageText">14 ans</span><span class="muted"><span id="lifeText">70 ans</span></span></div>
       <div class="bar age-bar"><div id="ageFill"></div></div>
     </div>
-    <div class="stat"><label>Écus</label><b id="coinsText">0</b></div>
-    <div class="stat"><label>Net / jour</label><b id="netText">0</b></div>
-    <div class="stat"><label>Bonheur</label><b id="happyText">×1</b></div>
-    <span id="ressources-modules"></span>
-    <button id="pauseBtn" class="btn">⏸ Pause</button>
+    <div class="ressources">
+      <span class="inscription"><small><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-ecus"/></svg>Écus</small><b id="coinsText">0</b></span>
+      <span class="brin"></span>
+      <span class="inscription"><small><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-revenu"/></svg>Par jour</small><b id="netText">0</b></span>
+      <span class="brin"></span>
+      <span class="inscription"><small><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-bonheur"/></svg>Bonheur</small><b id="happyText">×1</b></span>
+      <span id="ressources-modules"></span>
+    </div>
+    <button id="pauseBtn" class="btn">Pause</button>
   </header>
 
   <div class="layout">
     <aside class="sidebar">
-      <section class="card" id="nowCard">
+      <section class="card cadre-noble" id="nowCard">
+        <span class="lanterne" aria-hidden="true"></span>
         <div id="traitLine" class="trait-line"></div>
         <div id="jauges"></div>
         <div class="now">
@@ -47,14 +52,14 @@
         <ul id="buffs" class="buffs"></ul>
       </section>
 
-      <section class="card event-card hidden" id="eventCard">
+      <section class="card cadre event-card hidden" id="eventCard">
         <h3 id="eventTitle"></h3>
         <p id="eventText"></p>
         <div id="eventChoices" class="choices"></div>
         <div class="bar thin"><div id="eventTimer"></div></div>
       </section>
 
-      <section class="card hidden" id="autoCard">
+      <section class="card cadre hidden" id="autoCard">
         <h3>Automatisation</h3>
         <div id="promoteRow" class="auto-row">
           <label class="toggle"><input type="checkbox" id="autoPromote"> Promotion</label>
@@ -101,11 +106,11 @@
       </section>
 
       <section id="tab-legacy" class="tab">
-        <div class="legacy-head card">
+        <div class="legacy-head card cadre">
           <div class="stat"><label>Points</label><b id="lpPoints">0</b></div>
           <div class="stat"><label>Gain à la transmission</label><b id="lpPreview" class="gold">0</b></div>
           <div class="reb">
-            <button id="rebirthBtn" class="btn danger">Transmettre l'héritage</button>
+            <button id="rebirthBtn" class="btn btn-noble">Transmettre l'héritage</button>
             <span id="rebirthHint" class="muted small"></span>
           </div>
         </div>
@@ -123,12 +128,12 @@
         <div id="achGrid" class="grid-cards"></div>
       </section>
 
-      <section id="tab-journal" class="tab"><ul id="journal" class="journal"></ul></section>
+      <section id="tab-journal" class="tab"><ul id="journal" class="journal cadre"></ul></section>
 
       <section id="tab-stats" class="tab"><div id="statsBox"></div></section>
 
       <section id="tab-options" class="tab">
-        <div class="card">
+        <div class="card cadre">
           <h3>Sauvegarde</h3>
           <div class="row-btns">
             <button id="saveBtn" class="btn">Sauvegarder</button>
@@ -138,7 +143,7 @@
           </div>
           <textarea id="saveText" placeholder="Collez une sauvegarde ici puis cliquez sur Importer"></textarea>
         </div>
-        <div class="card">
+        <div class="card cadre">
           <h3>Préférences</h3>
           <label class="toggle"><input type="checkbox" id="optOffline"> Progression hors-ligne</label>
           <div class="row-btns"><button id="tutoReplay" class="btn small">Revoir le tutoriel</button></div>
@@ -148,7 +153,7 @@
     </main>
   </div>
 
-  <div id="tuto" class="tuto hidden">
+  <div id="tuto" class="tuto cadre-noble hidden">
     <div class="tuto-step muted small" id="tutoStep"></div>
     <p id="tutoText"></p>
     <div class="tuto-wait small" id="tutoWait"></div>
@@ -158,7 +163,7 @@
     </div>
   </div>
 
-  <div id="modal" class="modal hidden"><div class="modal-box" id="modalBox"></div></div>
+  <div id="modal" class="modal hidden"><div class="modal-box cadre-noble" id="modalBox"></div></div>
   <div id="toasts"></div>
 
   <script src="js/data.js"></script>

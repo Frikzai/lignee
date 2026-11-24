@@ -83,3 +83,27 @@
 
 /* ------------------------------------------------------- Moins d'animations */
 @media (prefers-reduced-motion: reduce) { .lanterne::after { animation: none; opacity: .8; } }
+
+/* ------------------------------------------------------- Cadre général */
+.topbar { border-bottom-color: var(--orne); }
+.ressources, #ressources-modules, .ressource-module { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.cadre-noble:has(> .lanterne) { padding-top: 20px; }
+.modal-box.cadre-noble {
+  border-radius: var(--radius); border-color: var(--orne);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .6), inset 0 0 0 3px var(--panel), inset 0 0 0 4px var(--filet);
+}
+.tuto.cadre-noble {
+  border-radius: var(--radius); border-color: var(--orne);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, .6), inset 0 0 0 3px var(--panel), inset 0 0 0 4px var(--filet);
+}
+/* catégorie sans rien de débloqué : ligne compacte en pointillés, sans brindilles */
+.table-wrap.compact.cadre::before, .table-wrap.compact.cadre::after { display: none; }
+.lock-title .icone, .lock-cat + .lock-title .icone { color: var(--muted); }
+.ach .ach-etoile { display: none; margin-right: 5px; color: var(--accent); }
+.ach.unlocked .ach-etoile { display: inline-block; }
+.perk .rank .icone, .challenge .rank .icone { color: var(--accent); }
+.marque { display: inline-flex; align-items: center; gap: 2px; margin-left: 6px; font: 11px system-ui, sans-serif; vertical-align: middle; cursor: help; }
+.marque-mauvais { color: var(--bad); }
+.marque-bon { color: var(--good); }
+.jauge { margin-bottom: 8px; }
+.jauge .now-head .icone { color: var(--orne-vif); }
