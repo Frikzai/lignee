@@ -10,6 +10,19 @@ function el(tag, cls, text) {
   if (text != null) e.textContent = text;
   return e;
 }
+// Icône du sprite img/icones.svg (style gravé au trait, couleur = currentColor).
+const ICONES = 'img/icones.svg';
+function icone(nom, cls = '') {
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('class', cls ? 'icone ' + cls : 'icone');
+  svg.setAttribute('aria-hidden', 'true');
+  const use = document.createElementNS(NS, 'use');
+  use.setAttribute('href', `${ICONES}#i-${nom}`);
+  svg.appendChild(use);
+  return svg;
+}
+
 // Barre de progression : quand un niveau est franchi entre deux rafraîchissements,
 // on la remplit jusqu'au bout avant de repartir de zéro (sans animation à l'envers).
 function setProgress(bar, level, pct) {

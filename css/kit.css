@@ -1,0 +1,19 @@
+/* =====================================================================
+   Lignée — kit « Arbre aux Lanternes »
+   Brindilles pour le courant, Enluminure pour l'important.
+   Règle : jamais d'aplat d'or — l'or n'existe qu'en traits et en texte.
+   ===================================================================== */
+
+:root {
+  --orne: #8a6326;                    /* ornements discrets */
+  --orne-vif: #d9973a;                /* ornements accentués */
+  --filet: rgba(217, 151, 58, .45);   /* filet intérieur des cadres nobles */
+  --lanterne: #ffc861;
+  --lanterne-halo: rgba(255, 180, 80, .35);
+}
+
+/* ----------------------------------------------------------------- Icônes */
+.icone {
+  width: 1em; height: 1em; vertical-align: -.15em; flex: none;
+  fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round;
+}
