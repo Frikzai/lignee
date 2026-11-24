@@ -116,3 +116,7 @@
   border: 1px solid var(--border); border-radius: var(--radius); padding: 6px 8px; font: 15px var(--font-titre);
 }
 .maison-ligne input:focus { outline: none; border-color: var(--orne); }
+
+/* focus clavier : lueur dorée plutôt que l'anneau bleu du navigateur */
+.btn:focus-visible { outline: none; box-shadow: 0 0 0 1px var(--accent), 0 0 12px rgba(217, 151, 58, .55); }
+.btn-noble:focus-visible, .btn.primary:focus-visible { box-shadow: inset 0 0 0 2px var(--panel), inset 0 0 0 3px var(--filet), 0 0 0 1px var(--accent), 0 0 12px rgba(217, 151, 58, .55); }
