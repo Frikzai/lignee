@@ -104,12 +104,9 @@ select, textarea {
 }
 textarea { margin-top: 10px; min-height: 80px; font-family: ui-monospace, Consolas, monospace; font-size: 11px; }
 
-.event-card { border-color: var(--event); box-shadow: 0 0 0 1px rgba(111,159,176,.25), 0 0 18px rgba(111,159,176,.15); animation: pulse 2s ease-in-out infinite; }
 .event-card h3 { color: var(--event); }
-.event-card .bar > div { background: var(--event); }
 .choices { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
 .choice { text-align: left; font-size: 13px; font-family: inherit; }
-@keyframes pulse { 50% { box-shadow: 0 0 0 1px rgba(111,159,176,.45), 0 0 24px rgba(111,159,176,.3); } }
 
 .goals, .buffs { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
 .goals li { font-size: 12px; }
@@ -186,7 +183,6 @@ table.grid { width: 100%; border-collapse: collapse; font-variant-numeric: tabul
 @keyframes focusPulse { 50% { outline-color: rgba(217,151,58,.35); } }
 
 /* --------------------------------------------------- Traits, défis, corruption */
-.trait-line { margin-bottom: 8px; font-family: var(--font-titre); color: var(--accent); cursor: help; }
 .challenge-active { margin: 8px 0; padding: 8px 10px; border: 1px solid var(--event); border-radius: 6px; background: rgba(111,159,176,.08); }
 .challenge-active b { color: var(--event); }
 .challenge-active .btn { margin-top: 6px; }
