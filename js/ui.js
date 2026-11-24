@@ -39,6 +39,8 @@ function creerRegistre(rendre) {
   };
 }
 const valeur = v => (typeof v === 'function' ? v() : v);
+// Texte venu d'une sauvegarde (prénoms, nom de maison) inséré dans du HTML.
+const echapper = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const TONS = { bon: 'var(--good)', moyen: 'var(--accent)', mauvais: 'var(--bad)' };
 
 // Barre de progression : quand un niveau est franchi entre deux rafraîchissements,
@@ -289,6 +291,13 @@ const UI = {
       try { importSave($('saveText').value); location.reload(); }
       catch (e) { this.toast('Sauvegarde invalide.', 'bad'); }
     });
+    const nommer = () => {
+      const n = Lignee.nommer($('maisonInput').value);
+      if (n) { $('maisonInput').value = ''; this.toast(`La maison ${n} est fondée.`, 'gold'); this.update(); }
+      else this.toast('Ce nom ne convient pas.', 'bad');
+    };
+    $('maisonBtn').addEventListener('click', nommer);
+    $('maisonInput').addEventListener('keydown', e => { if (e.key === 'Enter') nommer(); });
     $('resetBtn').addEventListener('click', () =>
       this.confirm('Tout effacer ?', 'Votre lignée entière, vos talents et vos hauts faits seront perdus. Action irréversible.', () => hardReset()));
   },
@@ -317,6 +326,7 @@ const UI = {
       case 'achievements': this.updateAchievements(); break;
       case 'stats': this.updateStats(); break;
       case 'journal': this.updateJournal(); break;
+      case 'options': this.updateOptions(); break;
     }
     if (G.dead) { if (this.modalKind !== 'death') this.showDeath(); }
     else if (G.pendingTraits && !this.modalKind) this.showTraits();
@@ -340,6 +350,10 @@ const UI = {
 
   updateTop() {
     const life = lifespanYears();
+    if (G.lignee && typeof nomComplet === 'function') {
+      const nom = nomComplet(G.lignee);
+      if ($('identite').textContent !== nom) $('identite').textContent = nom;
+    }
     $('ageText').textContent = fmtAge(G.days);
     $('lifeText').textContent = `${Math.floor(life)} ans`;
     const pct = Math.min(100, ageYears() / life * 100);
@@ -568,6 +582,14 @@ const UI = {
     box.appendChild(wrap);
   },
 
+  updateOptions() {
+    const l = G.lignee;
+    if (!l) return;
+    const gen = l.oublies + l.vies.length + 1;
+    const txt = `${l.maison ? 'Maison ' + l.maison : 'Maison sans nom'} · génération ${gen} · ${nomComplet(l)}`;
+    if ($('ligneeInfo').textContent !== txt) $('ligneeInfo').textContent = txt;
+  },
+
   updateJournal() {
     const key = G.log.length + ':' + (G.log[0] ? G.log[0].msg : '');
     if (key === this.logKey) return;
@@ -723,7 +745,7 @@ const UI = {
     const pts = legacyPointsPreview();
     this.openModal('death', `
       <h2>Fin d'une vie</h2>
-      <p>Vous vous éteignez à <b>${Math.floor(ageYears())} ans</b>.</p>
+      <p>${G.lignee ? `<b>${echapper(G.lignee.courante.prenom)}</b> s'éteint` : 'Vous vous éteignez'} à <b>${Math.floor(ageYears())} ans</b>.</p>
       <p>Vous transmettez <b class="gold">${pts} point(s) d'héritage</b>, et vos niveaux deviennent des bonus d'XP pour la suite.</p>`,
       [{ label: 'Commencer une nouvelle vie', cls: 'primary', run: () => { rebirth(); this.setTab('legacy'); } }]);
   },
