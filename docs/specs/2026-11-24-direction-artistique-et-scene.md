@@ -95,11 +95,12 @@ Couches, dans l'ordre :
   <g id="elements">        <g class="element" data-element="enclume|billot|riviere|…">
   <g id="perso">
      <g class="jambe-arriere"> <g class="jambe-avant">
-     <g class="torse">  (dont <g class="barbe">, <g class="yeux">)
-     <g class="tete">
-     <g class="bras-arriere"><g class="avant-bras-arriere">…
-     <g class="bras-avant"><g class="avant-bras-avant"><g class="main-avant">
-          <g class="objet" data-objet="marteau|hache|…">
+     <g class="haut">   (pivot hanche : se penche avec l'âge)
+        <g class="bras-arriere"><g class="avant-bras-arriere"><g class="main-arriere">
+        <g class="torse">
+        <g class="tete">  (dont <g class="barbe">, <g class="yeux">)
+        <g class="bras-avant"><g class="avant-bras-avant"><g class="main-avant">
+             <g class="objet" data-objet="marteau|hache|…">
   <g id="effets">          étincelles, éclat de niveau, fumée de corruption
 </svg>
 ```
@@ -195,7 +196,7 @@ Chargé dans `index.html` juste après `<script src="js/ui.js">` (l'ordre import
 - Un bloc par geste : `#scene[data-geste="frapper"] .bras-avant { animation: frapper-bras … }`, etc. Toutes les durées sont multipliées par `var(--tempo, 1)`.
 - Teintes par voie via variables (`#scene[data-voie="arcanes"] { --ciel-1: … }`).
 - **Uniquement `transform` et `opacity` animés** ; les filtres (corruption) sont statiques.
-- `@media (prefers-reduced-motion: reduce)` : toutes les animations du bandeau à l'arrêt (pose clé), pas d'éclat, fondu conservé.
+- `@media (prefers-reduced-motion: reduce)` : toutes les animations du bandeau à l'arrêt (pose clé), pas d'éclat, changement de métier en coupe nette (pas de fondu).
 
 ### 4.8 Modifications des fichiers partagés
 
