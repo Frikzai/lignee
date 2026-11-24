@@ -28,8 +28,8 @@
 | 5 | `feature/onglet-heritage` | L'arbre généalogique + talents | ✅ |
 | 6 | `feature/panneau-vie` | Colonne du personnage : identité, santé, métier/compétence, corruption, événements, automatisation | ✅ |
 | 7 | `feature/onglets-metiers-competences` | Registres illustrés avec icônes | ✅ |
-| 8 | `feature/onglet-boutique` | Logements et possessions | ✅ prête (à merger) |
-| 9 | `feature/onglets-secondaires` | Défis, Hauts faits, Journal, Statistiques, Options | |
+| 8 | `feature/onglet-boutique` | Logements et possessions | ✅ |
+| 9 | `feature/onglets-secondaires` | Défis, Hauts faits, Journal, Statistiques, Options | ✅ prête (à merger) |
 | 10 | `feature/scene-milice` / `-arcanes` / `-ombre` | Les 3 voies restantes + 12 médaillons | |
 | 11 | `feature/scene-saisons-sante` | La scène réagit aux saisons et à la santé | |
 | 12 | `feature/finitions` | Tutoriel, notifications, favicon, transitions d'onglets, passe mobile | |
