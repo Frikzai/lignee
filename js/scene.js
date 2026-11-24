@@ -85,12 +85,19 @@ async function initScene() {
   const med = document.createElement('div');
   med.className = 'medaillon';
   scene.appendChild(med);
+  try {
+    med.insertAdjacentHTML('afterbegin', await loadSvg('medaillons.svg'));
+    vu.med = med;
+  } catch (err) {
+    med.classList.add('hidden');   // la scène continue sans médaillon
+    console.warn('[scène] médaillon désactivé :', err.message);
+  }
   showOnly('decor', 'data-voie', 'neutre');
   setInterval(updateScene, 100);
 }
 
 const REDUIT = typeof matchMedia !== 'undefined' ? matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
-const vu = { job: null, fondu: false, jobNiv: null, corruption: null };   // dernières valeurs appliquées au bandeau
+const vu = { job: null, fondu: false, jobNiv: null, corruption: null, skill: null, skillNiv: null, med: null };   // dernières valeurs appliquées au bandeau
 const minuteurs = {};
 
 function setFlag(el, key, on) {
@@ -117,6 +124,18 @@ function applyJob(jobId) {
   showOnly('objet', 'data-objet', s.objet);
 }
 
+function applySkill(skillId) {
+  const med = vu.med;
+  const s = typeof SKILL_BY_ID !== 'undefined' ? SKILL_BY_ID[skillId] : undefined;
+  const nom = s ? s.name : String(skillId);
+  showOnly('med', 'data-skill', skillId);
+  setFlag(med, 'fallback', !med.querySelector('.med.actif'));
+  med.querySelector('.med-initiale').textContent = nom.charAt(0).toUpperCase();
+  const cat = s && typeof SKILL_CATS !== 'undefined' && SKILL_CATS[s.cat];
+  med.style.setProperty('--cat', cat ? cat.color : 'var(--muted)');
+  med.title = nom;
+}
+
 function updateScene() {
   if (typeof G === 'undefined' || !G) return;
   const scene = document.getElementById('scene');
@@ -139,6 +158,13 @@ function updateScene() {
   const job = { id: G.currentJob, level: G.jobs[G.currentJob]?.level ?? 0 };
   if (isLevelUp(vu.jobNiv, job)) flash(scene, 'eclat');
   vu.jobNiv = job;
+
+  if (vu.med) {
+    if (G.currentSkill !== vu.skill) applySkill(vu.skill = G.currentSkill);
+    const skill = { id: G.currentSkill, level: G.skills[G.currentSkill]?.level ?? 0 };
+    if (isLevelUp(vu.skillNiv, skill)) flash(vu.med, 'eclat-med');
+    vu.skillNiv = skill;
+  }
 
   const corruption = Math.min(100, Math.max(0, G.corruption || 0));
   if (corruption !== vu.corruption) {
