@@ -1,0 +1,47 @@
+/* =====================================================================
+   Lignée — colonne du personnage (index.html #nowCard, #eventCard, #autoCard)
+   ===================================================================== */
+
+/* portrait */
+.portrait { text-align: center; }
+.portrait-nom { font: 22px var(--font-titre); color: var(--accent); text-shadow: 0 0 12px rgba(217, 151, 58, .3); }
+.trait-badge { display: inline-flex; align-items: center; gap: 6px; margin-top: 8px; padding: 2px 11px; border: 1px solid var(--orne); border-radius: 12px;
+  font: 14px var(--font-titre); color: var(--accent); cursor: help; }
+#nowCard .sep { margin: 8px 0 10px; }
+.colonne-lbl { margin: 4px 0 6px; font: 12px var(--font-titre-sc); letter-spacing: .05em; color: var(--muted); }
+
+/* occupations : médaillon + barre */
+.occ { display: grid; grid-template-columns: 34px 1fr; align-items: center; gap: 9px; margin-bottom: 9px; }
+.occ .now { margin: 0; }
+.occ-med { color: var(--accent); display: flex; align-items: center; justify-content: center; width: 34px; height: 34px; border: 1px solid var(--orne); border-radius: 50%; background: #1a130f; }
+.occ-med .icone { width: 17px; height: 17px; }
+#jauges .now-head > span:first-child, .occ .now-head > span:first-child, #corruptionBox .now-head > span:first-child { font: 16px var(--font-titre); font-weight: normal; }
+#corruptionBox { margin-top: 6px; }
+#corruptionBox .icone { color: #a77bc4; }
+
+/* bonus temporaires en pastilles */
+.buffs { flex-direction: row; flex-wrap: wrap; gap: 5px; margin-top: 8px; }
+.buffs .buff { display: inline-flex; align-items: center; gap: 5px; padding: 2px 9px; border: 1px solid var(--border); border-radius: 11px; background: #1a130f; font-size: 11px; }
+.buffs .buff .icone { width: 12px; height: 12px; color: var(--orne-vif); }
+
+/* événement : cadre noble, titre bleu-nuit, la mèche se consume */
+.event-card h3 { margin-top: 2px; font: 19px var(--font-titre); text-transform: none; letter-spacing: 0; color: #a9c4cf; }
+.event-card .choice { border-color: var(--orne); }
+.meche { position: relative; height: 4px; margin-top: 10px; border-radius: 2px; background: #0b0806; }
+.meche > div { position: relative; height: 100%; border-radius: 2px; background: linear-gradient(90deg, #3a2a20, var(--ember)); }
+.meche > div::after { content: ''; position: absolute; right: -5px; top: -3px; width: 10px; height: 10px; border-radius: 50%;
+  background: radial-gradient(circle, #ffe08a, #ff6a1f 55%, transparent 72%); animation: braise-meche .5s ease-in-out infinite alternate; }
+@keyframes braise-meche { to { transform: scale(1.35); opacity: .75; } }
+
+/* serviteurs : interrupteurs-lanternes (dessinés en fond : pas de pseudo-élément sur un input) */
+#autoCard h3 { font: 14px var(--font-titre-sc); text-transform: none; letter-spacing: .04em; color: var(--muted); }
+#autoCard .toggle { font: 15px var(--font-titre); }
+#autoCard .toggle .icone { color: var(--orne-vif); }
+#autoCard .toggle input { appearance: none; -webkit-appearance: none; flex: none; width: 28px; height: 15px; margin: 0; border: 1px solid var(--orne); border-radius: 8px; cursor: pointer;
+  background: radial-gradient(circle at 7px 50%, #5a4630 4.5px, transparent 5px), #0b0806; }
+#autoCard .toggle input:checked { background: radial-gradient(circle at calc(100% - 7px) 50%, #ffc861 4.5px, transparent 5px), #0b0806; box-shadow: 0 0 6px rgba(255, 200, 97, .45); }
+
+@media (prefers-reduced-motion: reduce) { .meche > div::after { animation: none; } }
+
+/* le portrait porte le nom : la barre du haut ne le répète que lorsque la colonne passe sous le jeu */
+@media (min-width: 901px) { #identite { display: none; } }

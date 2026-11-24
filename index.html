@@ -10,6 +10,7 @@
   <link rel="stylesheet" href="css/accueil.css">
   <link rel="stylesheet" href="css/rituel.css">
   <link rel="stylesheet" href="css/heritage.css">
+  <link rel="stylesheet" href="css/colonne.css">
   <link rel="stylesheet" href="css/scene.css">
 </head>
 <body>
@@ -35,15 +36,27 @@
     <aside class="sidebar">
       <section class="card cadre-noble" id="nowCard">
         <span class="lanterne" aria-hidden="true"></span>
-        <div id="traitLine" class="trait-line"></div>
-        <div id="jauges"></div>
-        <div class="now">
-          <div class="now-head"><span id="curJobName"></span><span class="muted small" id="curJobInfo"></span></div>
-          <div class="bar"><div id="curJobFill"></div></div>
+        <div class="portrait">
+          <div id="portraitNom" class="portrait-nom"></div>
+          <div id="portraitSous" class="muted small"></div>
+          <div id="traitLine" class="trait-badge hidden"></div>
         </div>
-        <div class="now">
-          <div class="now-head"><span id="curSkillName"></span><span class="muted small" id="curSkillInfo"></span></div>
-          <div class="bar"><div id="curSkillFill"></div></div>
+        <div class="sep"></div>
+        <div id="jauges"></div>
+        <div class="colonne-lbl">Occupations</div>
+        <div class="occ">
+          <span id="curJobMed" class="occ-med" aria-hidden="true"></span>
+          <div class="now">
+            <div class="now-head"><span id="curJobName"></span><span class="muted small" id="curJobInfo"></span></div>
+            <div class="bar"><div id="curJobFill"></div></div>
+          </div>
+        </div>
+        <div class="occ">
+          <span id="curSkillMed" class="occ-med" aria-hidden="true"></span>
+          <div class="now">
+            <div class="now-head"><span id="curSkillName"></span><span class="muted small" id="curSkillInfo"></span></div>
+            <div class="bar"><div id="curSkillFill"></div></div>
+          </div>
         </div>
         <div id="challengeBox" class="challenge-active hidden">
           <b id="chName"></b>
@@ -51,37 +64,38 @@
           <button id="abandonBtn" class="btn small ghost">Abandonner</button>
         </div>
         <div id="corruptionBox" class="hidden">
-          <div class="age-line small"><span>Corruption</span><span id="corrText"></span></div>
+          <div class="now-head"><span><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-lune"/></svg> Corruption</span><span id="corrText" class="muted small"></span></div>
           <div class="bar"><div id="corrFill" class="corr"></div></div>
         </div>
         <ul id="buffs" class="buffs"></ul>
       </section>
 
-      <section class="card cadre event-card hidden" id="eventCard">
+      <section class="card cadre-noble event-card hidden" id="eventCard">
+        <span class="lanterne" aria-hidden="true"></span>
         <h3 id="eventTitle"></h3>
         <p id="eventText"></p>
         <div id="eventChoices" class="choices"></div>
-        <div class="bar thin"><div id="eventTimer"></div></div>
+        <div class="meche" title="Temps restant pour décider"><div id="eventTimer"></div></div>
       </section>
 
       <section class="card cadre hidden" id="autoCard">
-        <h3>Automatisation</h3>
+        <h3>Serviteurs de la maison</h3>
         <div id="promoteRow" class="auto-row">
-          <label class="toggle"><input type="checkbox" id="autoPromote"> Promotion</label>
+          <label class="toggle" title="Promotion automatique des métiers"><input type="checkbox" id="autoPromote"><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-cle"/></svg> Intendant</label>
           <select id="promoteMode">
             <option value="categorie">même catégorie</option>
             <option value="revenu">meilleur revenu</option>
           </select>
         </div>
         <div id="learnRow" class="auto-row">
-          <label class="toggle"><input type="checkbox" id="autoLearn"> Apprentissage</label>
+          <label class="toggle" title="Apprentissage automatique des compétences"><input type="checkbox" id="autoLearn"><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-livre"/></svg> Précepteur</label>
           <select id="learnMode">
             <option value="lowest">plus bas niveau</option>
             <option value="fastest">plus rapide</option>
           </select>
         </div>
         <div id="buyRow" class="auto-row">
-          <label class="toggle"><input type="checkbox" id="autoBuy"> Achats</label>
+          <label class="toggle" title="Achats automatiques en boutique"><input type="checkbox" id="autoBuy"><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-cloche"/></svg> Majordome</label>
           <div class="keep-line small muted">garder <input type="range" id="buyKeep" min="0" max="90" step="5"> <b id="buyKeepText">30 %</b></div>
         </div>
       </section>
@@ -204,6 +218,7 @@
 
   <script src="js/data.js"></script>
   <script src="js/game.js"></script>
+  <script src="js/emblemes.js"></script>
   <script src="js/ui.js"></script>
   <script src="js/lignee.js"></script>
   <script src="js/accueil.js"></script>

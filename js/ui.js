@@ -387,17 +387,31 @@ const UI = {
   },
 
   updateSidebar() {
-    const tr = currentTrait();
-    $('traitLine').classList.toggle('hidden', !tr);
-    if (tr) { $('traitLine').textContent = tr.name; $('traitLine').title = tr.desc; }
+    // Portrait : nom, âge, génération, trait de naissance gravé
+    if (G.lignee && typeof nomComplet === 'function') {
+      const l = G.lignee, gen = l.oublies + l.vies.length + 1;
+      const nom = nomComplet(l), sous = `${Math.floor(ageYears())} ans · génération ${typeof romain === 'function' ? romain(gen) : gen}`;
+      if ($('portraitNom').textContent !== nom) $('portraitNom').textContent = nom;
+      if ($('portraitSous').textContent !== sous) $('portraitSous').textContent = sous;
+    }
+    const tr = currentTrait(), badge = $('traitLine');
+    badge.classList.toggle('hidden', !tr);
+    if (tr && badge._id !== tr.id) {
+      badge._id = tr.id;
+      const d = typeof DESTINS !== 'undefined' && DESTINS[tr.id];
+      badge.replaceChildren(icone(d ? d.embleme : 'etoile'), tr.name);
+      badge.title = tr.desc;
+    }
 
     const j = JOB_BY_ID[G.currentJob], je = G.jobs[j.id];
+    this.medaillon($('curJobMed'), ICONES_METIERS[j.id]);
     $('curJobName').textContent = `${j.name} ${je.level}`;
     $('curJobInfo').textContent = `${fmt(jobIncome(j))} écus/j`;
     setProgress($('curJobFill'), je.level, je.xp / maxXp(j.xp, je.level) * 100);
     $('curJobFill').style.background = JOB_CATS[j.cat].color;
 
     const s = SKILL_BY_ID[G.currentSkill], se = G.skills[s.id];
+    this.medaillon($('curSkillMed'), ICONES_COMPETENCES[s.id]);
     $('curSkillName').textContent = `${s.name} ${se.level}`;
     $('curSkillInfo').textContent = s.effects.map(e => describeEffect(e, se.level)).join(', ');
     setProgress($('curSkillFill'), se.level, se.xp / maxXp(s.xp, se.level) * 100);
@@ -417,7 +431,9 @@ const UI = {
     }
     const bl = $('buffs'); bl.innerHTML = '';
     for (const b of G.buffs) {
-      bl.appendChild(el('li', null, `${b.name} : ×${fmtMult(b.mult)} ${STAT_LABELS[b.stat]} (${Math.ceil(b.until - G.days)} j)`));
+      const li = el('li', 'buff');
+      li.append(icone(iconeStat(b.stat)), `${b.name} : ×${fmtMult(b.mult)} ${STAT_LABELS[b.stat]} · ${Math.ceil(b.until - G.days)} j`);
+      bl.appendChild(li);
     }
 
     // Événement
@@ -459,6 +475,13 @@ const UI = {
     $('autoLearn').checked = G.settings.autoLearn;
     $('autoBuy').checked = G.settings.autoBuy;
     $('buyKeepText').textContent = G.settings.buyKeep + ' %';
+  },
+
+  // médaillon d'occupation : l'icône ne change qu'avec le métier ou la compétence
+  medaillon(box, nom) {
+    if (box._nom === nom) return;
+    box._nom = nom;
+    box.replaceChildren(icone(nom || 'etoile'));
   },
 
   updateEntityRows(kind, list, cats, rows, state, xpPerDay, col2) {
