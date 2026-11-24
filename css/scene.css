@@ -1,0 +1,53 @@
+/* =====================================================================
+   Lignée — scène animée du bandeau (voir js/scene.js et img/scene.svg)
+   Règle d'or : on n'anime que transform et opacity.
+   ===================================================================== */
+
+#scene {
+  --sil: #0a0705;
+  --ciel-haut: #120d10;
+  --ciel-bas: #3a1a14;
+  --lueur: #8a3414;
+  --lointain: #1c120f;
+  --lune: #e9c98a;
+  --feu: #ff6a1f;
+  --etincelle: #ffd27a;
+  position: relative; height: 160px; margin-bottom: 12px; overflow: hidden;
+  border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg);
+  box-shadow: inset 0 0 0 1px #0b0806;
+}
+@media (max-width: 900px) { #scene { height: 120px; } }
+#scene .scene-svg { display: block; width: 100%; height: 100%; }
+
+/* ---------------------------------------------------------------- Couleurs */
+#scene .ciel-haut { stop-color: var(--ciel-haut); }
+#scene .ciel-bas { stop-color: var(--ciel-bas); }
+#scene .lune { fill: var(--lune); opacity: .85; }
+#scene .lointain { fill: var(--lointain); }
+#scene .sol, #scene .sil, #scene .sil * { fill: var(--sil); }
+#scene .membre { fill: none; stroke: var(--sil); stroke-linecap: round; }
+#scene .yeux-oeil { fill: #ff3b2a; }
+#scene .yeux-halo { fill: #ff3b2a; opacity: .35; }
+
+/* -------------------------------------------- Calques : un seul affiché */
+#scene .decor, #scene .element, #scene .objet, #scene .med { display: none; }
+#scene .actif { display: inline; }
+#scene .barbe, #scene .yeux { display: none; }
+
+/* --------------------------------------------------------------- Pivots */
+#scene #perso { transform-origin: 220px 100px; }
+#scene .haut { transform-origin: 220px 76px; }
+#scene .tete { transform-origin: 220px 56px; }
+#scene .jambe-avant { transform-origin: 222px 76px; }
+#scene .jambe-arriere { transform-origin: 218px 76px; }
+#scene .bras-avant { transform-origin: 224px 59px; }
+#scene .avant-bras-avant { transform-origin: 224px 69px; }
+#scene .main-avant { transform-origin: 224px 78px; }
+#scene .bras-arriere { transform-origin: 216px 59px; }
+#scene .avant-bras-arriere { transform-origin: 216px 69px; }
+#scene .main-arriere { transform-origin: 216px 78px; }
+
+/* ------------------------------------------------- Moins d'animations */
+@media (prefers-reduced-motion: reduce) {
+  #scene * { animation: none !important; transition: none !important; }
+}

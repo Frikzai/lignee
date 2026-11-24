@@ -1,0 +1,65 @@
+<svg xmlns="http://www.w3.org/2000/svg" class="scene-svg" viewBox="0 0 480 110" preserveAspectRatio="xMidYMax slice">
+  <!--
+    Théâtre de la scène animée (voir docs/specs/2026-11-24-direction-artistique-et-scene.md §4.2).
+    Repères : sol y=100 · zone sûre x∈[90,390] y∈[38,110] · personnage centré x=220 · éléments x∈[236,330].
+    Pivots (transform-origin dans css/scene.css) :
+      #perso 220,100 · .haut 220,76 · .tete 220,56
+      .jambe-avant 222,76 · .jambe-arriere 218,76
+      .bras-avant 224,59 · .avant-bras-avant 224,69 · .main-avant 224,78
+      .bras-arriere 216,59 · .avant-bras-arriere 216,69 · .main-arriere 216,78
+    Pose de référence : debout, bras pendants. Les objets sont dessinés tenus dans .main-avant (ou .main-arriere).
+    Couleurs : uniquement via les classes / variables CSS (--sil, --ciel-haut…).
+  -->
+  <defs>
+    <linearGradient id="scene-ciel" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" class="ciel-haut"/>
+      <stop offset="1" class="ciel-bas"/>
+    </linearGradient>
+  </defs>
+
+  <g id="ciel">
+    <rect width="480" height="110" fill="url(#scene-ciel)"/>
+    <circle class="lune" cx="398" cy="42" r="7"/>
+  </g>
+
+  <g id="decors">
+    <g class="decor" data-voie="neutre">
+      <path class="lointain" d="M0 100 V86 Q40 78 80 84 T170 82 T260 85 T350 80 T430 84 T480 82 V100 Z"/>
+    </g>
+  </g>
+
+  <rect class="sol" y="100" width="480" height="10"/>
+
+  <g id="elements"></g>
+
+  <g id="perso" class="sil">
+    <g class="jambe-arriere"><path d="M216.2 76 H219.8 L218.4 98 L219.8 98.6 V100 H214.8 L215 98 Z"/></g>
+    <g class="jambe-avant"><path d="M220.2 76 H223.8 L223.2 98 L225.4 98.6 V100 H220.4 V98 Z"/></g>
+    <g class="haut">
+      <g class="bras-arriere">
+        <path class="membre" d="M216 59 V69" stroke-width="3.4"/>
+        <g class="avant-bras-arriere">
+          <path class="membre" d="M216 69 V77.4" stroke-width="3"/>
+          <g class="main-arriere"><circle cx="216" cy="78" r="1.7"/></g>
+        </g>
+      </g>
+      <g class="torse"><path d="M215.6 59.6 Q220 56.6 224.4 59.6 L223.8 70 L225.6 80 H214.4 L216.2 70 Z"/></g>
+      <g class="tete">
+        <rect x="218.7" y="54" width="2.6" height="4.5"/>
+        <path d="M220 44.4 A5.6 5.6 0 1 1 219.9 55.6 A5.6 5.6 0 0 1 220 44.4 Z M225.2 49.2 L226.8 51.2 L225.2 51.8 Z"/>
+        <g class="barbe"><path d="M221.6 53 L226.6 55.4 Q225 60.2 220.4 59.2 Z"/></g>
+        <g class="yeux"><circle class="yeux-halo" cx="223.4" cy="49.2" r="2"/><circle class="yeux-oeil" cx="223.4" cy="49.2" r=".8"/></g>
+      </g>
+      <g class="bras-avant">
+        <path class="membre" d="M224 59 V69" stroke-width="3.4"/>
+        <g class="avant-bras-avant">
+          <path class="membre" d="M224 69 V77.4" stroke-width="3"/>
+          <g class="main-avant"><circle cx="224" cy="78" r="1.7"/></g>
+        </g>
+      </g>
+    </g>
+  </g>
+
+  <g id="effets"></g>
+
+</svg>
