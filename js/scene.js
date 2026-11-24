@@ -89,8 +89,45 @@ async function initScene() {
   setInterval(updateScene, 100);
 }
 
+const REDUIT = typeof matchMedia !== 'undefined' ? matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
+const vu = { job: null, fondu: false };   // dernières valeurs appliquées au bandeau
+
+function setFlag(el, key, on) {
+  if (on === key in el.dataset) return;
+  if (on) el.dataset[key] = ''; else delete el.dataset[key];
+}
+
+function applyJob(jobId) {
+  const s = sceneFor(jobId), scene = document.getElementById('scene');
+  scene.dataset.voie = s.voie;
+  scene.dataset.geste = s.geste;
+  showOnly('decor', 'data-voie', s.voie);
+  showOnly('element', 'data-element', s.element);
+  showOnly('objet', 'data-objet', s.objet);
+}
+
 function updateScene() {
   if (typeof G === 'undefined' || !G) return;
+  const scene = document.getElementById('scene');
+
+  if (G.currentJob !== vu.job) {
+    vu.job = G.currentJob;
+    if (REDUIT.matches || !scene.dataset.geste) applyJob(vu.job);   // premier affichage : sans fondu
+    else if (!vu.fondu) {
+      vu.fondu = true;
+      scene.classList.add('fondu');
+      setTimeout(() => {
+        vu.job = G.currentJob;   // le métier a pu encore changer pendant le fondu : on affiche le dernier
+        applyJob(vu.job);
+        scene.classList.remove('fondu');
+        vu.fondu = false;
+      }, 250);
+    }
+  }
+
+  setFlag(scene, 'pause', !!(G.paused || G.dead));
+  const age = ageStage(ageYears(), lifespanYears());
+  if (scene.dataset.age !== age) scene.dataset.age = age;
 }
 
 if (typeof document !== 'undefined') initScene();

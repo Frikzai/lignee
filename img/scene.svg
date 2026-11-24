@@ -15,16 +15,22 @@
       <stop offset="0" class="ciel-haut"/>
       <stop offset="1" class="ciel-bas"/>
     </linearGradient>
+    <radialGradient id="scene-lueur" cx=".5" cy=".5" r=".5">
+      <stop offset="0" class="lueur-coeur"/>
+      <stop offset="1" class="lueur-bord"/>
+    </radialGradient>
   </defs>
 
   <g id="ciel">
     <rect width="480" height="110" fill="url(#scene-ciel)"/>
     <circle class="lune" cx="398" cy="42" r="7"/>
+    <!-- lueur d'horizon derrière le personnage : garde la silhouette lisible -->
+    <ellipse cx="230" cy="100" rx="200" ry="46" fill="url(#scene-lueur)"/>
   </g>
 
   <g id="decors">
     <g class="decor" data-voie="neutre">
-      <path class="lointain" d="M0 100 V86 Q40 78 80 84 T170 82 T260 85 T350 80 T430 84 T480 82 V100 Z"/>
+      <path class="lointain" d="M0 100 V91 Q40 85 80 89 T170 88 T260 92 T350 86 T430 90 T480 87 V100 Z"/>
     </g>
   </g>
 

@@ -23,6 +23,8 @@
 #scene .ciel-haut { stop-color: var(--ciel-haut); }
 #scene .ciel-bas { stop-color: var(--ciel-bas); }
 #scene .lune { fill: var(--lune); opacity: .85; }
+#scene .lueur-coeur { stop-color: var(--lueur); stop-opacity: .75; }
+#scene .lueur-bord { stop-color: var(--lueur); stop-opacity: 0; }
 #scene .lointain { fill: var(--lointain); }
 #scene .sol, #scene .sil, #scene .sil * { fill: var(--sil); }
 #scene .membre { fill: none; stroke: var(--sil); stroke-linecap: round; }
@@ -46,6 +48,33 @@
 #scene .bras-arriere { transform-origin: 216px 59px; }
 #scene .avant-bras-arriere { transform-origin: 216px 69px; }
 #scene .main-arriere { transform-origin: 216px 78px; }
+
+/* ---------------------------------------- Changement de métier (fondu) */
+#scene #decors, #scene #elements, #scene #perso { transition: opacity .25s; }
+#scene.fondu #decors, #scene.fondu #elements, #scene.fondu #perso { opacity: 0; }
+
+/* -------------------------------------------------------- Pause, mort */
+#scene[data-pause] * { animation-play-state: paused !important; }
+
+/* ---------------------------------------------------------------- Âge */
+/* Toute keyframe qui anime .haut commence par rotate(var(--penche, 0deg)). */
+#scene .haut { transform: rotate(var(--penche, 0deg)); }
+#scene[data-age="jeune"] #perso { transform: scale(.9, .94); }
+#scene[data-age="vieux"] { --penche: 12deg; --tempo: 1.4; }
+#scene[data-age="vieux"] .barbe { display: inline; }
+
+/* ------------------------------------------------------- Geste : repos */
+#scene[data-geste="repos"] .haut { animation: repos-souffle calc(3.2s * var(--tempo, 1)) ease-in-out infinite; }
+#scene[data-geste="repos"] .tete { animation: repos-regard calc(6s * var(--tempo, 1)) ease-in-out infinite; }
+@keyframes repos-souffle {
+  0%, 100% { transform: rotate(var(--penche, 0deg)) translateY(0); }
+  50%      { transform: rotate(var(--penche, 0deg)) translateY(-.6px); }
+}
+@keyframes repos-regard {
+  0%, 100% { transform: rotate(0deg); }
+  30%      { transform: rotate(-6deg); }
+  70%      { transform: rotate(6deg); }
+}
 
 /* ------------------------------------------------- Moins d'animations */
 @media (prefers-reduced-motion: reduce) {
