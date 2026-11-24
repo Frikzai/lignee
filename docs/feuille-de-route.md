@@ -23,7 +23,7 @@
 | 1 | `feature/socle-arbre` | Kit Brindilles/Enluminure, icônes, barre du haut, API d'interface (+ migration santé/saisons), ambiance de saison | ✅ prête (à merger) |
 | 2 | `feature/lignee` | Mémoire des générations (`G.lignee`), nom de maison, prénoms | ✅ prête (à merger) |
 | — | `feature/scene-boutique` | Les achats de la boutique dans la scène : logis sur l'horizon, possessions autour du personnage | ✅ prête (à merger) |
-| 3 | `feature/ecran-accueil` | Arbre animé, lanternes des ancêtres, « Fonder une lignée » / « Continuer » | |
+| 3 | `feature/ecran-accueil` | Arbre animé, lanternes des ancêtres, « Fonder une lignée » / « Continuer » | ✅ prête (à merger) |
 | 4 | `feature/naissance-mort` | Choix du trait en « destins », mort (lanterne qui s'éteint), transmission | |
 | 5 | `feature/onglet-heritage` | L'arbre généalogique + talents | |
 | 6 | `feature/panneau-vie` | Colonne du personnage : identité, santé, métier/compétence, corruption, événements, automatisation | |
