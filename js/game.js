@@ -155,7 +155,8 @@ function rawExpenses() {
 const expenses = () => rawExpenses() * getMult('expenses');
 const netIncome = () => income() - expenses();
 const lifespanYears = () => (BASE_LIFESPAN + 5 * perkRank('vigueur') + G.lifeBonusYears) * getMult('lifespan');
-const speed = () => BASE_SPEED * getMult('speed');
+let debugSpeed = 1;   // multiplicateur réglé par le panneau de debug (js/debug.js)
+const speed = () => BASE_SPEED * getMult('speed') * debugSpeed;
 const etaSeconds = (entry, base, xpPerDay) => (maxXp(base, entry.level) - entry.xp) / (xpPerDay * speed());
 
 // ------------------------------------------------------- Prérequis
