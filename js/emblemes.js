@@ -23,10 +23,15 @@ const ICONES_CATEGORIES = {
   fondamentaux: 'livre', combat: 'poing', mystique: 'oeil', tenebres: 'lune',
 };
 
+const ICONES_OBJETS = {
+  livre: 'livre', outils: 'marteau', pierres: 'pierre', cheval: 'cheval', serviteur: 'plateau',
+  grimoire: 'grimoire', atelier: 'alambic', bibliotheque: 'etagere', jardin: 'feuille', observatoire: 'lunette',
+};
+
 // Icône d'un bonus temporaire selon la statistique touchée (clés de STAT_LABELS)
 function iconeStat(stat) {
   const famille = stat.split(':')[0];
   return { xp: 'etoile', income: 'revenu', happiness: 'bonheur', lifespan: 'sante', speed: 'sablier', expenses: 'ecus' }[famille] || 'etoile';
 }
 
-if (typeof module !== 'undefined') module.exports = { ICONES_METIERS, ICONES_COMPETENCES, ICONES_CATEGORIES, iconeStat };
+if (typeof module !== 'undefined') module.exports = { ICONES_METIERS, ICONES_COMPETENCES, ICONES_CATEGORIES, ICONES_OBJETS, iconeStat };
