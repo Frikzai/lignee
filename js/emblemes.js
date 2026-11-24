@@ -28,10 +28,31 @@ const ICONES_OBJETS = {
   grimoire: 'grimoire', atelier: 'alambic', bibliotheque: 'etagere', jardin: 'feuille', observatoire: 'lunette',
 };
 
+const ICONES_DEFIS = {
+  ascete: 'lotus', ephemere: 'sablier', pauvrete: 'revenu', amnesique: 'oeil', pacifiste: 'feuille', renegat: 'masque',
+};
+
+// Médaille de chaque haut fait (game.js et modules)
+const ICONES_HAUTS_FAITS = {
+  age25: 'age', age50: 'age', age80: 'sablier', age120: 'sablier',
+  coins1k: 'ecus', coins1m: 'ecus', coins1b: 'balance',
+  job25: 'marteau', job100: 'marteau', job300: 'etoile',
+  skill50: 'livre', skill200: 'parchemin', skill1000: 'orbe',
+  manoir: 'couronne', chevalier: 'heaume', novice: 'balai', archimage: 'orbe', gardien: 'horloge',
+  reb1: 'lignee', reb5: 'lignee', reb20: 'lignee', ev10: 'carte', ev50: 'parchemin',
+  assassin: 'dague', seigneur: 'lune', corrompu: 'crane', defi1: 'etendard', defiAll: 'bouclier',
+  bonpied: 'sante', increvable: 'soin',
+};
+
+// Icône d'une entrée du journal selon son type (log(msg, type) dans game.js)
+function iconeJournal(type) {
+  return { good: 'acquis', bad: 'risque', event: 'parchemin', gold: 'etoile' }[type] || 'age';
+}
+
 // Icône d'un bonus temporaire selon la statistique touchée (clés de STAT_LABELS)
 function iconeStat(stat) {
   const famille = stat.split(':')[0];
   return { xp: 'etoile', income: 'revenu', happiness: 'bonheur', lifespan: 'sante', speed: 'sablier', expenses: 'ecus' }[famille] || 'etoile';
 }
 
-if (typeof module !== 'undefined') module.exports = { ICONES_METIERS, ICONES_COMPETENCES, ICONES_CATEGORIES, ICONES_OBJETS, iconeStat };
+if (typeof module !== 'undefined') module.exports = { ICONES_METIERS, ICONES_COMPETENCES, ICONES_CATEGORIES, ICONES_OBJETS, ICONES_DEFIS, ICONES_HAUTS_FAITS, iconeStat, iconeJournal };

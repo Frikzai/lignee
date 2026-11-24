@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="css/colonne.css">
   <link rel="stylesheet" href="css/registres.css">
   <link rel="stylesheet" href="css/boutique.css">
+  <link rel="stylesheet" href="css/secondaires.css">
   <link rel="stylesheet" href="css/scene.css">
 </head>
 <body>
@@ -172,22 +173,32 @@
       </section>
 
       <section id="tab-challenges" class="tab">
+        <h3 class="onglet-titre">Les épreuves</h3>
         <p class="muted small">Un défi termine votre vie (vous gardez vos points) et en commence une nouvelle avec des règles spéciales. Réussissez-le pour un bonus permanent.</p>
-        <div id="challengeGrid" class="grid-cards"></div>
+        <div id="challengeGrid" class="epreuves"></div>
       </section>
 
       <section id="tab-achievements" class="tab">
-        <p class="muted small" id="achCount"></p>
-        <div id="achGrid" class="grid-cards"></div>
+        <h3 class="onglet-titre">Hauts faits</h3>
+        <p class="hf-compte"><b id="achNombre"></b> <span class="muted small" id="achCount"></span></p>
+        <div id="achGrid" class="medailles"></div>
       </section>
 
-      <section id="tab-journal" class="tab"><ul id="journal" class="journal cadre"></ul></section>
+      <section id="tab-journal" class="tab">
+        <h3 class="onglet-titre">Journal</h3>
+        <p class="muted small">Du plus récent au plus ancien.</p>
+        <ol id="journal" class="frise"></ol>
+      </section>
 
-      <section id="tab-stats" class="tab"><div id="statsBox"></div></section>
+      <section id="tab-stats" class="tab">
+        <h3 class="onglet-titre">Registre de la maison</h3>
+        <p class="muted small">Toutes vies confondues.</p>
+        <div id="statsBox" class="registre-maison"></div>
+      </section>
 
       <section id="tab-options" class="tab">
         <div class="card cadre">
-          <h3>Sauvegarde</h3>
+          <h3><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-parchemin"/></svg> Sauvegarde</h3>
           <div class="row-btns">
             <button id="saveBtn" class="btn">Sauvegarder</button>
             <button id="exportBtn" class="btn">Exporter</button>
@@ -197,7 +208,7 @@
           <textarea id="saveText" placeholder="Collez une sauvegarde ici puis cliquez sur Importer"></textarea>
         </div>
         <div class="card cadre">
-          <h3>Lignée</h3>
+          <h3><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-lignee"/></svg> Lignée</h3>
           <p class="muted small" id="ligneeInfo"></p>
           <div class="row-btns maison-ligne">
             <input id="maisonInput" type="text" maxlength="24" placeholder="Nom de la maison" autocomplete="off">
@@ -205,10 +216,10 @@
           </div>
         </div>
         <div class="card cadre">
-          <h3>Préférences</h3>
+          <h3><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-sablier"/></svg> Préférences</h3>
           <label class="toggle"><input type="checkbox" id="optOffline"> Progression hors-ligne</label>
           <div class="row-btns"><button id="tutoReplay" class="btn small">Revoir le tutoriel</button></div>
-          <p class="muted small">Espace : pause · 1 à 9 : onglets</p>
+          <p class="muted small raccourcis"><kbd>Espace</kbd> pause · <kbd>1</kbd> à <kbd>9</kbd> onglets</p>
         </div>
       </section>
     </main>

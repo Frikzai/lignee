@@ -33,13 +33,10 @@
   background: radial-gradient(circle, #ffe08a, #ff6a1f 55%, transparent 72%); animation: braise-meche .5s ease-in-out infinite alternate; }
 @keyframes braise-meche { to { transform: scale(1.35); opacity: .75; } }
 
-/* serviteurs : interrupteurs-lanternes (dessinés en fond : pas de pseudo-élément sur un input) */
+/* serviteurs (interrupteurs-lanternes : voir kit.css) */
 #autoCard h3 { font: 14px var(--font-titre-sc); text-transform: none; letter-spacing: .04em; color: var(--muted); }
 #autoCard .toggle { font: 15px var(--font-titre); }
 #autoCard .toggle .icone { color: var(--orne-vif); }
-#autoCard .toggle input { appearance: none; -webkit-appearance: none; flex: none; width: 28px; height: 15px; margin: 0; border: 1px solid var(--orne); border-radius: 8px; cursor: pointer;
-  background: radial-gradient(circle at 7px 50%, #5a4630 4.5px, transparent 5px), #0b0806; }
-#autoCard .toggle input:checked { background: radial-gradient(circle at calc(100% - 7px) 50%, #ffc861 4.5px, transparent 5px), #0b0806; box-shadow: 0 0 6px rgba(255, 200, 97, .45); }
 
 @media (prefers-reduced-motion: reduce) { .meche > div::after { animation: none; } }
 

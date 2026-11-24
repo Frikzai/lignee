@@ -99,9 +99,7 @@
 /* catégorie sans rien de débloqué : ligne compacte en pointillés, sans brindilles */
 .table-wrap.compact.cadre::before, .table-wrap.compact.cadre::after { display: none; }
 .lock-title .icone, .lock-cat + .lock-title .icone { color: var(--muted); }
-.ach .ach-etoile { display: none; margin-right: 5px; color: var(--accent); }
-.ach.unlocked .ach-etoile { display: inline-block; }
-.perk .rank .icone, .challenge .rank .icone { color: var(--accent); }
+.perk .rank .icone { color: var(--accent); }
 .marque { display: inline-flex; align-items: center; gap: 2px; margin-left: 6px; font: 11px system-ui, sans-serif; vertical-align: middle; cursor: help; }
 .marque-mauvais { color: var(--bad); }
 .marque-bon { color: var(--good); }
@@ -120,3 +118,8 @@
 /* focus clavier : lueur dorée plutôt que l'anneau bleu du navigateur */
 .btn:focus-visible { outline: none; box-shadow: 0 0 0 1px var(--accent), 0 0 12px rgba(217, 151, 58, .55); }
 .btn-noble:focus-visible, .btn.primary:focus-visible { box-shadow: inset 0 0 0 2px var(--panel), inset 0 0 0 3px var(--filet), 0 0 0 1px var(--accent), 0 0 12px rgba(217, 151, 58, .55); }
+
+/* interrupteur-lanterne (dessiné en fond : pas de pseudo-élément sur un input) */
+.toggle input[type="checkbox"] { appearance: none; -webkit-appearance: none; flex: none; width: 28px; height: 15px; margin: 0; border: 1px solid var(--orne); border-radius: 8px; cursor: pointer;
+  background: radial-gradient(circle at 7px 50%, #5a4630 4.5px, transparent 5px), #0b0806; }
+.toggle input[type="checkbox"]:checked { background: radial-gradient(circle at calc(100% - 7px) 50%, #ffc861 4.5px, transparent 5px), #0b0806; box-shadow: 0 0 6px rgba(255, 200, 97, .45); }

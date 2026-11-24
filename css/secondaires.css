@@ -1,0 +1,68 @@
+/* =====================================================================
+   Lignée — onglets secondaires : Défis, Hauts faits, Journal,
+   Statistiques, Options (js/ui.js)
+   ===================================================================== */
+
+.onglet-titre { margin: 2px 0 4px; font-size: 17px; text-transform: none; letter-spacing: .04em; }
+.tab > .onglet-titre + .muted { margin: 0 0 12px; }
+
+/* les épreuves */
+.epreuves { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 10px; }
+.epreuve { position: relative; display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; }
+.e-tete { display: flex; align-items: center; gap: 9px; margin-bottom: 4px; padding-right: 40px; }
+.e-tete h4 { margin: 0; font: 18px var(--font-titre); color: var(--text); }
+.e-emb { display: flex; flex: none; align-items: center; justify-content: center; width: 30px; height: 30px; border: 1px solid var(--orne); border-radius: 50%; color: var(--accent); }
+.e-ligne { display: flex; gap: 7px; font-size: 12px; color: var(--muted); }
+.e-ligne .icone { flex: none; width: 13px; height: 13px; margin-top: 2px; }
+.e-ligne.gold { color: var(--accent); }
+.epreuve .btn { align-self: flex-start; margin-top: auto; }
+.epreuve .e-ligne:last-of-type { margin-bottom: 8px; }
+.epreuve.done, .epreuve.active { --orne: var(--accent); }
+.epreuve.active { border-color: var(--event); box-shadow: 0 0 12px rgba(111, 159, 176, .25); }
+.epreuve.done .btn, .epreuve.active .btn { padding: 0; border: none; background: none; font: 14px var(--font-titre-sc); opacity: 1; }
+.epreuve.done .btn { color: var(--good); }
+.epreuve.active .btn { color: #a9c4cf; }
+/* le sceau de cire des épreuves réussies */
+.sceau { display: none; position: absolute; top: 10px; right: 12px; width: 34px; height: 34px; align-items: center; justify-content: center; border-radius: 50%;
+  color: #f0c9a0; background: radial-gradient(circle at 40% 35%, #b5372a, #6e1a14 70%); box-shadow: 0 0 0 3px rgba(110, 26, 20, .35), 0 2px 4px #000; transform: rotate(-12deg); }
+.sceau .icone { width: 16px; height: 16px; }
+.epreuve.done .sceau { display: flex; }
+
+/* hauts faits : galerie de médailles */
+.hf-compte { display: flex; align-items: baseline; gap: 8px; margin: 0 0 14px; }
+.hf-compte b { font: 24px var(--font-titre); font-weight: normal; color: var(--accent); }
+.medailles { display: grid; grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); gap: 14px 8px; }
+.medaille { display: flex; flex-direction: column; align-items: center; gap: 3px; text-align: center; }
+.m-rond { display: flex; align-items: center; justify-content: center; width: 48px; height: 48px; margin-bottom: 3px; border: 1px dashed var(--border); border-radius: 50%; color: #4a3b2e; }
+.m-rond .icone { width: 21px; height: 21px; }
+.m-nom { font: 14px var(--font-titre); line-height: 1.15; color: #6f5d4a; }
+.m-desc { font-size: 11px; line-height: 1.25; color: #5f4f3f; }
+.medaille.unlocked .m-rond { border: 1px solid var(--accent); color: var(--accent); background: radial-gradient(circle, #3a2414, var(--panel) 70%);
+  box-shadow: 0 0 0 3px var(--bg), 0 0 0 4px rgba(217, 151, 58, .45), 0 0 12px rgba(255, 190, 90, .3); }
+.medaille.unlocked .m-nom { color: var(--text); }
+.medaille.unlocked .m-desc { color: var(--muted); }
+
+/* journal : frise par âge */
+.frise { list-style: none; margin: 0 0 0 6px; padding: 0 0 0 18px; border-left: 1px solid var(--border); }
+.frise .f-age { position: relative; margin: 10px 0 3px; font: 16px var(--font-titre); color: var(--accent); }
+.frise .f-age:first-child { margin-top: 0; }
+.f-point { position: absolute; left: -23px; top: 6px; width: 9px; height: 9px; border-radius: 50%; background: var(--lanterne); box-shadow: 0 0 8px rgba(255, 200, 97, .8); }
+.frise .f-entree { display: flex; gap: 8px; padding: 3px 0; font-size: 13px; }
+.f-entree .icone { flex: none; width: 13px; height: 13px; margin-top: 3px; color: var(--muted); }
+.f-entree.good .icone { color: var(--good); }
+.f-entree.bad .icone { color: var(--bad); }
+.f-entree.bad span { color: #e9a497; }
+.f-entree.event .icone { color: #a9c4cf; }
+.f-entree.gold .icone, .f-entree.gold span { color: var(--accent); }
+
+/* registre de la maison */
+.registre-maison { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 8px; }
+.stat-carte { padding: 12px 14px; }
+.stat-carte small { display: flex; align-items: center; gap: 6px; font: 13px var(--font-titre-sc); letter-spacing: .04em; color: var(--muted); }
+.stat-carte small .icone { width: 13px; height: 13px; color: var(--orne-vif); }
+.stat-carte b { display: block; margin-top: 4px; font: 26px var(--font-titre); font-weight: normal; }
+
+/* options */
+#tab-options h3 .icone { width: 14px; height: 14px; margin-right: 4px; vertical-align: -2px; color: var(--orne-vif); }
+.raccourcis kbd { padding: 0 5px; border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 3px; background: var(--panel2); font: 11px ui-monospace, Consolas, monospace; color: var(--text); }
+#tab-options .card + .card { margin-top: 12px; }
