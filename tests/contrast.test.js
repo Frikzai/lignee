@@ -21,7 +21,8 @@ function ratio(a, b) {
 
 test('la palette définit --ember', () => assert.match(vars['--ember'] ?? '', /^#[0-9a-f]{6}$/i));
 
-for (const fg of ['--text', '--muted', '--accent'])
+// --good / --bad / --event servent aussi de couleur de texte (revenu net négatif, journal)
+for (const fg of ['--text', '--muted', '--accent', '--good', '--bad', '--event'])
   for (const bg of ['--bg', '--panel', '--panel2'])
     test(`${fg} sur ${bg} ≥ 4.5`, () => {
       const r = ratio(vars[fg], vars[bg]);

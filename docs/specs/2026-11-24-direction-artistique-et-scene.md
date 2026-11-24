@@ -44,7 +44,7 @@ On **garde les noms** des variables CSS existantes dans `css/style.css` et on ch
 | `--accent` | `#d4a64a` | `#d9973a` | or ancien : titres, onglet actif, chiffres clés |
 | `--ember` | — (nouvelle) | `#e0561f` | orange de forge : actions fortes et dangereuses |
 | `--good` | `#7fb069` | `#8fa86a` | positif |
-| `--bad` | `#e06456` | `#c4452f` | négatif |
+| `--bad` | `#e06456` | `#de6248` | négatif (texte : revenu net négatif, journal) |
 | `--event` | `#5aa9c8` | `#6f9fb0` | événements |
 | `--radius` | `8px` | `3px` | coins presque droits (fer forgé) |
 
