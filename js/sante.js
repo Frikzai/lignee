@@ -87,55 +87,35 @@ ACHIEVEMENTS.push(
 );
 
 // ------------------------------------------------------------- Interface
-const HealthUI = {
-  built: false,
-  build() {
-    const style = document.createElement('style');
-    style.textContent = `
-      .health-box { margin-bottom: 8px; }
-      #healthFill { transition: width .2s linear; }
-      .risk-mark { margin-left: 6px; font-size: 11px; color: #e0a456; cursor: help; }
-      .regen-mark { margin-left: 6px; font-size: 11px; font-weight: 400; color: #7fb069; }
-    `;
-    document.head.appendChild(style);
-
-    const box = el('div', 'health-box');
-    const line = el('div', 'age-line small');
-    line.append(el('span', null, 'Santé'), Object.assign(el('span'), { id: 'healthText' }));
-    const bar = el('div', 'bar');
-    bar.appendChild(Object.assign(el('div'), { id: 'healthFill' }));
-    box.append(line, bar, Object.assign(el('div', 'muted small'), { id: 'healthInfo' }));
-    $('traitLine').after(box);
-
-    // Pénibilité dans le tableau des métiers
-    for (const j of JOBS) {
-      const r = jobRisk(j.id);
-      if (!r) continue;
-      const m = el('span', 'risk-mark', r >= 2 ? '⚠⚠' : '⚠');
-      m.title = `Métier pénible : −${String(r).replace('.', ',')} santé / an`;
-      UI.jobRows[j.id].tr.firstChild.appendChild(m);
-    }
-    // Récupération dans la boutique
-    for (const h of HOUSING) {
-      const g = HEALTH.housingRegen[h.id];
-      if (g) UI.housingRows[h.id].cells[0].appendChild(el('span', 'regen-mark', `+${g} santé/an`));
-    }
-    for (const id in HEALTH.itemRegen) {
-      UI.itemRows[id].cells[1].appendChild(el('span', 'regen-mark', `+${HEALTH.itemRegen[id]} santé/an`));
-    }
-    this.built = true;
-  },
-  update() {
-    if (!this.built) this.build();
+// Affichage déclaré à la couche visuelle (js/ui.js) : jauge Santé et marques dans les tableaux.
+UI.ajouterJauge({
+  id: 'sante',
+  icone: 'sante',
+  libelle: 'Santé',
+  etat: () => {
     const h = healthOf(), b = healthBreakdown();
-    $('healthText').textContent = Math.floor(h) + ' / 100';
-    const fill = $('healthFill');
-    fill.style.width = h + '%';
-    fill.style.background = h >= 60 ? '#6fae5a' : h >= 35 ? '#d4a64a' : '#e06456';
     const sign = b.net >= 0 ? '+' : '−';
-    $('healthInfo').textContent = `${sign}${Math.abs(b.net).toFixed(1).replace('.', ',')} / an · XP ×${fmtMult(healthXpMult())}`
-      + (healthLifeMult() < 1 ? ` · vie ×${fmtMult(healthLifeMult())}` : '');
-    $('healthInfo').title = `Récupération +${b.regen.toFixed(1)} · usure de l'âge −${b.aging.toFixed(1)} · pénibilité −${b.risk.toFixed(1)}`;
+    return {
+      pct: h,
+      texte: Math.floor(h) + ' / 100',
+      ton: h >= 60 ? 'bon' : h >= 35 ? 'moyen' : 'mauvais',
+      info: `${sign}${Math.abs(b.net).toFixed(1).replace('.', ',')} / an · XP ×${fmtMult(healthXpMult())}`
+        + (healthLifeMult() < 1 ? ` · vie ×${fmtMult(healthLifeMult())}` : ''),
+      titre: `Récupération +${b.regen.toFixed(1)} · usure de l'âge −${b.aging.toFixed(1)} · pénibilité −${b.risk.toFixed(1)}`,
+    };
   },
-};
-HOOKS.ui.push(() => HealthUI.update());
+});
+// Pénibilité dans le tableau des métiers
+for (const j of JOBS) {
+  const r = jobRisk(j.id);
+  if (r) UI.ajouterMarque({ cible: 'job', id: j.id, icone: 'risque', nombre: r >= 2 ? 2 : 1, ton: 'mauvais',
+    titre: `Métier pénible : −${String(r).replace('.', ',')} santé / an` });
+}
+// Récupération dans la boutique
+for (const h of HOUSING) {
+  const g = HEALTH.housingRegen[h.id];
+  if (g) UI.ajouterMarque({ cible: 'housing', id: h.id, icone: 'soin', texte: `+${g} santé/an`, ton: 'bon', titre: 'Récupération de santé' });
+}
+for (const id in HEALTH.itemRegen) {
+  UI.ajouterMarque({ cible: 'item', id, icone: 'soin', texte: `+${HEALTH.itemRegen[id]} santé/an`, ton: 'bon', titre: 'Récupération de santé' });
+}

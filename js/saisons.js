@@ -71,22 +71,11 @@ const SEASON_EVENTS = [
 for (const ev of SEASON_EVENTS) { EVENTS.push(ev); EVENT_BY_ID[ev.id] = ev; }
 
 // ------------------------------------------------------------- Interface
-const SeasonUI = {
-  built: false,
-  span: null,
-  build() {
-    const style = document.createElement('style');
-    style.textContent = `.season-tag { margin-left: 10px; color: var(--muted, #9c8c76); cursor: help; }`;
-    document.head.appendChild(style);
-    this.span = el('span', 'season-tag');
-    $('ageText').after(this.span);
-    this.built = true;
-  },
-  update() {
-    if (!this.built) this.build();
-    const s = currentSeason();
-    this.span.textContent = `${s.icon} ${s.name}`;
-    this.span.title = `${describeSeason(s)}\nFin de la saison dans ${Math.ceil(seasonDaysLeft())} jours`;
-  },
-};
-HOOKS.ui.push(() => SeasonUI.update());
+// Affichage déclaré à la couche visuelle (js/ui.js) : une inscription « Saison » dans la barre du haut.
+UI.ajouterRessource({
+  id: 'saison',
+  icone: () => currentSeason().id,
+  libelle: 'Saison',
+  valeur: () => currentSeason().name,
+  titre: () => `${describeSeason(currentSeason())}\nFin de la saison dans ${Math.ceil(seasonDaysLeft())} jours`,
+});
