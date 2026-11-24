@@ -1,0 +1,109 @@
+/* =====================================================================
+   Lignée — kit « Arbre aux Lanternes »
+   Brindilles pour le courant, Enluminure pour l'important.
+   Règle : jamais d'aplat d'or — l'or n'existe qu'en traits et en texte.
+   ===================================================================== */
+
+:root {
+  --orne: #8a6326;                    /* ornements discrets */
+  --orne-vif: #d9973a;                /* ornements accentués */
+  --filet: rgba(217, 151, 58, .45);   /* filet intérieur des cadres nobles */
+  --lanterne: #ffc861;
+  --lanterne-halo: rgba(255, 180, 80, .35);
+}
+
+/* ----------------------------------------------------------------- Icônes */
+.icone {
+  width: 1em; height: 1em; vertical-align: -.15em; flex: none;
+  fill: none; stroke: currentColor; stroke-width: 1.4; stroke-linecap: round; stroke-linejoin: round;
+}
+
+/* --------------------------------------------- Cadre courant : brindilles */
+.cadre { position: relative; background: var(--panel); border: 1px solid var(--border); }
+.cadre::before, .cadre::after {
+  content: ''; position: absolute; width: 26px; height: 26px; pointer-events: none;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 34 34'%3E%3Cpath d='M3 33 V12 Q3 3 12 3 H33 M3 18 Q8 14 12 15 M18 3 Q14 8 15 12' fill='none' stroke='%238a6326' stroke-width='1.3' stroke-linecap='round'/%3E%3Cpath d='M11.5 14.6 Q14 12 15 15' fill='none' stroke='%23d9973a'/%3E%3C/svg%3E") no-repeat center / contain;
+}
+.cadre::before { left: 0; top: 0; }
+.cadre::after { right: 0; bottom: 0; transform: rotate(180deg); }
+
+/* ------------------------------------------- Cadre noble : enluminure */
+.cadre-noble {
+  position: relative; background: var(--panel); border: 1px solid var(--orne);
+  box-shadow: inset 0 0 0 3px var(--panel), inset 0 0 0 4px var(--filet);
+}
+.cadre-noble::before {
+  content: ''; position: absolute; inset: 0; pointer-events: none;
+  background:
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cg transform='rotate(0 15 15)'%3E%3Cpath d='M2 28 V10 Q2 2 10 2 H28 M6 22 Q6 6 22 6 M10 10 Q14 8 14 12 Q12 14 10 12' fill='none' stroke='%23d9973a' stroke-width='.9' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E") left 5px top 5px / 24px no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cg transform='rotate(90 15 15)'%3E%3Cpath d='M2 28 V10 Q2 2 10 2 H28 M6 22 Q6 6 22 6 M10 10 Q14 8 14 12 Q12 14 10 12' fill='none' stroke='%23d9973a' stroke-width='.9' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E") right 5px top 5px / 24px no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cg transform='rotate(180 15 15)'%3E%3Cpath d='M2 28 V10 Q2 2 10 2 H28 M6 22 Q6 6 22 6 M10 10 Q14 8 14 12 Q12 14 10 12' fill='none' stroke='%23d9973a' stroke-width='.9' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E") right 5px bottom 5px / 24px no-repeat,
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cg transform='rotate(270 15 15)'%3E%3Cpath d='M2 28 V10 Q2 2 10 2 H28 M6 22 Q6 6 22 6 M10 10 Q14 8 14 12 Q12 14 10 12' fill='none' stroke='%23d9973a' stroke-width='.9' stroke-linecap='round'/%3E%3C/g%3E%3C/svg%3E") left 5px bottom 5px / 24px no-repeat;
+}
+.cadre-noble > * { position: relative; }   /* le contenu passe au-dessus des filigranes */
+
+/* lanterne suspendue au milieu du bord haut d'un cadre noble */
+.cadre-noble > .lanterne {
+  position: absolute; left: 50%; top: -14px; width: 22px; height: 26px; transform: translateX(-50%);
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 22 26'%3E%3Cpath d='M11 0 V5' stroke='%238a6326'/%3E%3Cpath d='M6 6 H16 L17.5 8.6 V18 L14.6 21 H7.4 L4.5 18 V8.6 Z' fill='%232a1a10' stroke='%238a6326'/%3E%3Ccircle cx='11' cy='13' r='3' fill='%23ffc861'/%3E%3C/svg%3E") no-repeat center / contain; pointer-events: none;
+}
+.lanterne::after {
+  content: ''; position: absolute; left: 50%; top: 50%; width: 26px; height: 26px; margin: -11px 0 0 -13px; border-radius: 50%;
+  background: radial-gradient(circle, var(--lanterne-halo), transparent 70%);
+  animation: lanterne-souffle 3s ease-in-out infinite;
+}
+@keyframes lanterne-souffle { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+
+/* ------------------------------------------------------------ Séparateurs */
+.sep { height: 14px; margin: 10px 0; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 14'%3E%3Cpath d='M2 7 H52 M68 7 H118' stroke='%233d2f24'/%3E%3Cpath d='M60 2 Q66 7 60 12 Q54 7 60 2 Z' fill='none' stroke='%23d9973a'/%3E%3C/svg%3E") no-repeat center / 120px 14px; }
+.sep-noble { height: 16px; margin: 12px 0; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 150 16'%3E%3Cpath d='M4 8 H60 M90 8 H146' stroke='%238a6326'/%3E%3Cpath d='M60 8 Q66 2 70 8 Q66 14 60 8 M90 8 Q84 2 80 8 Q84 14 90 8' fill='none' stroke='%23d9973a'/%3E%3Ccircle cx='75' cy='8' r='3' fill='%23ffc861'/%3E%3C/svg%3E") no-repeat center / 150px 16px; }
+
+/* ---------------------------------------------------------------- Boutons */
+/* jamais d'aplat d'or : les boutons « primaires » deviennent nobles */
+.btn-noble, .btn.primary {
+  background: transparent; color: var(--accent); border-color: var(--orne);
+  box-shadow: inset 0 0 0 2px var(--panel), inset 0 0 0 3px var(--filet);
+}
+.btn-noble:hover:not(:disabled), .btn.primary:hover:not(:disabled) {
+  border-color: var(--ember);
+  box-shadow: inset 0 0 0 2px var(--panel), inset 0 0 0 3px var(--filet), 0 0 8px rgba(224, 86, 31, .45);
+}
+#pauseBtn { display: inline-flex; align-items: center; gap: 6px; }
+#pauseBtn.paused { background: transparent; color: var(--ember); border-color: var(--ember); }
+
+/* ----------------------------------------------- Inscriptions gravées */
+.inscription { display: flex; flex-direction: column; align-items: flex-start; line-height: 1.15; }
+.inscription small {
+  display: flex; align-items: center; gap: 4px;
+  font: 11px var(--font-titre-sc); letter-spacing: .04em; color: var(--muted);
+}
+.inscription small .icone { width: 12px; height: 12px; color: var(--orne-vif); }
+.inscription b { font-size: 16px; font-variant-numeric: tabular-nums; }
+.brin { display: inline-block; width: 10px; height: 26px; flex: none; background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 26'%3E%3Cpath d='M5 1 V25 M5 9 Q8 7 9 4 M5 17 Q2 15 1 12' fill='none' stroke='%235a4630' stroke-linecap='round'/%3E%3C/svg%3E") no-repeat center / contain; }
+
+/* ------------------------------------------------------- Moins d'animations */
+@media (prefers-reduced-motion: reduce) { .lanterne::after { animation: none; opacity: .8; } }
+
+/* ------------------------------------------------------- Cadre général */
+.topbar { border-bottom-color: var(--orne); }
+.ressources, #ressources-modules, .ressource-module { display: flex; align-items: center; gap: 14px; flex-wrap: wrap; }
+.cadre-noble:has(> .lanterne) { padding-top: 20px; }
+.modal-box.cadre-noble {
+  border-radius: var(--radius); border-color: var(--orne);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, .6), inset 0 0 0 3px var(--panel), inset 0 0 0 4px var(--filet);
+}
+.tuto.cadre-noble {
+  border-radius: var(--radius); border-color: var(--orne);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, .6), inset 0 0 0 3px var(--panel), inset 0 0 0 4px var(--filet);
+}
+/* catégorie sans rien de débloqué : ligne compacte en pointillés, sans brindilles */
+.table-wrap.compact.cadre::before, .table-wrap.compact.cadre::after { display: none; }
+.lock-title .icone, .lock-cat + .lock-title .icone { color: var(--muted); }
+.ach .ach-etoile { display: none; margin-right: 5px; color: var(--accent); }
+.ach.unlocked .ach-etoile { display: inline-block; }
+.perk .rank .icone, .challenge .rank .icone { color: var(--accent); }
+.marque { display: inline-flex; align-items: center; gap: 2px; margin-left: 6px; font: 11px system-ui, sans-serif; vertical-align: middle; cursor: help; }
+.marque-mauvais { color: var(--bad); }
+.marque-bon { color: var(--good); }
+.jauge { margin-bottom: 8px; }
+.jauge .now-head .icone { color: var(--orne-vif); }

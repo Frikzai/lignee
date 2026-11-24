@@ -160,7 +160,6 @@ table.grid { width: 100%; border-collapse: collapse; font-variant-numeric: tabul
 .perk .btn { margin-top: auto; }
 .ach { opacity: .4; filter: grayscale(1); }
 .ach.unlocked { opacity: 1; filter: none; border-color: #6b5627; }
-.ach.unlocked h4::before { content: '★ '; color: var(--accent); }
 
 /* ----------------------------------------------------------- Carte « en cours » */
 .now { margin-bottom: 8px; }

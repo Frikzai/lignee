@@ -10,6 +10,37 @@ function el(tag, cls, text) {
   if (text != null) e.textContent = text;
   return e;
 }
+// Icône du sprite img/icones.svg (style gravé au trait, couleur = currentColor).
+const ICONES = 'img/icones.svg';
+function icone(nom, cls = '') {
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  svg.setAttribute('class', cls ? 'icone ' + cls : 'icone');
+  svg.setAttribute('aria-hidden', 'true');
+  const use = document.createElementNS(NS, 'use');
+  use.setAttribute('href', `${ICONES}#i-${nom}`);
+  svg.appendChild(use);
+  return svg;
+}
+
+// Registre de déclarations des modules : avant demarrer(), on mémorise ; après, on rend tout de suite.
+// Un id redéclaré remplace l'ancien (le rendu remplace alors l'élément affiché).
+function creerRegistre(rendre) {
+  const defs = new Map();
+  let demarre = false;
+  return {
+    ajouter(def) {
+      if (!def || !def.id) throw new Error('UI : une déclaration doit avoir un id');
+      defs.set(def.id, def);
+      if (demarre) rendre(def);
+    },
+    demarrer() { demarre = true; for (const d of defs.values()) rendre(d); },
+    liste: () => [...defs.values()],
+  };
+}
+const valeur = v => (typeof v === 'function' ? v() : v);
+const TONS = { bon: 'var(--good)', moyen: 'var(--accent)', mauvais: 'var(--bad)' };
+
 // Barre de progression : quand un niveau est franchi entre deux rafraîchissements,
 // on la remplit jusqu'au bout avant de repartir de zéro (sans animation à l'envers).
 function setProgress(bar, level, pct) {
@@ -67,6 +98,7 @@ const UI = {
   jobRows: {}, skillRows: {}, catParts: {},
   housingRows: {}, itemRows: {}, perkCards: {}, achCards: {}, challengeCards: {},
   eventUid: null, logKey: null, modalKind: null, tutoShown: null, focusEls: [],
+  vues: new Map(), alertes: {},
 
   init() {
     this.jobRows = this.buildTables('tab-jobs', JOB_CATS, JOBS, 'job', ['', 'Niveau', 'Revenu / jour', 'Prochain niveau']);
@@ -76,6 +108,9 @@ const UI = {
     this.buildChallenges();
     this.buildAchievements();
     this.bind();
+    this.ressources.demarrer();
+    this.jauges.demarrer();
+    this.marques.demarrer();
     this.ready = true;
     this.update();
   },
@@ -117,7 +152,7 @@ const UI = {
       const lock = el('tr', 'lock-row');
       const ltd = el('td'); ltd.colSpan = cols.length; lock.appendChild(ltd);
       tbody.appendChild(lock);
-      const wrap = el('div', 'table-wrap'); wrap.appendChild(table);
+      const wrap = el('div', 'table-wrap cadre'); wrap.appendChild(table);
       root.appendChild(wrap);
       this.catParts[kind + ':' + catId] = { thead, wrap, lockTr: lock, lockTd: ltd, cat };
     }
@@ -131,7 +166,7 @@ const UI = {
       cols.forEach(c => hr.appendChild(el('th', null, c)));
       const thead = el('thead'); thead.appendChild(hr); table.appendChild(thead);
       const tbody = el('tbody'); table.appendChild(tbody);
-      const wrap = el('div', 'table-wrap'); wrap.appendChild(table);
+      const wrap = el('div', 'table-wrap cadre'); wrap.appendChild(table);
       $(rootId).appendChild(wrap);
       return tbody;
     };
@@ -158,7 +193,7 @@ const UI = {
   buildPerks() {
     const grid = $('perkGrid');
     for (const p of PERKS) {
-      const card = el('div', 'perk card' + (p.setting ? ' auto' : ''));
+      const card = el('div', 'perk card cadre' + (p.setting ? ' auto' : ''));
       const rank = el('span', 'rank');
       const head = el('div', 'perk-head'); head.append(el('h4', null, p.name), rank);
       const btn = el('button', 'btn small');
@@ -172,7 +207,7 @@ const UI = {
   buildChallenges() {
     const grid = $('challengeGrid');
     for (const c of CHALLENGES) {
-      const card = el('div', 'challenge card');
+      const card = el('div', 'challenge card cadre');
       const status = el('span', 'rank');
       const head = el('div', 'perk-head'); head.append(el('h4', null, c.name), status);
       const btn = el('button', 'btn small');
@@ -192,8 +227,10 @@ const UI = {
   buildAchievements() {
     const grid = $('achGrid');
     for (const a of ACHIEVEMENTS) {
-      const card = el('div', 'ach card');
-      card.append(el('h4', null, a.name), el('p', 'muted small', a.desc));
+      const card = el('div', 'ach card cadre');
+      const titre = el('h4');
+      titre.append(icone('etoile', 'ach-etoile'), a.name);
+      card.append(titre, el('p', 'muted small', a.desc));
       grid.appendChild(card);
       this.achCards[a.id] = card;
     }
@@ -269,6 +306,7 @@ const UI = {
     this.updateTop();
     this.updateTabs();
     this.updateSidebar();
+    this.majModules();
     for (const f of HOOKS.ui) f();
     switch (this.tab) {
       case 'jobs': this.updateJobs(); break;
@@ -312,7 +350,11 @@ const UI = {
     $('netText').textContent = (net >= 0 ? '+' : '') + fmt(net);
     $('netText').className = net >= 0 ? 'pos' : 'neg';
     $('happyText').textContent = '×' + fmtMult(happiness());
-    $('pauseBtn').textContent = G.paused ? '▶ Reprendre' : '⏸ Pause';
+    const pb = $('pauseBtn');
+    if (pb._enPause !== G.paused) {
+      pb._enPause = G.paused;
+      pb.replaceChildren(icone(G.paused ? 'reprendre' : 'pause'), G.paused ? 'Reprendre' : 'Pause');
+    }
     $('pauseBtn').classList.toggle('paused', G.paused);
     document.body.classList.toggle('is-paused', G.paused);
   },
@@ -424,8 +466,12 @@ const UI = {
         const n = el('b', 'lock-cat', P.cat.name); n.style.color = P.cat.color;
         P.lockTd.appendChild(n);
       }
-      if (forbidden) { P.lockTd.appendChild(el('span', 'lock-title', '⛔ interdit par le défi')); continue; }
-      P.lockTd.appendChild(el('span', 'lock-title', `🔒 ${e.name}`));
+      if (forbidden) {
+        const t = el('span', 'lock-title'); t.append(icone('interdit'), ' interdit par le défi');
+        P.lockTd.appendChild(t); continue;
+      }
+      const t = el('span', 'lock-title'); t.append(icone('cadenas'), ' ' + e.name);
+      P.lockTd.appendChild(t);
       for (const r of e.req) {
         const p = reqProgress(r);
         P.lockTd.appendChild(el('span', p.cur >= p.need ? 'req ok' : 'req', `${p.label} ${Math.min(p.cur, p.need)}/${p.need}`));
@@ -472,7 +518,8 @@ const UI = {
     $('rebirthHint').textContent = canReb ? '' : 'Possible dès 30 ans.';
     for (const p of PERKS) {
       const c = this.perkCards[p.id], r = perkRank(p.id), cost = perkCost(p);
-      c.rank.textContent = p.max > 1 ? `${r} / ${p.max}` : (r ? '✔' : '');
+      if (p.max > 1) c.rank.textContent = `${r} / ${p.max}`;
+      else if (c.rank._acquis !== !!r) { c.rank._acquis = !!r; c.rank.replaceChildren(...(r ? [icone('acquis')] : [])); }
       if (r >= p.max) { c.btn.textContent = p.max > 1 ? 'Maximum' : 'Acquis'; c.btn.disabled = true; }
       else { c.btn.textContent = `Acheter — ${cost} pt${cost > 1 ? 's' : ''}`; c.btn.disabled = G.legacy.points < cost; }
       c.card.classList.toggle('owned', r > 0);
@@ -485,7 +532,7 @@ const UI = {
       const done = !!G.challengesDone[c.id], active = G.challenge === c.id;
       r.card.classList.toggle('done', done);
       r.card.classList.toggle('active', active);
-      r.status.textContent = done ? '★' : '';
+      if (r.status._fait !== done) { r.status._fait = done; r.status.replaceChildren(...(done ? [icone('etoile')] : [])); }
       r.btn.textContent = done ? 'Réussi' : active ? 'En cours…' : 'Commencer';
       r.btn.disabled = done || active || G.dead;
     }
@@ -517,7 +564,7 @@ const UI = {
       const tr = el('tr'); tr.append(el('td', null, k), el('td', 'num', String(v))); tb.appendChild(tr);
     }
     t.appendChild(tb);
-    const wrap = el('div', 'table-wrap'); wrap.appendChild(t);
+    const wrap = el('div', 'table-wrap cadre'); wrap.appendChild(t);
     box.appendChild(wrap);
   },
 
@@ -532,6 +579,87 @@ const UI = {
       ul.appendChild(li);
     }
     if (!G.log.length) ul.appendChild(el('li', 'muted', 'Rien à signaler pour l\'instant.'));
+  },
+
+  // ------------------------------------------------- API pour les modules
+  // Les modules (santé, saisons…) déclarent ce qu'ils veulent afficher ; le rendu reste ici.
+  ajouterRessource(def) { this.ressources.ajouter(def); },
+  ajouterJauge(def) { this.jauges.ajouter(def); },
+  ajouterMarque(def) { this.marques.ajouter({ ...def, id: `${def.cible}:${def.id}:${def.icone}`, cibleId: def.id }); },
+
+  rendreRessource(d) {
+    const box = $('ressources-modules');
+    const ancienne = this.vues.get('r:' + d.id);
+    const n = el('span', 'ressource-module');
+    const ins = el('span', 'inscription'), small = el('small'), lib = el('span'), b = el('b');
+    small.append(el('span'), lib);   // le premier enfant sera l'icône
+    ins.append(small, b);
+    n.append(el('span', 'brin'), ins);
+    if (ancienne) ancienne.n.replaceWith(n); else box.appendChild(n);
+    this.vues.set('r:' + d.id, { n, small, lib, b, icone: null });
+    this.majRessource(d);
+  },
+  majRessource(d) {
+    const v = this.vues.get('r:' + d.id);
+    const nom = valeur(d.icone);
+    if (nom !== v.icone) { v.icone = nom; v.small.firstChild.replaceWith(icone(nom)); }
+    v.lib.textContent = valeur(d.libelle);
+    v.b.textContent = valeur(d.valeur);
+    v.n.title = d.titre ? valeur(d.titre) : '';
+    const ton = d.ton ? valeur(d.ton) : null;
+    v.b.className = ton === 'bon' ? 'pos' : ton === 'mauvais' ? 'neg' : '';
+  },
+
+  rendreJauge(d) {
+    const box = $('jauges');
+    const ancienne = this.vues.get('j:' + d.id);
+    const n = el('div', 'jauge');
+    const tete = el('div', 'now-head'), nom = el('span'), texte = el('span', 'muted small');
+    nom.append(icone(valeur(d.icone)), ' ', valeur(d.libelle));
+    tete.append(nom, texte);
+    const bar = el('div', 'bar'), fill = el('div');
+    bar.appendChild(fill);
+    const info = el('div', 'muted small');
+    n.append(tete, bar, info);
+    if (ancienne) ancienne.n.replaceWith(n); else box.appendChild(n);
+    this.vues.set('j:' + d.id, { n, texte, fill, info });
+    this.majJauge(d);
+  },
+  majJauge(d) {
+    const v = this.vues.get('j:' + d.id), e = d.etat();
+    v.texte.textContent = e.texte || '';
+    v.fill.style.width = Math.max(0, Math.min(100, e.pct)) + '%';
+    v.fill.style.background = TONS[e.ton] || TONS.moyen;
+    v.info.textContent = e.info || '';
+    v.n.title = e.titre || '';
+  },
+
+  rendreMarque(d) {
+    const cellule = {
+      job: () => this.jobRows[d.cibleId] && this.jobRows[d.cibleId].tr.firstChild,
+      housing: () => this.housingRows[d.cibleId] && this.housingRows[d.cibleId].cells[0],
+      item: () => this.itemRows[d.cibleId] && this.itemRows[d.cibleId].cells[1],
+    }[d.cible];
+    const cell = cellule && cellule();
+    if (!cell) { console.warn(`[UI] marque « ${d.id} » : cible introuvable`); return; }
+    for (const m of cell.querySelectorAll('.marque')) if (m.dataset.cle === d.id) m.remove();
+    const m = el('span', 'marque marque-' + (d.ton || 'bon'));
+    m.dataset.cle = d.id;
+    m.title = d.titre || '';
+    for (let i = 0; i < (d.nombre || 1); i++) m.appendChild(icone(d.icone));
+    if (d.texte) m.append(' ' + d.texte);
+    cell.appendChild(m);
+  },
+
+  // Une valeur de module qui plante ne doit pas arrêter l'interface : on prévient une fois et on continue.
+  protege(d, f) {
+    try { f(d); } catch (e) {
+      if (!this.alertes[d.id]) { this.alertes[d.id] = true; console.warn(`[UI] « ${d.id} » :`, e); }
+    }
+  },
+  majModules() {
+    for (const d of this.ressources.liste()) if (this.vues.has('r:' + d.id)) this.protege(d, x => this.majRessource(x));
+    for (const d of this.jauges.liste()) if (this.vues.has('j:' + d.id)) this.protege(d, x => this.majJauge(x));
   },
 
   // ------------------------------------------------------------- Tutoriel
@@ -570,6 +698,7 @@ const UI = {
     this.modalKind = kind;
     const box = $('modalBox');
     box.innerHTML = html;
+    box.prepend(el('span', 'lanterne'));
     if (buttons.length) {
       const row = el('div', 'row-btns');
       for (const b of buttons) {
@@ -627,3 +756,8 @@ const UI = {
     while ($('toasts').children.length > 4) $('toasts').firstChild.remove();
   },
 };
+UI.ressources = creerRegistre(d => UI.protege(d, x => UI.rendreRessource(x)));
+UI.jauges = creerRegistre(d => UI.protege(d, x => UI.rendreJauge(x)));
+UI.marques = creerRegistre(d => UI.protege(d, x => UI.rendreMarque(x)));
+
+if (typeof module !== 'undefined') module.exports = { creerRegistre };

@@ -1,0 +1,58 @@
+/* =====================================================================
+   Lignée — ambiance de saison (js/ambiance.js)
+   Discrète : opacité ≤ 0,5, lente, derrière l'interface, jamais cliquable.
+   ===================================================================== */
+
+#ambiance {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+  transition: opacity .8s;
+}
+#ambiance.change { opacity: 0; }
+#ambiance i {
+  position: absolute; left: var(--x); top: 100%; display: block; opacity: 0;
+  animation: var(--duree) linear var(--retard) infinite;
+}
+
+/* -------- braises (printemps, été) : montent en ondulant */
+#ambiance[data-saison="printemps"] i, #ambiance[data-saison="ete"] i {
+  width: 4px; height: 4px; border-radius: 50%;
+  background: radial-gradient(circle, #ffd27a, #e0561f 55%, transparent 70%);
+  animation-name: ambiance-braise;
+}
+@keyframes ambiance-braise {
+  0%   { transform: translate(0, 0) scale(var(--taille)); opacity: 0; }
+  10%  { opacity: .35; }
+  50%  { transform: translate(calc(var(--derive) * -.4), -55vh) scale(var(--taille)); }
+  90%  { opacity: .2; }
+  100% { transform: translate(var(--derive), -110vh) scale(var(--taille)); opacity: 0; }
+}
+
+/* -------- feuilles (automne) : tombent en tournoyant */
+#ambiance[data-saison="automne"] i {
+  top: -24px; width: 13px; height: 13px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M5 19 Q5 6 19 5 Q18 19 5 19 Z M5 19 L15 9' fill='none' stroke='%23b8862f' stroke-width='1.8'/%3E%3C/svg%3E") no-repeat center / contain;
+  animation-name: ambiance-feuille;
+}
+@keyframes ambiance-feuille {
+  0%   { transform: translate(0, 0) rotate(0deg) scale(var(--taille)); opacity: 0; }
+  10%  { opacity: .5; }
+  50%  { transform: translate(var(--derive), 55vh) rotate(320deg) scale(var(--taille)); }
+  90%  { opacity: .25; }
+  100% { transform: translate(calc(var(--derive) * -.5), 112vh) rotate(640deg) scale(var(--taille)); opacity: 0; }
+}
+
+/* -------- neige (hiver) : tombe lentement en dérivant */
+#ambiance[data-saison="hiver"] i {
+  top: -12px; width: 3px; height: 3px; border-radius: 50%; background: #e8e2d8;
+  animation-name: ambiance-neige;
+}
+@keyframes ambiance-neige {
+  0%   { transform: translate(0, 0) scale(var(--taille)); opacity: 0; }
+  10%  { opacity: .3; }
+  50%  { transform: translate(var(--derive), 55vh) scale(var(--taille)); }
+  100% { transform: translate(calc(var(--derive) * .3), 112vh) scale(var(--taille)); opacity: 0; }
+}
+
+/* jeu en pause : tout se fige */
+body.is-paused #ambiance i { animation-play-state: paused; }
+@media (prefers-reduced-motion: reduce) { #ambiance { display: none; } }

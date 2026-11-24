@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8">
+  <title>Lignée — planche du kit</title>
+  <link rel="stylesheet" href="../css/style.css">
+  <link rel="stylesheet" href="../css/kit.css">
+  <style>
+    .planche { position: relative; z-index: 1; max-width: 1000px; margin: 0 auto; padding: 24px 20px 60px; display: grid; grid-template-columns: 1fr 1fr; gap: 28px; }
+    .planche h3 { grid-column: 1 / -1; margin: 12px 0 0; }
+    .planche code { color: var(--muted); font-size: 11px; }
+    .ex { padding: 16px; }
+    .barre { grid-column: 1 / -1; display: flex; align-items: center; gap: 16px; padding: 10px 16px; background: linear-gradient(#211913, #17110d); border-bottom: 1px solid var(--orne); }
+  </style>
+</head>
+<body>
+  <div class="planche">
+    <h2 style="grid-column:1/-1;color:var(--accent)">Kit « Arbre aux Lanternes »</h2>
+    <p class="muted small" style="grid-column:1/-1">Brindilles pour le courant, Enluminure pour l'important — jamais d'aplat d'or. Classes dans <code>css/kit.css</code>, icônes dans <code>img/icones.svg</code>.</p>
+
+    <h3>Cadres</h3>
+    <div class="cadre ex">
+      <h4>Cadre courant</h4><p class="muted small"><code>.cadre</code> — tableaux, cartes, journal, événements, notifications.</p>
+      <div class="sep"></div>
+      <button class="btn">Action courante</button> <code>.btn</code>
+    </div>
+    <div class="cadre-noble ex" style="margin-top:14px">
+      <span class="lanterne" aria-hidden="true"></span>
+      <h4 style="text-align:center;color:var(--accent)">Cadre noble</h4><p class="muted small" style="text-align:center"><code>.cadre-noble</code> + <code>.lanterne</code> — personnage, fenêtres, héritage.</p>
+      <div class="sep-noble"></div>
+      <div style="text-align:center"><button class="btn btn-noble">Transmettre</button> <code>.btn-noble</code></div>
+    </div>
+
+    <h3>Inscriptions gravées</h3>
+    <div class="barre">
+      <span class="brand">Lignée</span><span style="flex:1"></span>
+      <span class="inscription"><small><svg class="icone"><use href="../img/icones.svg#i-ecus"/></svg>Écus</small><b>1 240</b></span><span class="brin"></span>
+      <span class="inscription"><small><svg class="icone"><use href="../img/icones.svg#i-revenu"/></svg>Par jour</small><b class="pos">+18</b></span><span class="brin"></span>
+      <span class="inscription"><small><svg class="icone"><use href="../img/icones.svg#i-bonheur"/></svg>Bonheur</small><b>×1,4</b></span><span class="brin"></span>
+      <span class="inscription"><small><svg class="icone"><use href="../img/icones.svg#i-ete"/></svg>Saison</small><b>Été</b></span>
+    </div>
+  </div>
+</body>
+</html>
