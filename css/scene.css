@@ -226,6 +226,53 @@
   100%    { opacity: 0; }
 }
 
+/* ---------------------------------------------- Geste : pecher (4 s) */
+/* lancer, longue attente (canne à -115° au total, fil vertical), touche du bouchon vers 72 % */
+#scene .eau { fill: var(--ciel-bas); opacity: .55; }
+#scene .reflets { fill: none; stroke: var(--etincelle); stroke-width: .5; stroke-linecap: round; opacity: .35; animation: reflets 3s ease-in-out infinite alternate; }
+@keyframes reflets { from { transform: translateX(-3px); } to { transform: translateX(3px); } }
+#scene .sil .fil { fill: none; stroke: var(--sil); stroke-width: .35; }
+#scene[data-geste="pecher"] .bras-avant { animation: pecher-bras calc(4s * var(--tempo, 1)) ease-in-out infinite; }
+#scene[data-geste="pecher"] .avant-bras-avant { animation: pecher-avant-bras calc(4s * var(--tempo, 1)) ease-in-out infinite; }
+#scene[data-geste="pecher"] .main-avant { animation: pecher-main calc(4s * var(--tempo, 1)) ease-in-out infinite; }
+#scene[data-geste="pecher"] .bouchon { animation: pecher-bouchon calc(4s * var(--tempo, 1)) ease-in-out infinite; }
+#scene[data-geste="pecher"] .bras-arriere { transform: rotate(-20deg); }
+@keyframes pecher-bras       { 0%, 92%, 100% { transform: rotate(-120deg); } 12%, 85% { transform: rotate(-60deg); } }
+@keyframes pecher-avant-bras { 0%, 92%, 100% { transform: rotate(-40deg); } 12%, 85% { transform: rotate(-30deg); } }
+@keyframes pecher-main {
+  0%, 92%, 100% { transform: rotate(-10deg); }
+  12%, 70%, 76%, 85% { transform: rotate(-25deg); }
+  73% { transform: rotate(-21deg); }
+}
+/* le bouchon plonge d'une unité vers le bas du monde (direction locale -0,906 / -0,423) */
+@keyframes pecher-bouchon { 0%, 70%, 76%, 100% { transform: translate(0, 0); } 73% { transform: translate(-1.2px, -.6px); } }
+#scene .ronds { display: none; }
+#scene[data-geste="pecher"] .ronds { display: inline; }
+#scene .ronds ellipse { fill: none; stroke: var(--etincelle); stroke-width: .4; opacity: 0; animation: ronds calc(4s * var(--tempo, 1)) ease-out infinite; }
+@keyframes ronds { 0%, 72% { opacity: 0; transform: scale(.4); } 74% { opacity: .8; transform: scale(.6); } 90%, 100% { opacity: 0; transform: scale(2.4); } }
+
+/* ------------------------------------------ Geste : marchander (1,8 s) */
+/* les deux mains au-dessus de l'étal, des pièces passent de la main arrière (229,66) à la main avant (239,65) */
+#scene .toile { fill: #3a1d12; }
+#scene[data-geste="marchander"] .bras-avant { transform: rotate(-40deg); }
+#scene[data-geste="marchander"] .avant-bras-avant { animation: marchander-avant calc(1.8s * var(--tempo, 1)) ease-in-out infinite; }
+#scene[data-geste="marchander"] .bras-arriere { transform: rotate(-30deg); }
+#scene[data-geste="marchander"] .avant-bras-arriere { animation: marchander-arriere calc(1.8s * var(--tempo, 1)) ease-in-out infinite; }
+#scene[data-geste="marchander"] .tete { animation: marchander-tete calc(1.8s * var(--tempo, 1)) ease-in-out infinite; }
+@keyframes marchander-avant   { 0%, 100% { transform: rotate(-50deg); } 50% { transform: rotate(-56deg); } }
+@keyframes marchander-arriere { 0%, 100% { transform: rotate(-60deg); } 50% { transform: rotate(-52deg); } }
+@keyframes marchander-tete    { 0%, 40%, 100% { transform: rotate(0deg); } 20% { transform: rotate(7deg); } }
+#scene .pieces { display: none; }
+#scene[data-geste="marchander"] .pieces { display: inline; }
+#scene .pieces circle { fill: var(--accent); opacity: 0; animation: pieces calc(1.8s * var(--tempo, 1)) ease-in-out infinite; }
+@keyframes pieces {
+  0%   { opacity: 0; transform: translate(0, 0); }
+  10%  { opacity: 1; transform: translate(0, 0); }
+  50%  { opacity: 1; transform: translate(4.7px, -8px); }
+  90%  { opacity: 1; transform: translate(9.4px, -1px); }
+  100% { opacity: 0; transform: translate(9.4px, -1px); }
+}
+
 /* ------------------------------------------------- Moins d'animations */
 @media (prefers-reduced-motion: reduce) {
   #scene * { animation: none !important; transition: none !important; }

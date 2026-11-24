@@ -86,6 +86,17 @@
       <path class="sil-decor" d="M236 100 V89.5 Q246 86.6 256 89.5 V100 Z"/>
       <rect class="sil-decor" x="240.5" y="81" width="7" height="8" rx=".6"/>
     </g>
+    <!-- Pêcheur : rivière (le bouchon touche l'eau vers 265,96) -->
+    <g class="element" data-element="riviere">
+      <path class="eau" d="M236 100 Q238 95.6 244 95.4 H480 V100 Z"/>
+      <path class="reflets" d="M250 97.4 H262 M274 98.4 H290 M300 97 H309 M322 98.2 H340 M356 97.4 H366"/>
+    </g>
+    <!-- Négociant : étal et sa toile -->
+    <g class="element" data-element="etal">
+      <path class="sil-decor" d="M240 85 H283 V87.2 H240 Z M242 87 H244 V100 H242 Z M279 87 H281 V100 H279 Z M241 62 H242.4 V85 H241 Z M281 62 H282.4 V85 H281 Z"/>
+      <path class="toile" d="M238 61 H285 L284 66 Q281 68.4 278 66 Q275 68.4 272 66 Q269 68.4 266 66 Q263 68.4 260 66 Q257 68.4 254 66 Q251 68.4 248 66 Q245 68.4 242 66 Q240 67.4 239 66 Z"/>
+      <path class="sil-decor" d="M248 85 V80.5 Q250 78.6 252 80.5 V85 Z M256 85 V79 H263 V85 Z M268 85 Q266.4 80 271 79.6 Q275.6 80 274 85 Z"/>
+    </g>
   </g>
 
   <!-- derrière le personnage : fumée de corruption et halo de montée de niveau -->
@@ -114,7 +125,11 @@
           </g>
         </g>
       </g>
-      <g class="torse"><path d="M215.6 59.6 Q220 56.6 224.4 59.6 L223.8 70 L225.6 80 H214.4 L216.2 70 Z"/></g>
+      <g class="torse">
+        <path d="M215.6 59.6 Q220 56.6 224.4 59.6 L223.8 70 L225.6 80 H214.4 L216.2 70 Z"/>
+        <!-- bourse portée à la ceinture -->
+        <g class="objet" data-objet="bourse"><path d="M224.6 73.4 Q229.4 73.4 228.8 78.6 Q226.8 80.6 224.6 78.6 Z"/></g>
+      </g>
       <g class="tete">
         <rect x="218.7" y="54" width="2.6" height="4.5"/>
         <path d="M220 44.4 A5.6 5.6 0 1 1 219.9 55.6 A5.6 5.6 0 0 1 220 44.4 Z M225.2 49.2 L226.8 51.2 L225.2 51.8 Z"/>
@@ -136,6 +151,12 @@
               <path class="manche" d="M224 78 V90.5"/>
               <path d="M224.6 87.6 L218.6 85.6 Q217 89.2 218.6 92.6 L224.6 90.6 Z M224 88 H226.2 V90.2 H224 Z"/>
             </g>
+            <!-- canne : le fil est tracé pour pendre à la verticale quand la canne est à -115° (pose d'attente) -->
+            <g class="objet" data-objet="canne">
+              <path class="manche" d="M224 78 V104"/>
+              <path class="fil" d="M224 104 L185.0 85.8"/>
+              <g class="bouchon"><circle cx="185.0" cy="85.8" r="1.1"/></g>
+            </g>
             <g class="objet" data-objet="pioche">
               <path class="manche" d="M224 78 V90"/>
               <path d="M215.5 89 Q224 85.6 232.5 89 L232.8 90.4 Q224 88 215.2 90.4 Z"/>
@@ -147,6 +168,12 @@
   </g>
 
   <g id="effets">
+    <g class="ronds" transform="translate(265 96.4)">
+      <ellipse rx="3" ry=".8"/><ellipse rx="3" ry=".8" style="animation-delay:.25s"/>
+    </g>
+    <g class="pieces" transform="translate(229.4 66)">
+      <circle r="1.1"/><circle r="1.1" style="animation-delay:-.9s"/>
+    </g>
     <g class="copeaux" transform="translate(244 82)">
       <rect width="1.6" height=".8" style="--dx:-10px;--dy:-9px"/><rect width="1.2" height=".7" style="--dx:9px;--dy:-11px"/>
       <rect width="1.4" height=".8" style="--dx:13px;--dy:-3px"/><rect width="1.1" height=".6" style="--dx:-13px;--dy:-2px"/>
