@@ -39,7 +39,7 @@ const SCENES = {
 };
 
 const REPOS = Object.freeze({ voie: 'neutre', geste: 'repos', objet: null, element: null });
-const VOIES_DESSINEES = new Set(['paysannerie']);
+const VOIES_DESSINEES = new Set(['paysannerie', 'milice', 'arcanes', 'ombre']);
 
 function sceneFor(jobId, voies = VOIES_DESSINEES) {
   const s = SCENES[jobId];
