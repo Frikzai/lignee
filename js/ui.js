@@ -12,6 +12,7 @@ function el(tag, cls, text) {
 }
 // Icône du sprite img/icones.svg (style gravé au trait, couleur = currentColor).
 const ICONES = 'img/icones.svg';
+const LOGIS = 'img/logis.svg';
 function icone(nom, cls = '') {
   const NS = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(NS, 'svg');
@@ -163,34 +164,34 @@ const UI = {
     return rows;
   },
 
+  // Boutique : le chemin des logis (silhouettes de img/logis.svg) et les possessions en cartes à emblème
   buildShop() {
-    const mk = (rootId, cols) => {
-      const table = el('table', 'grid');
-      const hr = el('tr');
-      cols.forEach(c => hr.appendChild(el('th', null, c)));
-      const thead = el('thead'); thead.appendChild(hr); table.appendChild(thead);
-      const tbody = el('tbody'); table.appendChild(tbody);
-      const wrap = el('div', 'table-wrap cadre'); wrap.appendChild(table);
-      $(rootId).appendChild(wrap);
-      return tbody;
-    };
-    const hb = mk('housingTable', ['Logement', 'Bonheur', 'Coût / jour']);
+    const NS = 'http://www.w3.org/2000/svg';
     for (const h of HOUSING) {
-      const tr = el('tr', 'row');
-      const cells = [el('td', 'name-cell', h.name), el('td', null, '×' + fmtMult(h.happiness)), el('td')];
-      tr.append(...cells);
-      tr.addEventListener('click', () => { setHousing(h.id); this.update(); });
-      hb.appendChild(tr);
-      this.housingRows[h.id] = { tr, cells };
+      const carte = el('button', 'carte-logis');
+      carte.type = 'button';
+      const svg = document.createElementNS(NS, 'svg'), use = document.createElementNS(NS, 'use');
+      svg.setAttribute('class', 'sil'); svg.setAttribute('viewBox', '0 0 120 64'); svg.setAttribute('aria-hidden', 'true');
+      use.setAttribute('href', `${LOGIS}#l-${h.id}`);
+      svg.append(use);
+      const nom = el('span', 'l-nom'), info = el('span', 'l-info'), marques = el('span', 'l-marques');
+      carte.append(el('span', 'l-badge', 'Votre logis'), svg, nom, info, marques);
+      carte.addEventListener('click', () => { setHousing(h.id); this.update(); });
+      $('housingTable').append(carte);
+      this.housingRows[h.id] = { carte, nom, info, marques };
     }
-    const ib = mk('itemsTable', ['Possession', 'Effet', 'Coût / jour']);
     for (const it of ITEMS) {
-      const tr = el('tr', 'row');
-      const cells = [el('td', 'name-cell', it.name), el('td', null, it.effects.map(e => describeEffect(e)).join(', ')), el('td')];
-      tr.append(...cells);
-      tr.addEventListener('click', () => { toggleItem(it.id); this.update(); });
-      ib.appendChild(tr);
-      this.itemRows[it.id] = { tr, cells };
+      const carte = el('button', 'carte-objet');
+      carte.type = 'button';
+      const emb = el('span', 'o-emb');
+      emb.append(icone(ICONES_OBJETS[it.id] || 'etoile'));
+      const corps = el('span', 'o-corps'), tete = el('span', 'o-tete'), marques = el('span', 'o-marques'), prix = el('span', 'o-prix');
+      tete.append(el('b', null, it.name), marques);
+      corps.append(tete, el('span', 'o-eff', it.effects.map(e => describeEffect(e)).join(', ')), prix);
+      carte.append(emb, corps);
+      carte.addEventListener('click', () => { toggleItem(it.id); this.update(); });
+      $('itemsTable').append(carte);
+      this.itemRows[it.id] = { carte, prix, marques };
     }
   },
 
@@ -540,27 +541,42 @@ const UI = {
   },
 
   updateShop() {
-    const em = getMult('expenses'), net = netIncome();
+    const em = getMult('expenses'), net = netIncome(), dep = expenses(), ferme = isForbidden('shop');
+    $('bourseRevenus').textContent = '+' + fmt(income()) + ' /j';
+    $('bourseDepenses').textContent = (dep > 0 ? '−' + fmt(dep) : '0') + ' /j';
+    $('bourseReste').textContent = (net >= 0 ? '+' : '−') + fmt(Math.abs(net)) + ' /j';
+    $('bourseReste').className = net >= 0 ? 'pos' : 'neg';
+    $('shopSummary').textContent = ferme ? 'Défi Ascète : la boutique est fermée.' : '';
+    $('shopSummary').classList.toggle('hidden', !ferme);
+
     const curH = HOUSING_BY_ID[G.housing];
     for (const h of HOUSING) {
-      const r = this.housingRows[h.id];
-      r.tr.style.display = G.unlocked['shop:' + h.id] ? '' : 'none';
-      const active = G.housing === h.id;
-      r.tr.classList.toggle('selected', active);
-      r.cells[2].textContent = fmt(h.cost * em);
-      r.tr.classList.toggle('unaffordable', !active && net + (curH.cost - h.cost) * em < 0);
+      const r = this.housingRows[h.id], ouvert = !!G.unlocked['shop:' + h.id], actuel = G.housing === h.id;
+      r.carte.classList.toggle('verrou', !ouvert);
+      r.carte.classList.toggle('actuel', actuel);
+      r.carte.classList.toggle('cher', ouvert && !actuel && net + (curH.cost - h.cost) * em < 0);
+      r.carte.disabled = !ouvert || ferme;
+      r.carte.setAttribute('aria-pressed', actuel);
+      // un logis pas encore débloqué ne montre que sa silhouette
+      const texte = ouvert ? `×${fmtMult(h.happiness)} · ${fmt(h.cost * em)}/j` : 'à découvrir';
+      if (r._ouvert !== ouvert) {
+        r._ouvert = ouvert;
+        r.nom.textContent = ouvert ? h.name : '???';
+        r.info.replaceChildren(icone(ouvert ? 'bonheur' : 'cadenas'), el('span'));
+      }
+      if (r.info.lastChild.textContent !== texte) r.info.lastChild.textContent = texte;
     }
     for (const it of ITEMS) {
-      const r = this.itemRows[it.id];
-      r.tr.style.display = G.unlocked['shop:' + it.id] ? '' : 'none';
-      const owned = !!G.items[it.id];
-      r.tr.classList.toggle('selected', owned);
-      r.cells[2].textContent = fmt(it.cost * em);
-      r.tr.classList.toggle('unaffordable', !owned && net - it.cost * em < 0);
+      const r = this.itemRows[it.id], pris = !!G.items[it.id];
+      r.carte.classList.toggle('hidden', !G.unlocked['shop:' + it.id]);
+      r.carte.classList.toggle('pris', pris);
+      r.carte.classList.toggle('cher', !pris && net - it.cost * em < 0);
+      r.carte.disabled = ferme;
+      r.carte.setAttribute('aria-pressed', pris);
+      const texte = pris ? `Possédé · ${fmt(it.cost * em)}/j` : `${fmt(it.cost * em)} / jour`;
+      if (r._pris !== pris) { r._pris = pris; r.prix.replaceChildren(icone(pris ? 'acquis' : 'ecus'), el('span')); }
+      if (r.prix.lastChild.textContent !== texte) r.prix.lastChild.textContent = texte;
     }
-    $('shopSummary').textContent = isForbidden('shop')
-      ? 'Défi Ascète : la boutique est fermée.'
-      : `Dépenses : ${fmt(expenses())} écus/jour · cliquez pour acheter ou revendre`;
   },
 
   updateLegacy() {
@@ -700,8 +716,8 @@ const UI = {
   rendreMarque(d) {
     const cellule = {
       job: () => this.jobRows[d.cibleId] && this.jobRows[d.cibleId].tr.firstChild,
-      housing: () => this.housingRows[d.cibleId] && this.housingRows[d.cibleId].cells[0],
-      item: () => this.itemRows[d.cibleId] && this.itemRows[d.cibleId].cells[1],
+      housing: () => this.housingRows[d.cibleId] && this.housingRows[d.cibleId].marques,
+      item: () => this.itemRows[d.cibleId] && this.itemRows[d.cibleId].marques,
     }[d.cible];
     const cell = cellule && cellule();
     if (!cell) { console.warn(`[UI] marque « ${d.id} » : cible introuvable`); return; }

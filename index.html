@@ -12,6 +12,7 @@
   <link rel="stylesheet" href="css/heritage.css">
   <link rel="stylesheet" href="css/colonne.css">
   <link rel="stylesheet" href="css/registres.css">
+  <link rel="stylesheet" href="css/boutique.css">
   <link rel="stylesheet" href="css/scene.css">
 </head>
 <body>
@@ -120,9 +121,20 @@
       <section id="tab-skills" class="tab"></section>
 
       <section id="tab-shop" class="tab">
-        <p class="muted" id="shopSummary"></p>
-        <div id="housingTable"></div>
-        <div id="itemsTable"></div>
+        <div class="bourse cadre-noble">
+          <span class="bourse-titre"><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-balance"/></svg> La bourse de la maison</span>
+          <span class="inscription"><small>Revenus</small><b id="bourseRevenus" class="pos">0</b></span>
+          <span class="brin"></span>
+          <span class="inscription"><small>Dépenses</small><b id="bourseDepenses" class="neg">0</b></span>
+          <span class="brin"></span>
+          <span class="inscription"><small>Il reste</small><b id="bourseReste">0</b></span>
+        </div>
+        <p class="muted hidden" id="shopSummary"></p>
+        <h3 class="boutique-titre">Logis <span>bonheur et coût par jour · cliquez pour emménager</span></h3>
+        <div id="housingTable" class="chemin"></div>
+        <h3 class="boutique-titre">Possessions <span>cliquez pour acheter ou revendre</span></h3>
+        <div id="itemsTable" class="objets"></div>
+        <p class="muted small boutique-note">Ce que vous possédez apparaît dans la scène.</p>
       </section>
 
       <section id="tab-legacy" class="tab">
