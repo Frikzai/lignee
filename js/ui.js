@@ -329,7 +329,8 @@ const UI = {
       case 'options': this.updateOptions(); break;
     }
     if (G.dead) { if (this.modalKind !== 'death') this.showDeath(); }
-    else if (G.pendingTraits && !this.modalKind) this.showTraits();
+    // la naissance attend que l'écran d'accueil soit refermé
+    else if (G.pendingTraits && !this.modalKind && !(typeof Accueil !== 'undefined' && Accueil.ouvert)) this.showTraits();
     this.updateTuto();
   },
 

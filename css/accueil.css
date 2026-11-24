@@ -1,0 +1,69 @@
+/* =====================================================================
+   Lignée — écran d'accueil « L'Arbre aux Lanternes » (js/accueil.js)
+   ===================================================================== */
+
+#accueil { position: fixed; inset: 0; z-index: 80; overflow: hidden; background: #0d0910; color: var(--text); }
+body.accueil-ouvert { overflow: hidden; }
+body.accueil-ouvert .modal.au-dessus { z-index: 90; }   /* seule la confirmation « nouvelle lignée » passe devant l'accueil */
+
+#accueil .accueil-svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+#accueil .lune { fill: #e9c98a; opacity: .85; }
+#accueil .collines { fill: #140c0a; }
+#accueil .sol { fill: #070504; }
+#accueil .arbre { fill: #0a0705; }
+
+/* lanternes */
+#accueil .lanterne-arbre { animation: lanterne-balance 5s ease-in-out infinite; cursor: pointer; outline: none; }
+#accueil .fil { stroke: #0a0705; stroke-width: 1.6; }
+#accueil .corps { fill: #1a100a; stroke: #5a3a20; stroke-width: 1.4; }
+#accueil .lant-ancetre .corps, #accueil .lant-groupe .corps { stroke: #8a6326; }
+#accueil .lant-courante .corps { stroke: #d9973a; }
+#accueil .lant-oublie .corps { stroke: #4a3422; }
+#accueil .lanterne-arbre:hover .corps, #accueil .lanterne-arbre:focus .corps { stroke: #ffc861; }
+#accueil .flamme { fill: #e8a350; opacity: .8; }
+#accueil .lant-courante .flamme { fill: #ffc861; opacity: 1; }
+#accueil .halo { fill: rgba(255, 170, 70, .16); }
+#accueil .lant-oublie .halo { fill: rgba(255, 170, 70, .08); }
+#accueil .lant-oublie .flamme { opacity: .45; }
+#accueil .lant-courante .halo { fill: rgba(255, 190, 90, .38); animation: lanterne-souffle 3s ease-in-out infinite; }
+#accueil .allumage .halo, #accueil .allumage .flamme { transform-box: fill-box; transform-origin: center; animation: allumage 1s ease-out; }
+@keyframes lanterne-balance { 0%, 100% { transform: rotate(-2.5deg); } 50% { transform: rotate(2.5deg); } }
+@keyframes allumage { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+#accueil .braise-ac { fill: #ffb347; animation: braise-accueil 7s linear infinite; }
+@keyframes braise-accueil { from { transform: translate(0, 0); opacity: 0; } 10% { opacity: .9; } to { transform: translate(40px, -640px); opacity: 0; } }
+
+/* titre et formulaire */
+.accueil-voile { position: absolute; left: 15%; right: 15%; bottom: 0; height: 50%; pointer-events: none;
+  background: radial-gradient(ellipse at 50% 78%, rgba(8, 5, 4, .8), transparent 70%); }
+.accueil-titre { position: absolute; left: 0; right: 0; bottom: 8%; display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 0 16px; text-align: center; }
+.accueil-titre h1 { margin: 0; font: normal clamp(44px, 7vw, 76px) var(--font-titre-sc); color: var(--accent); letter-spacing: .04em;
+  text-shadow: 0 2px 0 #000, 0 0 24px rgba(217, 151, 58, .45); }
+.accueil-titre p { margin: 0 0 6px; font: italic 16px var(--font-titre); color: var(--muted); }
+.accueil-titre input { width: min(300px, 80vw); text-align: center; padding: 8px; background: rgba(18, 12, 9, .85);
+  border: 1px solid var(--orne); color: var(--text); font: 20px var(--font-titre); }
+.accueil-titre input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 10px rgba(217, 151, 58, .3); }
+.accueil-titre .btn-noble { font: 18px var(--font-titre-sc); padding: 8px 24px; background: rgba(18, 12, 9, .8); }
+.accueil-lien { background: none; border: none; color: var(--muted); font: 13px system-ui, sans-serif; text-decoration: underline dotted; cursor: pointer; }
+.accueil-lien:hover { color: var(--text); }
+.accueil-message { min-height: 1.2em; color: var(--ember) !important; font: 14px system-ui, sans-serif !important; font-style: normal !important; }
+
+/* bulle d'un ancêtre */
+.accueil-bulle { position: fixed; z-index: 2; max-width: 280px; padding: 12px 18px; font: 13px system-ui, sans-serif; pointer-events: none; }
+.accueil-bulle b { font: 17px var(--font-titre); color: var(--accent); font-weight: normal; }
+
+/* entrée dans le jeu : la caméra plonge vers la lanterne allumée */
+#accueil.entree .accueil-svg { transform: scale(3.2); transition: transform 1.3s cubic-bezier(.5, 0, .8, .3); }
+#accueil.entree { opacity: 0; transition: opacity .9s .4s; }
+#accueil.entree .accueil-titre, #accueil.entree .accueil-voile { opacity: 0; transition: opacity .3s; }
+
+@media (prefers-reduced-motion: reduce) {
+  #accueil .lanterne-arbre, #accueil .braise-ac, #accueil .lant-courante .halo { animation: none; }
+}
+
+/* portrait : l'arbre entier en haut, le titre sur le sol sombre en dessous */
+@media (orientation: portrait) {
+  #accueil { background: #070504; }
+  .accueil-titre { bottom: auto; top: calc(100vw * 860 / 980 - 40px); }
+  .accueil-voile { display: none; }
+  .accueil-titre input { font-size: 18px; }
+}
