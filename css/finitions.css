@@ -1,0 +1,50 @@
+/* =====================================================================
+   Lignée — finitions : onglets, notifications, tutoriel, passe mobile
+   ===================================================================== */
+
+/* onglets : icône gravée, fondu à l'ouverture */
+.tabs button { display: inline-flex; align-items: center; gap: 6px; }
+.tabs button .icone { width: 13px; height: 13px; opacity: .7; }
+.tabs button.active .icone { opacity: 1; }
+.tab.active { animation: onglet-entree .25s ease-out; }
+@keyframes onglet-entree { from { opacity: 0; transform: translateY(4px); } }
+
+/* notifications : cartouches gravés */
+.toast { display: flex; align-items: flex-start; gap: 9px; background: var(--panel); border: 1px solid var(--border); border-left: 3px solid var(--muted); border-radius: var(--radius);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, .5), inset 0 0 0 1px #0b0806; }
+.toast .icone { flex: none; width: 14px; height: 14px; margin-top: 2px; color: var(--muted); }
+.toast.good, .toast.good .icone { border-left-color: var(--good); color: var(--good); }
+.toast.bad, .toast.bad .icone { border-left-color: var(--bad); color: var(--bad); }
+.toast.gold, .toast.gold .icone { border-left-color: var(--accent); color: var(--accent); }
+.toast.event, .toast.event .icone { border-left-color: var(--event); color: #a9c4cf; }
+.toast span { color: var(--text); }
+.toast.gold { box-shadow: 0 6px 20px rgba(0, 0, 0, .5), inset 0 0 0 1px #0b0806, 0 0 14px rgba(217, 151, 58, .25); }
+
+/* tutoriel : une lanterne par étape */
+.tuto { border-radius: var(--radius); }
+.tuto-tete { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+.tuto-step { font: 13px var(--font-titre-sc); letter-spacing: .04em; color: var(--muted); }
+.tuto-pips i.fait { background: var(--orne); border-color: var(--orne); }
+.tuto-pips i.en-cours { background: var(--lanterne); border-color: var(--lanterne); box-shadow: 0 0 6px rgba(255, 200, 97, .8); }
+.tuto p { font: 16px/1.4 var(--font-titre); }
+
+/* ------------------------------------------------------------ Passe mobile */
+@media (max-width: 600px) {
+  /* onglets : une seule ligne qui défile, plutôt que trois lignes empilées */
+  .tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+  .tabs::-webkit-scrollbar { display: none; }
+  .tabs button { flex: none; padding: 8px 10px; }
+  #toasts { left: 8px; right: 8px; bottom: 8px; max-width: none; }
+  .tuto { bottom: 8px; }
+}
+
+/* barre du haut sur mobile : logo et Pause, puis l'âge, puis les ressources sur une ligne (3 rangs au lieu de 4) */
+@media (max-width: 600px) {
+  .topbar { gap: 8px 12px; }
+  .topbar .brand { order: 0; }
+  #pauseBtn { order: 1; margin-left: auto; padding: 5px 10px; }
+  .topbar .age-box { order: 2; flex-basis: 100%; min-width: 0; }
+  .topbar .ressources { order: 3; flex-basis: 100%; gap: 4px 12px; }
+  .topbar .ressources .brin { display: none; }
+  .topbar .inscription b { font-size: 15px; }
+}
