@@ -77,7 +77,7 @@ Les couleurs de catégories (`JOB_CATS`, `SKILL_CATS` dans `data.js`) sont appli
 ### 4.1 Bandeau
 
 - `<div id="scene" aria-hidden="true">` placé dans `<main>`, juste avant `<nav class="tabs">`, visible sur tous les onglets.
-- Hauteur fixe **160 px** (120 px sous 900 px de large), largeur 100 % de la colonne principale, bordure et coins de la DA.
+- Hauteur **proportionnelle** à la largeur (ratio 480:72 sur la zone dessinée, entre 110 et 160 px), largeur 100 % de la colonne principale, bordure et coins de la DA. Ainsi la zone sûre (§4.2) reste entièrement visible à toutes les largeurs ; une hauteur fixe la rognait entre 821 et 899 px.
 - Contient : le SVG de la scène (plein cadre) et, en surimpression HTML en bas à droite, le **médaillon** de la compétence (48 px, 40 px sur mobile) avec une infobulle `title` = nom de la compétence.
 - Pas d'étiquette texte du métier : la carte « en cours » de la barre latérale l'affiche déjà.
 
@@ -185,9 +185,9 @@ Chargé dans `index.html` juste après `<script src="js/ui.js">` (l'ordre import
 |---|---|
 | `G.currentJob` | Changement → classe `fondu` (opacité → 0 en 250 ms), puis bascule : classe `actif` sur le seul `.decor`, `.element`, `.objet` correspondants ; attributs `data-voie` et `data-geste` sur `#scene` ; retrait de `fondu`. |
 | `G.currentSkill` | Classe `actif` sur le `.med` correspondant, sinon mode initiale (`data-fallback`) ; infobulle mise à jour. |
-| Niveau du métier / de la compétence | `isLevelUp` vrai → classe `eclat` (métier) ou `eclat-med` (compétence) pendant 900 ms. Un seul éclat même si plusieurs niveaux sont gagnés d'un coup. |
+| Niveau du métier / de la compétence | `isLevelUp` vrai → classe `eclat` (métier) ou `eclat-med` (compétence) pendant 900 ms. Un seul éclat même si plusieurs niveaux sont gagnés d'un coup, et un niveau gagné pendant un éclat ne le relance pas (pas d'effet stroboscope quand les niveaux tombent à chaque tick). |
 | `G.paused \|\| G.dead` | `data-pause` → `animation-play-state: paused` sur tout le bandeau. |
-| `ageYears()`, `lifespanYears()` | `data-age` = `ageStage(...)`. `jeune` : silhouette plus fine ; `vieux` : torse penché, tête basse, barbe visible, gestes ralentis (variable `--tempo`). |
+| `ageYears()`, `lifespanYears()` | `data-age` = `ageStage(...)`. `jeune` : silhouette plus fine ; `vieux` : torse penché, tête basse, barbe visible, gestes ralentis (variable `--tempo`). Le bras avant des gestes qui visent une cible compense l'inclinaison, pour que l'outil touche toujours sa cible. |
 | `G.corruption` | Variable `--corruption` (0 → 1) : décor refroidi (filtre statique), fumée noire dont l'opacité suit la valeur ; `data-corrompu` à partir de 50 → yeux rouges. Visible quel que soit le métier, comme la jauge de la barre latérale. |
 
 ### 4.7 `css/scene.css`
