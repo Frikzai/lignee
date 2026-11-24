@@ -55,22 +55,24 @@ def svg(graine=11):
     formes, bouts = generer(graine)
     pl = ';'.join(f'{x},{y}' for x, y in places(bouts))
     braises = ''.join(f'<circle class="braise-ac" cx="{560+k*58}" cy="860" r="{1.6+(k%3)*.6:.1f}" style="animation-delay:{-k*1.3:.1f}s"/>' for k in range(9))
-    return f'''<svg xmlns="http://www.w3.org/2000/svg" class="accueil-svg" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
+    return f'''<svg xmlns="http://www.w3.org/2000/svg" class="accueil-svg arbre-lignee" viewBox="0 0 1600 900" preserveAspectRatio="xMidYMid slice">
   <!-- Généré par outils/arbre.py (graine {graine}) — ne pas modifier à la main. -->
   <defs>
     <linearGradient id="ac-ciel" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#0d0910"/><stop offset=".55" stop-color="#2c1512"/><stop offset=".85" stop-color="#6b2f17"/><stop offset="1" stop-color="#1a0f0a"/></linearGradient>
     <radialGradient id="ac-lueur" cx=".5" cy=".5" r=".5"><stop offset="0" stop-color="#a5461a" stop-opacity=".55"/><stop offset="1" stop-color="#a5461a" stop-opacity="0"/></radialGradient>
     <linearGradient id="ac-brume" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#8a7060" stop-opacity="0"/><stop offset="1" stop-color="#8a7060" stop-opacity=".18"/></linearGradient>
   </defs>
-  <rect width="1600" height="900" fill="url(#ac-ciel)"/>
-  <circle class="lune" cx="1320" cy="150" r="46"/>
-  <ellipse cx="800" cy="760" rx="760" ry="260" fill="url(#ac-lueur)"/>
-  <path class="collines" d="M0 800 Q200 700 420 730 T860 720 T1260 700 T1600 720 V900 H0 Z"/>
-  <path class="sol" d="M0 900 V790 Q300 750 620 772 Q800 784 980 768 Q1300 744 1600 770 V900 Z"/>
+  <g class="fond">
+    <rect width="1600" height="900" fill="url(#ac-ciel)"/>
+    <circle class="lune" cx="1320" cy="150" r="46"/>
+    <ellipse cx="800" cy="760" rx="760" ry="260" fill="url(#ac-lueur)"/>
+    <path class="collines" d="M0 800 Q200 700 420 730 T860 720 T1260 700 T1600 720 V900 H0 Z"/>
+    <path class="sol" d="M0 900 V790 Q300 750 620 772 Q800 784 980 768 Q1300 744 1600 770 V900 Z"/>
+  </g>
   <path class="arbre" d="{' '.join(formes)}"/>
   <g id="lanternes" data-places="{pl}"></g>
-  <g class="braises">{braises}</g>
-  <rect class="brume" y="760" width="1600" height="140" fill="url(#ac-brume)"/>
+  <g class="avant"><g class="braises">{braises}</g>
+  <rect class="brume" y="760" width="1600" height="140" fill="url(#ac-brume)"/></g>
 </svg>
 '''
 

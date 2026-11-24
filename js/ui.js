@@ -192,17 +192,26 @@ const UI = {
     }
   },
 
+  // Talents : « serviteurs de la maison » (automatisation) et « vertus de la lignée », emblème et rangs en lanternes
   buildPerks() {
-    const grid = $('perkGrid');
     for (const p of PERKS) {
-      const card = el('div', 'perk card cadre' + (p.setting ? ' auto' : ''));
+      const card = el('div', 'perk vertu cadre' + (p.setting ? ' auto' : ''));
+      const emb = el('span', 'v-emb');
+      emb.append(icone((typeof EMBLEMES_TALENTS !== 'undefined' && EMBLEMES_TALENTS[p.id]) || 'etoile'));
       const rank = el('span', 'rank');
-      const head = el('div', 'perk-head'); head.append(el('h4', null, p.name), rank);
+      const head = el('div', 'perk-head'); head.append(emb, el('h4', null, p.name), rank);
       const btn = el('button', 'btn small');
       btn.addEventListener('click', () => { buyPerk(p.id); this.update(); });
-      card.append(head, el('p', 'muted small', p.desc), btn);
-      grid.appendChild(card);
-      this.perkCards[p.id] = { card, rank, btn };
+      card.append(head, el('p', 'muted small', p.desc));
+      let pips = null;
+      if (p.max > 1) {
+        pips = el('div', 'pips');
+        for (let k = 0; k < p.max; k++) pips.append(el('i'));
+        card.append(pips);
+      }
+      card.append(btn);
+      $(p.setting ? 'perkGridAuto' : 'perkGrid').appendChild(card);
+      this.perkCards[p.id] = { card, rank, btn, pips };
     }
   },
 
@@ -537,11 +546,13 @@ const UI = {
     for (const p of PERKS) {
       const c = this.perkCards[p.id], r = perkRank(p.id), cost = perkCost(p);
       if (p.max > 1) c.rank.textContent = `${r} / ${p.max}`;
+      if (c.pips && c._r !== r) { c._r = r; [...c.pips.children].forEach((pip, k) => pip.classList.toggle('on', k < r)); }
       else if (c.rank._acquis !== !!r) { c.rank._acquis = !!r; c.rank.replaceChildren(...(r ? [icone('acquis')] : [])); }
       if (r >= p.max) { c.btn.textContent = p.max > 1 ? 'Maximum' : 'Acquis'; c.btn.disabled = true; }
-      else { c.btn.textContent = `Acheter — ${cost} pt${cost > 1 ? 's' : ''}`; c.btn.disabled = G.legacy.points < cost; }
+      else { c.btn.textContent = `Accorder — ${cost} pt${cost > 1 ? 's' : ''}`; c.btn.disabled = G.legacy.points < cost; }
       c.card.classList.toggle('owned', r > 0);
     }
+    if (typeof Heritage !== 'undefined') Heritage.maj();
   },
 
   updateChallenges() {

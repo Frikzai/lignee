@@ -9,6 +9,7 @@
   <link rel="stylesheet" href="css/ambiance.css">
   <link rel="stylesheet" href="css/accueil.css">
   <link rel="stylesheet" href="css/rituel.css">
+  <link rel="stylesheet" href="css/heritage.css">
   <link rel="stylesheet" href="css/scene.css">
 </head>
 <body>
@@ -110,16 +111,37 @@
       </section>
 
       <section id="tab-legacy" class="tab">
-        <div class="legacy-head card cadre">
-          <div class="stat"><label>Points</label><b id="lpPoints">0</b></div>
-          <div class="stat"><label>Gain à la transmission</label><b id="lpPreview" class="gold">0</b></div>
-          <div class="reb">
-            <button id="rebirthBtn" class="btn btn-noble">Transmettre l'héritage</button>
-            <span id="rebirthHint" class="muted small"></span>
+        <div class="maison cadre-noble">
+          <div class="maison-infos">
+            <h2 id="maisonNom" class="maison-nom">Maison sans nom</h2>
+            <p id="maisonGen" class="muted"></p>
+            <div class="maison-ins">
+              <span class="inscription"><small><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-lignee"/></svg>Points d'héritage</small><b id="lpPoints">0</b></span>
+              <span class="brin"></span>
+              <span class="inscription"><small><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-etoile"/></svg>Gain à la transmission</small><b id="lpPreview" class="gold">0</b></span>
+              <span class="brin"></span>
+              <span class="inscription"><small><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-age"/></svg>Vies transmises</small><b id="lpVies">0</b></span>
+            </div>
+            <div class="reb">
+              <button id="rebirthBtn" class="btn btn-noble">Transmettre l'héritage</button>
+              <span id="rebirthHint" class="muted small"></span>
+            </div>
           </div>
+          <div id="arbreLignee" class="maison-arbre" aria-hidden="true"></div>
         </div>
-        <p class="muted small">À chaque nouvelle vie, vos meilleurs niveaux deviennent des bonus d'XP permanents.</p>
-        <div id="perkGrid" class="grid-cards"></div>
+        <div class="heritage-cols">
+          <div>
+            <h3>Serviteurs de la maison</h3>
+            <div id="perkGridAuto" class="vertus"></div>
+            <h3>Vertus de la lignée</h3>
+            <div id="perkGrid" class="vertus"></div>
+            <p class="muted small">À chaque nouvelle vie, vos meilleurs niveaux deviennent des bonus d'XP permanents.</p>
+          </div>
+          <aside class="chronique cadre">
+            <h3>Chronique</h3>
+            <ol id="chronique"></ol>
+          </aside>
+        </div>
       </section>
 
       <section id="tab-challenges" class="tab">
@@ -186,6 +208,7 @@
   <script src="js/lignee.js"></script>
   <script src="js/accueil.js"></script>
   <script src="js/rituel.js"></script>
+  <script src="js/heritage.js"></script>
   <script src="js/sante.js"></script>
   <script src="js/saisons.js"></script>
   <script src="js/ambiance.js"></script>

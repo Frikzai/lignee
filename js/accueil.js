@@ -36,6 +36,66 @@ function texteAncetre(v) {
 }
 
 // ------------------------------------------------------------ Navigateur
+// L'arbre de la lignée (img/accueil.svg) et ses lanternes, avec une bulle au survol.
+// Partagé par l'écran d'accueil et l'onglet Héritage.
+const Arbre = {
+  texte: null,
+  async source() {
+    if (!this.texte) {
+      const res = await fetch(new URL('../img/accueil.svg', ACCUEIL_SRC));
+      if (!res.ok) throw new Error('HTTP ' + res.status);
+      this.texte = await res.text();
+    }
+    return this.texte;
+  },
+  // eteinte : la lanterne de la vie en cours n'est pas encore allumée (première fondation)
+  async dessiner(conteneur, { eteinte = false } = {}) {
+    conteneur.insertAdjacentHTML('afterbegin', await this.source());   // contenu de confiance : notre propre fichier
+    const svg = conteneur.querySelector('.arbre-lignee');
+    const g = svg.querySelector('#lanternes');
+    const places = g.dataset.places.split(';').map(p => p.split(',').map(Number));
+    let courante = null;
+    for (const item of lanternes(G.lignee, places.length)) {
+      const [x, y] = places[item.place];
+      const L = item.type === 'courante' ? 34 : 30 + (item.place % 3) * 14, ly = y + L;
+      const type = item.type === 'courante' && eteinte ? 'eteinte' : item.type;
+      const nom = item.type === 'ancetre' ? texteAncetre(item.vie) : item.type === 'courante' ? { nom: item.prenom, vie: 'la vie en cours', detail: '' }
+        : item.type === 'groupe' ? { nom: `${item.nombre} ancêtres`, vie: 'des générations plus anciennes', detail: '' }
+        : { nom: 'Un ancêtre', vie: 'dont le nom s\'est perdu', detail: '' };
+      const halo = type === 'eteinte' ? '' : `<circle class="halo" cx="${x}" cy="${ly + 17}" r="${type === 'courante' ? 48 : 26}"/>`;
+      const flamme = type === 'eteinte' ? '' : `<circle class="flamme" cx="${x}" cy="${ly + 18}" r="${type === 'courante' ? 6 : 4}"/>`;
+      g.insertAdjacentHTML('beforeend',   // nombres uniquement ; les noms passent par textContent
+        `<g class="lanterne-arbre lant-${type}" tabindex="0" role="img" style="transform-origin:${x}px ${y}px;animation-delay:${(-item.place * 0.37).toFixed(2)}s">`
+        + `<title></title><path class="fil" d="M${x} ${y} V${ly}"/>${halo}`
+        + `<path class="corps" d="M${x - 12} ${ly + 3} H${x + 12} L${x + 15} ${ly + 9} V${ly + 27} L${x + 9} ${ly + 34} H${x - 9} L${x - 15} ${ly + 27} V${ly + 9} Z"/>`
+        + `<path class="corps" d="M${x - 6} ${ly} H${x + 6} V${ly + 3} H${x - 6} Z"/>${flamme}</g>`);
+      const lant = g.lastElementChild;
+      lant.querySelector('title').textContent = [nom.nom, nom.vie, nom.detail].filter(Boolean).join(' · ');
+      const montre = () => this.montrer(lant, nom);
+      lant.addEventListener('mouseenter', montre);
+      lant.addEventListener('focus', montre);
+      lant.addEventListener('mouseleave', () => this.cacher());
+      lant.addEventListener('blur', () => this.cacher());
+      if (item.type === 'courante') courante = lant;
+    }
+    return { svg, courante };
+  },
+  bulle() {
+    if (!this._bulle) { this._bulle = el('div', 'arbre-bulle cadre-noble hidden'); document.body.append(this._bulle); }
+    return this._bulle;
+  },
+  montrer(lant, t) {
+    const b = this.bulle();
+    b.replaceChildren(el('b', null, t.nom), ' · ' + t.vie);
+    if (t.detail) b.append(el('br'), el('span', 'muted', t.detail));
+    b.classList.remove('hidden');
+    const r = lant.getBoundingClientRect(), w = b.offsetWidth;
+    b.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.right + 10)) + 'px';
+    b.style.top = Math.max(8, r.top + r.height / 2 - b.offsetHeight / 2) + 'px';
+  },
+  cacher() { if (this._bulle) this._bulle.classList.add('hidden'); },
+};
+
 const Accueil = {
   ouvert: false,
   sortie: false,
@@ -79,8 +139,6 @@ const Accueil = {
     this.message = el('p', 'accueil-message');
     titre.append(this.message);
     box.append(el('div', 'accueil-voile'), titre);
-    this.bulle = el('div', 'accueil-bulle cadre-noble hidden');
-    box.append(this.bulle);
 
     box.classList.remove('hidden');
     document.body.classList.add('accueil-ouvert');
@@ -99,15 +157,15 @@ const Accueil = {
   },
 
   async chargerArbre(box) {
+    let r;
     try {
-      const res = await fetch(new URL('../img/accueil.svg', ACCUEIL_SRC));   // contenu de confiance : notre propre fichier
-      if (!res.ok) throw new Error('HTTP ' + res.status);
-      box.insertAdjacentHTML('afterbegin', await res.text());
+      r = await Arbre.dessiner(box, { eteinte: !this.dejaJoue });   // première fondation : la lanterne s'allume quand on fonde
     } catch (err) {
       console.warn('[accueil] arbre indisponible :', err.message);   // l'accueil reste utilisable, sur fond sombre
       return;
     }
-    this.svg = box.querySelector('.accueil-svg');
+    this.svg = r.svg;
+    this.lanterneCourante = r.courante;
     // écran en portrait : cadrage sur la couronne, en haut (sinon les lanternes des côtés sortent du cadre)
     const cadrer = () => {
       const portrait = innerWidth < innerHeight * .9;
@@ -116,42 +174,6 @@ const Accueil = {
     };
     cadrer();
     addEventListener('resize', cadrer);
-    const g = this.svg.querySelector('#lanternes');
-    const places = g.dataset.places.split(';').map(p => p.split(',').map(Number));
-    const eteinte = !this.dejaJoue;   // première fondation : la lanterne s'allume quand on fonde
-    for (const item of lanternes(G.lignee, places.length)) {
-      const [x, y] = places[item.place];
-      const L = item.type === 'courante' ? 34 : 30 + (item.place % 3) * 14, ly = y + L;
-      const type = item.type === 'courante' && eteinte ? 'eteinte' : item.type;
-      const nom = item.type === 'ancetre' ? texteAncetre(item.vie) : item.type === 'courante' ? { nom: item.prenom, vie: 'la vie en cours', detail: '' }
-        : item.type === 'groupe' ? { nom: `${item.nombre} ancêtres`, vie: 'des générations plus anciennes', detail: '' }
-        : { nom: 'Un ancêtre', vie: 'dont le nom s\'est perdu', detail: '' };
-      const halo = type === 'eteinte' ? '' : `<circle class="halo" cx="${x}" cy="${ly + 17}" r="${type === 'courante' ? 48 : 26}"/>`;
-      const flamme = type === 'eteinte' ? '' : `<circle class="flamme" cx="${x}" cy="${ly + 18}" r="${type === 'courante' ? 6 : 4}"/>`;
-      g.insertAdjacentHTML('beforeend',
-        `<g class="lanterne-arbre lant-${type}" tabindex="0" role="img" style="transform-origin:${x}px ${y}px;animation-delay:${(-item.place * 0.37).toFixed(2)}s">`
-        + `<title></title><path class="fil" d="M${x} ${y} V${ly}"/>${halo}`
-        + `<path class="corps" d="M${x - 12} ${ly + 3} H${x + 12} L${x + 15} ${ly + 9} V${ly + 27} L${x + 9} ${ly + 34} H${x - 9} L${x - 15} ${ly + 27} V${ly + 9} Z"/>`
-        + `<path class="corps" d="M${x - 6} ${ly} H${x + 6} V${ly + 3} H${x - 6} Z"/>${flamme}</g>`);
-      const lant = g.lastElementChild;
-      lant.querySelector('title').textContent = [nom.nom, nom.vie, nom.detail].filter(Boolean).join(' · ');
-      const montre = () => this.montrerBulle(lant, nom);
-      lant.addEventListener('mouseenter', montre);
-      lant.addEventListener('focus', montre);
-      lant.addEventListener('mouseleave', () => this.bulle.classList.add('hidden'));
-      lant.addEventListener('blur', () => this.bulle.classList.add('hidden'));
-      if (item.type === 'courante') this.lanterneCourante = lant;
-    }
-  },
-
-  montrerBulle(lant, t) {
-    const b = this.bulle;
-    b.replaceChildren(el('b', null, t.nom), ' · ' + t.vie);
-    if (t.detail) b.append(el('br'), el('span', 'muted', t.detail));
-    b.classList.remove('hidden');
-    const r = lant.getBoundingClientRect(), w = b.offsetWidth;
-    b.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.right + 10)) + 'px';
-    b.style.top = Math.max(8, r.top + r.height / 2 - b.offsetHeight / 2) + 'px';
   },
 
   fonder() {
@@ -187,6 +209,7 @@ const Accueil = {
     const box = $('accueil');
     const fin = () => {
       box.classList.add('hidden');
+      Arbre.cacher();
       document.body.classList.remove('accueil-ouvert');
       this.ouvert = false;
       UI.update();
