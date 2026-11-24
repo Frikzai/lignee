@@ -23,7 +23,7 @@ Hors périmètre (branches ultérieures) : refonte visuelle de chaque onglet (M�
 | Contenu de la scène | Métier en cours = scène principale ; compétence en cours = médaillon animé |
 | Granularité | Kit réutilisable : 4 décors (un par voie) + 11 gestes + objets tenus + éléments de décor |
 | Emplacement | Bandeau pleine largeur au-dessus des onglets |
-| Ambiance | « Braise & suie » : noir fumé, orange de forge, or ancien ; titres en IM Fell English SC |
+| Ambiance | « Braise & suie » : noir fumé, orange de forge, or ancien ; titres en IM Fell English (SC et romaine) |
 | Réactions | Pause, changement de métier/compétence, montée de niveau, vieillissement, corruption |
 | Architecture | Un « théâtre » SVG chargé dans la page, piloté par `js/scene.js` via attributs et classes |
 
@@ -54,7 +54,8 @@ Les couleurs de catégories (`JOB_CATS`, `SKILL_CATS` dans `data.js`) sont appli
 
 ### 3.2 Typographie
 
-- **IM Fell English SC** (licence OFL) pour : `.brand`, `h2`, `h3`, `h4`, boutons d'onglets, noms de métiers et compétences dans les tableaux, boutons.
+- **IM Fell English SC** (petites capitales, `--font-titre-sc`) pour les libellés fixes : `.brand`, onglets, `h3` (déjà en majuscules), noms de catégories. Ses circonflexes minuscules (â ê î ô û) sont mal dessinés : jamais de texte dynamique dans cette police.
+- **IM Fell English** (romaine, `--font-titre`, licence OFL) pour `h2`, `h4`, noms de métiers et compétences dans les tableaux, traits, boutons.
 - Fichier de police hébergé dans le dépôt (`fonts/`) avec sa licence `fonts/OFL.txt`, déclaré par `@font-face` avec `font-display: swap` et Georgia en secours. Pas de Google Fonts : le jeu doit fonctionner hors-ligne.
 - Texte courant et **chiffres** : police système inchangée, `font-variant-numeric: tabular-nums` sur les valeurs numériques (lisibilité des tableaux).
 
