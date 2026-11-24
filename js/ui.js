@@ -23,6 +23,24 @@ function icone(nom, cls = '') {
   return svg;
 }
 
+// Registre de déclarations des modules : avant demarrer(), on mémorise ; après, on rend tout de suite.
+// Un id redéclaré remplace l'ancien (le rendu remplace alors l'élément affiché).
+function creerRegistre(rendre) {
+  const defs = new Map();
+  let demarre = false;
+  return {
+    ajouter(def) {
+      if (!def || !def.id) throw new Error('UI : une déclaration doit avoir un id');
+      defs.set(def.id, def);
+      if (demarre) rendre(def);
+    },
+    demarrer() { demarre = true; for (const d of defs.values()) rendre(d); },
+    liste: () => [...defs.values()],
+  };
+}
+const valeur = v => (typeof v === 'function' ? v() : v);
+const TONS = { bon: 'var(--good)', moyen: 'var(--accent)', mauvais: 'var(--bad)' };
+
 // Barre de progression : quand un niveau est franchi entre deux rafraîchissements,
 // on la remplit jusqu'au bout avant de repartir de zéro (sans animation à l'envers).
 function setProgress(bar, level, pct) {
@@ -80,6 +98,7 @@ const UI = {
   jobRows: {}, skillRows: {}, catParts: {},
   housingRows: {}, itemRows: {}, perkCards: {}, achCards: {}, challengeCards: {},
   eventUid: null, logKey: null, modalKind: null, tutoShown: null, focusEls: [],
+  vues: new Map(), alertes: {},
 
   init() {
     this.jobRows = this.buildTables('tab-jobs', JOB_CATS, JOBS, 'job', ['', 'Niveau', 'Revenu / jour', 'Prochain niveau']);
@@ -89,6 +108,9 @@ const UI = {
     this.buildChallenges();
     this.buildAchievements();
     this.bind();
+    this.ressources.demarrer();
+    this.jauges.demarrer();
+    this.marques.demarrer();
     this.ready = true;
     this.update();
   },
@@ -282,6 +304,7 @@ const UI = {
     this.updateTop();
     this.updateTabs();
     this.updateSidebar();
+    this.majModules();
     for (const f of HOOKS.ui) f();
     switch (this.tab) {
       case 'jobs': this.updateJobs(); break;
@@ -547,6 +570,87 @@ const UI = {
     if (!G.log.length) ul.appendChild(el('li', 'muted', 'Rien à signaler pour l\'instant.'));
   },
 
+  // ------------------------------------------------- API pour les modules
+  // Les modules (santé, saisons…) déclarent ce qu'ils veulent afficher ; le rendu reste ici.
+  ajouterRessource(def) { this.ressources.ajouter(def); },
+  ajouterJauge(def) { this.jauges.ajouter(def); },
+  ajouterMarque(def) { this.marques.ajouter({ ...def, id: `${def.cible}:${def.id}:${def.icone}`, cibleId: def.id }); },
+
+  rendreRessource(d) {
+    const box = $('ressources-modules');
+    const ancienne = this.vues.get('r:' + d.id);
+    const n = el('span', 'ressource-module');
+    const ins = el('span', 'inscription'), small = el('small'), lib = el('span'), b = el('b');
+    small.append(el('span'), lib);   // le premier enfant sera l'icône
+    ins.append(small, b);
+    n.append(el('span', 'brin'), ins);
+    if (ancienne) ancienne.n.replaceWith(n); else box.appendChild(n);
+    this.vues.set('r:' + d.id, { n, small, lib, b, icone: null });
+    this.majRessource(d);
+  },
+  majRessource(d) {
+    const v = this.vues.get('r:' + d.id);
+    const nom = valeur(d.icone);
+    if (nom !== v.icone) { v.icone = nom; v.small.firstChild.replaceWith(icone(nom)); }
+    v.lib.textContent = valeur(d.libelle);
+    v.b.textContent = valeur(d.valeur);
+    v.n.title = d.titre ? valeur(d.titre) : '';
+    const ton = d.ton ? valeur(d.ton) : null;
+    v.b.className = ton === 'bon' ? 'pos' : ton === 'mauvais' ? 'neg' : '';
+  },
+
+  rendreJauge(d) {
+    const box = $('jauges');
+    const ancienne = this.vues.get('j:' + d.id);
+    const n = el('div', 'jauge');
+    const tete = el('div', 'now-head'), nom = el('span'), texte = el('span', 'muted small');
+    nom.append(icone(valeur(d.icone)), ' ', valeur(d.libelle));
+    tete.append(nom, texte);
+    const bar = el('div', 'bar'), fill = el('div');
+    bar.appendChild(fill);
+    const info = el('div', 'muted small');
+    n.append(tete, bar, info);
+    if (ancienne) ancienne.n.replaceWith(n); else box.appendChild(n);
+    this.vues.set('j:' + d.id, { n, texte, fill, info });
+    this.majJauge(d);
+  },
+  majJauge(d) {
+    const v = this.vues.get('j:' + d.id), e = d.etat();
+    v.texte.textContent = e.texte || '';
+    v.fill.style.width = Math.max(0, Math.min(100, e.pct)) + '%';
+    v.fill.style.background = TONS[e.ton] || TONS.moyen;
+    v.info.textContent = e.info || '';
+    v.n.title = e.titre || '';
+  },
+
+  rendreMarque(d) {
+    const cellule = {
+      job: () => this.jobRows[d.cibleId] && this.jobRows[d.cibleId].tr.firstChild,
+      housing: () => this.housingRows[d.cibleId] && this.housingRows[d.cibleId].cells[0],
+      item: () => this.itemRows[d.cibleId] && this.itemRows[d.cibleId].cells[1],
+    }[d.cible];
+    const cell = cellule && cellule();
+    if (!cell) { console.warn(`[UI] marque « ${d.id} » : cible introuvable`); return; }
+    for (const m of cell.querySelectorAll('.marque')) if (m.dataset.cle === d.id) m.remove();
+    const m = el('span', 'marque marque-' + (d.ton || 'bon'));
+    m.dataset.cle = d.id;
+    m.title = d.titre || '';
+    for (let i = 0; i < (d.nombre || 1); i++) m.appendChild(icone(d.icone));
+    if (d.texte) m.append(' ' + d.texte);
+    cell.appendChild(m);
+  },
+
+  // Une valeur de module qui plante ne doit pas arrêter l'interface : on prévient une fois et on continue.
+  protege(d, f) {
+    try { f(d); } catch (e) {
+      if (!this.alertes[d.id]) { this.alertes[d.id] = true; console.warn(`[UI] « ${d.id} » :`, e); }
+    }
+  },
+  majModules() {
+    for (const d of this.ressources.liste()) if (this.vues.has('r:' + d.id)) this.protege(d, x => this.majRessource(x));
+    for (const d of this.jauges.liste()) if (this.vues.has('j:' + d.id)) this.protege(d, x => this.majJauge(x));
+  },
+
   // ------------------------------------------------------------- Tutoriel
   updateTuto() {
     const box = $('tuto');
@@ -640,3 +744,8 @@ const UI = {
     while ($('toasts').children.length > 4) $('toasts').firstChild.remove();
   },
 };
+UI.ressources = creerRegistre(d => UI.protege(d, x => UI.rendreRessource(x)));
+UI.jauges = creerRegistre(d => UI.protege(d, x => UI.rendreJauge(x)));
+UI.marques = creerRegistre(d => UI.protege(d, x => UI.rendreMarque(x)));
+
+if (typeof module !== 'undefined') module.exports = { creerRegistre };
