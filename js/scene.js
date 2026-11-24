@@ -90,11 +90,22 @@ async function initScene() {
 }
 
 const REDUIT = typeof matchMedia !== 'undefined' ? matchMedia('(prefers-reduced-motion: reduce)') : { matches: false };
-const vu = { job: null, fondu: false };   // dernières valeurs appliquées au bandeau
+const vu = { job: null, fondu: false, jobNiv: null, corruption: null };   // dernières valeurs appliquées au bandeau
+const minuteurs = {};
 
 function setFlag(el, key, on) {
   if (on === key in el.dataset) return;
   if (on) el.dataset[key] = ''; else delete el.dataset[key];
+}
+
+// Rejoue l'animation liée à `cls` sur `el` (même si elle est déjà en cours), puis la retire.
+function flash(el, cls, ms = 900) {
+  if (REDUIT.matches) return;
+  el.classList.remove(cls);
+  void el.getBoundingClientRect();   // force le recalcul pour relancer l'animation CSS
+  el.classList.add(cls);
+  clearTimeout(minuteurs[cls]);
+  minuteurs[cls] = setTimeout(() => el.classList.remove(cls), ms);
 }
 
 function applyJob(jobId) {
@@ -123,6 +134,17 @@ function updateScene() {
         vu.fondu = false;
       }, 250);
     }
+  }
+
+  const job = { id: G.currentJob, level: G.jobs[G.currentJob]?.level ?? 0 };
+  if (isLevelUp(vu.jobNiv, job)) flash(scene, 'eclat');
+  vu.jobNiv = job;
+
+  const corruption = Math.min(100, Math.max(0, G.corruption || 0));
+  if (corruption !== vu.corruption) {
+    vu.corruption = corruption;
+    scene.style.setProperty('--corruption', corruption / 100);
+    setFlag(scene, 'corrompu', corruption >= 50);
   }
 
   setFlag(scene, 'pause', !!(G.paused || G.dead));

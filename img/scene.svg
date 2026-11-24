@@ -19,6 +19,11 @@
       <stop offset="0" class="lueur-coeur"/>
       <stop offset="1" class="lueur-bord"/>
     </radialGradient>
+    <radialGradient id="scene-halo">
+      <stop offset="0" class="halo-coeur"/>
+      <stop offset="1" class="halo-bord"/>
+    </radialGradient>
+    <filter id="scene-flou" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="1.6"/></filter>
   </defs>
 
   <g id="ciel">
@@ -37,6 +42,15 @@
   <rect class="sol" y="100" width="480" height="10"/>
 
   <g id="elements"></g>
+
+  <!-- derrière le personnage : fumée de corruption et halo de montée de niveau -->
+  <g class="fumee" filter="url(#scene-flou)">
+    <ellipse class="volute" cx="210" cy="96" rx="7" ry="4"/>
+    <ellipse class="volute" cx="226" cy="98" rx="8" ry="4.5" style="animation-delay:-1.3s"/>
+    <ellipse class="volute" cx="216" cy="99" rx="6" ry="3.5" style="animation-delay:-2.6s"/>
+    <ellipse class="volute" cx="232" cy="95" rx="6.5" ry="4" style="animation-delay:-3.8s"/>
+  </g>
+  <ellipse class="halo" cx="220" cy="72" rx="28" ry="32" fill="url(#scene-halo)"/>
 
   <g id="perso" class="sil">
     <g class="jambe-arriere"><path d="M216.2 76 H219.8 L218.4 98 L219.8 98.6 V100 H214.8 L215 98 Z"/></g>
@@ -66,6 +80,13 @@
     </g>
   </g>
 
-  <g id="effets"></g>
+  <g id="effets">
+    <g class="gerbe" transform="translate(220 66)">
+      <circle r=".9" style="--dx:-16px;--dy:-12px"/><circle r=".7" style="--dx:15px;--dy:-14px"/>
+      <circle r=".8" style="--dx:-20px;--dy:2px"/><circle r=".9" style="--dx:19px;--dy:-1px"/>
+      <circle r=".7" style="--dx:-9px;--dy:-20px"/><circle r=".8" style="--dx:8px;--dy:-21px"/>
+      <circle r=".6" style="--dx:-14px;--dy:12px"/><circle r=".7" style="--dx:13px;--dy:11px"/>
+    </g>
+  </g>
 
 </svg>

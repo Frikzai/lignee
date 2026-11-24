@@ -63,6 +63,31 @@
 #scene[data-age="vieux"] { --penche: 12deg; --tempo: 1.4; }
 #scene[data-age="vieux"] .barbe { display: inline; }
 
+/* ----------------------------------------------------------- Corruption */
+/* filtre statique (jamais animé) : le décor se refroidit avec la corruption */
+#scene #ciel, #scene #decors { filter: saturate(calc(1 - .6 * var(--corruption, 0))) hue-rotate(calc(-25deg * var(--corruption, 0))); }
+#scene .fumee { opacity: var(--corruption, 0); }
+#scene .volute { fill: #060405; transform-box: fill-box; transform-origin: center; animation: volute calc(5s * var(--tempo, 1)) linear infinite; }
+@keyframes volute {
+  0%   { transform: translateY(0) scale(.6); opacity: 0; }
+  20%  { opacity: .9; }
+  100% { transform: translateY(-34px) scale(2.3); opacity: 0; }
+}
+#scene[data-corrompu] .yeux { display: inline; }
+
+/* ------------------------------------------------------ Montée de niveau */
+#scene .halo-coeur { stop-color: var(--etincelle); stop-opacity: .55; }
+#scene .halo-bord { stop-color: var(--etincelle); stop-opacity: 0; }
+#scene .halo { opacity: 0; }
+#scene.eclat .halo { animation: halo .9s ease-out; }
+@keyframes halo { 0% { opacity: 0; } 25% { opacity: 1; } 100% { opacity: 0; } }
+#scene .gerbe circle { fill: var(--etincelle); opacity: 0; }
+#scene.eclat .gerbe circle { animation: gerbe .9s ease-out; }
+@keyframes gerbe {
+  0%   { opacity: 1; transform: translate(0, 0); }
+  100% { opacity: 0; transform: translate(var(--dx), var(--dy)); }
+}
+
 /* ------------------------------------------------------- Geste : repos */
 #scene[data-geste="repos"] .haut { animation: repos-souffle calc(3.2s * var(--tempo, 1)) ease-in-out infinite; }
 #scene[data-geste="repos"] .tete { animation: repos-regard calc(6s * var(--tempo, 1)) ease-in-out infinite; }
