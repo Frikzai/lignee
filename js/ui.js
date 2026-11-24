@@ -269,6 +269,7 @@ const UI = {
     this.updateTop();
     this.updateTabs();
     this.updateSidebar();
+    for (const f of HOOKS.ui) f();
     switch (this.tab) {
       case 'jobs': this.updateJobs(); break;
       case 'skills': this.updateSkills(); break;
