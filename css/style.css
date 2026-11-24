@@ -136,11 +136,8 @@ table.grid { width: 100%; border-collapse: collapse; font-variant-numeric: tabul
 .grid tr:last-child td { border-bottom: none; }
 .grid tr.row { cursor: pointer; }
 .grid tr.row:hover td { background: var(--panel2); }
-.grid tr.selected td { background: #33271c; }
-.grid tr.selected .name-cell { box-shadow: inset 3px 0 0 var(--accent); }
 .grid tr.unaffordable td { color: #b07a70; }
-.name-cell { position: relative; min-width: 170px; font-family: var(--font-titre); font-weight: normal; font-size: 15px; }
-.row-bar { position: absolute; left: 0; top: 0; bottom: 0; width: 0; opacity: .28; pointer-events: none; }
+.name-cell { min-width: 170px; font-family: var(--font-titre); font-weight: normal; font-size: 15px; }
 .row-name { position: relative; }
 .lock-row td { color: var(--muted); font-size: 12px; white-space: normal; background: #1a140f; }
 .lock-title { margin-right: 6px; }
