@@ -268,6 +268,7 @@ const UI = {
       this.confirm('Abandonner le défi ?', 'Les règles du défi sont levées, mais vous n\'obtiendrez pas la récompense.', () => abandonChallenge()));
     $('rebirthBtn').addEventListener('click', () => {
       if (ageYears() < 30) return;
+      if (typeof Rituel !== 'undefined') return Rituel.fin(false);
       this.confirm('Transmettre l\'héritage maintenant ?',
         `Votre vie actuelle s'achève et vous gagnez <b>${legacyPointsPreview()}</b> point(s) d'héritage.`,
         () => rebirth());
@@ -328,7 +329,9 @@ const UI = {
       case 'journal': this.updateJournal(); break;
       case 'options': this.updateOptions(); break;
     }
-    if (G.dead) { if (this.modalKind !== 'death') this.showDeath(); }
+    // naissance et mort : écrans plein écran du rituel (js/rituel.js), sinon les anciennes fenêtres
+    if (typeof Rituel !== 'undefined') Rituel.verifier();
+    else if (G.dead) { if (this.modalKind !== 'death') this.showDeath(); }
     // la naissance attend que l'écran d'accueil soit refermé
     else if (G.pendingTraits && !this.modalKind && !(typeof Accueil !== 'undefined' && Accueil.ouvert)) this.showTraits();
     this.updateTuto();
@@ -688,7 +691,7 @@ const UI = {
   // ------------------------------------------------------------- Tutoriel
   updateTuto() {
     const box = $('tuto');
-    if (G.tutorial < 0 || G.tutorial >= TUTO.length || this.modalKind || G.dead) {
+    if (G.tutorial < 0 || G.tutorial >= TUTO.length || this.modalKind || G.dead || (typeof Rituel !== 'undefined' && Rituel.phase)) {
       box.classList.add('hidden');
       this.setFocus(null);
       this.tutoShown = null;
