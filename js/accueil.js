@@ -61,7 +61,7 @@ const Accueil = {
     } else {
       titre.append(el('p', null, `${l.maison ? 'Maison ' + l.maison + ' · ' : ''}${ordinal(gen)} génération`));
       if (!l.maison) {
-        this.champ = Object.assign(el('input'), { type: 'text', maxLength: 24, placeholder: 'Nommez votre maison (facultatif)', autocomplete: 'off' });
+        this.champ = Object.assign(el('input'), { type: 'text', maxLength: 24, placeholder: 'Nom de votre maison', autocomplete: 'off' });
         this.champ.setAttribute('aria-label', 'Nom de votre maison');
         titre.append(this.champ);
       }
@@ -108,6 +108,14 @@ const Accueil = {
       return;
     }
     this.svg = box.querySelector('.accueil-svg');
+    // écran en portrait : cadrage sur la couronne, en haut (sinon les lanternes des côtés sortent du cadre)
+    const cadrer = () => {
+      const portrait = innerWidth < innerHeight * .9;
+      this.svg.setAttribute('viewBox', portrait ? '330 0 980 860' : '0 0 1600 900');
+      this.svg.setAttribute('preserveAspectRatio', portrait ? 'xMidYMin meet' : 'xMidYMid slice');
+    };
+    cadrer();
+    addEventListener('resize', cadrer);
     const g = this.svg.querySelector('#lanternes');
     const places = g.dataset.places.split(';').map(p => p.split(',').map(Number));
     const eteinte = !this.dejaJoue;   // première fondation : la lanterne s'allume quand on fonde

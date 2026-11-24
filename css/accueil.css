@@ -59,3 +59,11 @@ body.accueil-ouvert .modal.au-dessus { z-index: 90; }   /* seule la confirmation
 @media (prefers-reduced-motion: reduce) {
   #accueil .lanterne-arbre, #accueil .braise-ac, #accueil .lant-courante .halo { animation: none; }
 }
+
+/* portrait : l'arbre entier en haut, le titre sur le sol sombre en dessous */
+@media (orientation: portrait) {
+  #accueil { background: #070504; }
+  .accueil-titre { bottom: auto; top: calc(100vw * 860 / 980 - 40px); }
+  .accueil-voile { display: none; }
+  .accueil-titre input { font-size: 18px; }
+}
