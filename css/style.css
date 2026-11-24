@@ -141,7 +141,6 @@ table.grid { width: 100%; border-collapse: collapse; font-variant-numeric: tabul
 .row-name { position: relative; }
 .lock-row td { color: var(--muted); font-size: 12px; white-space: normal; background: #1a140f; }
 .lock-title { margin-right: 6px; }
-.grid.stats td.num { text-align: right; font-weight: 600; }
 
 /* ---------------------------------------------------------- Héritage / cartes */
 .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin-top: 10px; }
@@ -150,8 +149,6 @@ table.grid { width: 100%; border-collapse: collapse; font-variant-numeric: tabul
 .perk .rank { font-size: 12px; color: var(--muted); }
 .perk.owned { border-color: #5a4a2a; }
 .perk .btn { margin-top: auto; }
-.ach { opacity: .4; filter: grayscale(1); }
-.ach.unlocked { opacity: 1; filter: none; border-color: #6b5627; }
 
 /* ----------------------------------------------------------- Carte « en cours » */
 .now { margin-bottom: 8px; }
@@ -186,12 +183,6 @@ table.grid { width: 100%; border-collapse: collapse; font-variant-numeric: tabul
 #corrFill.corr { background: linear-gradient(90deg, #5c6675, #8e3fae); }
 .keep-line { display: flex; align-items: center; gap: 6px; margin-top: 2px; }
 .keep-line input[type=range] { flex: 1; accent-color: var(--accent); }
-.challenge { display: flex; flex-direction: column; gap: 2px; }
-.challenge .btn { margin-top: auto; }
-.challenge.active { border-color: var(--event); }
-.challenge.done { border-color: #6b5627; }
-.challenge.done .rank { color: var(--accent); }
-.challenge.active .rank { color: var(--event); }
 .trait-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
 .trait {
   display: flex; flex-direction: column; align-items: flex-start; gap: 2px; text-align: left;
@@ -202,14 +193,6 @@ table.grid { width: 100%; border-collapse: collapse; font-variant-numeric: tabul
 .trait b { font-family: var(--font-titre); font-weight: normal; font-size: 16px; color: var(--accent); }
 
 /* ---------------------------------------------------------------------- Journal */
-.journal { list-style: none; margin: 0; padding: 0; background: var(--panel); border: 1px solid var(--border); border-radius: var(--radius); box-shadow: inset 0 0 0 1px #0b0806, inset 0 0 0 2px rgba(217,151,58,.06); }
-.journal li { padding: 6px 12px; border-bottom: 1px solid var(--panel2); font-size: 13px; display: flex; gap: 10px; }
-.journal li:last-child { border-bottom: none; }
-.log-age { color: var(--muted); min-width: 52px; font-variant-numeric: tabular-nums; }
-.journal .good span:last-child { color: var(--good); }
-.journal .bad span:last-child { color: var(--bad); }
-.journal .gold span:last-child { color: var(--accent); }
-.journal .event span:last-child { color: var(--event); }
 
 .row-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 

@@ -218,33 +218,41 @@ const UI = {
     }
   },
 
+  // Défis : « les épreuves », un sceau de cire sur celles qu'on a réussies
   buildChallenges() {
     const grid = $('challengeGrid');
     for (const c of CHALLENGES) {
-      const card = el('div', 'challenge card cadre');
-      const status = el('span', 'rank');
-      const head = el('div', 'perk-head'); head.append(el('h4', null, c.name), status);
+      const card = el('div', 'epreuve cadre');
+      const sceau = el('span', 'sceau');
+      sceau.title = 'Défi réussi';
+      sceau.append(icone('acquis'));
+      const emb = el('span', 'e-emb');
+      emb.append(icone(ICONES_DEFIS[c.id] || 'etendard'));
+      const tete = el('div', 'e-tete');
+      tete.append(emb, el('h4', null, c.name));
+      const ligne = (nom, texte, cls) => {
+        const d = el('div', 'e-ligne' + (cls ? ' ' + cls : ''));
+        d.append(icone(nom), el('span', null, texte));
+        return d;
+      };
       const btn = el('button', 'btn small');
       btn.addEventListener('click', () => this.confirm(`Commencer le défi « ${c.name} » ?`,
         `Votre vie actuelle s'achève (+${legacyPointsPreview()} point(s) d'héritage) et une nouvelle commence.<br><br><b>Règles :</b> ${c.rules}<br><b>Objectif :</b> ${c.goalText}`,
         () => startChallenge(c.id)));
-      card.append(head,
-        el('p', 'small', c.rules),
-        el('p', 'small muted', 'Objectif : ' + c.goalText),
-        el('p', 'small gold', c.rewardText),
-        btn);
+      card.append(sceau, tete, ligne('cadenas', c.rules), ligne('etendard', 'Objectif : ' + c.goalText), ligne('etoile', c.rewardText, 'gold'), btn);
       grid.appendChild(card);
-      this.challengeCards[c.id] = { card, status, btn };
+      this.challengeCards[c.id] = { card, btn };
     }
   },
 
+  // Hauts faits : une médaille gravée par haut fait, en empreinte tant qu'il n'est pas obtenu
   buildAchievements() {
     const grid = $('achGrid');
     for (const a of ACHIEVEMENTS) {
-      const card = el('div', 'ach card cadre');
-      const titre = el('h4');
-      titre.append(icone('etoile', 'ach-etoile'), a.name);
-      card.append(titre, el('p', 'muted small', a.desc));
+      const card = el('div', 'medaille');
+      const rond = el('span', 'm-rond');
+      rond.append(icone(ICONES_HAUTS_FAITS[a.id] || 'etoile'));
+      card.append(rond, el('span', 'm-nom', a.name), el('span', 'm-desc', a.desc));
       grid.appendChild(card);
       this.achCards[a.id] = card;
     }
@@ -603,8 +611,7 @@ const UI = {
       const done = !!G.challengesDone[c.id], active = G.challenge === c.id;
       r.card.classList.toggle('done', done);
       r.card.classList.toggle('active', active);
-      if (r.status._fait !== done) { r.status._fait = done; r.status.replaceChildren(...(done ? [icone('etoile')] : [])); }
-      r.btn.textContent = done ? 'Réussi' : active ? 'En cours…' : 'Commencer';
+      r.btn.textContent = done ? 'Réussi' : active ? 'En cours…' : 'Relever le défi';
       r.btn.disabled = done || active || G.dead;
     }
   },
@@ -616,48 +623,60 @@ const UI = {
       if (got) n++;
       this.achCards[a.id].classList.toggle('unlocked', got);
     }
-    $('achCount').textContent = `${n} / ${ACHIEVEMENTS.length} — chaque haut fait donne +2 % d'XP.`;
+    $('achNombre').textContent = `${n} / ${ACHIEVEMENTS.length}`;
+    $('achCount').textContent = `· +${2 * Object.keys(G.achievements).length} % d'XP, pour toujours`;
   },
 
+  // Registre de la maison : de grands chiffres gravés, construits une fois
   updateStats() {
     const rows = [
-      ['Vies transmises', G.legacy.rebirths],
-      ['Meilleur âge atteint', `${Math.floor(Math.max(G.stats.bestAge, ageYears()))} ans`],
-      ['Écus gagnés (toutes vies)', fmt(G.stats.coinsEarned)],
-      ['Événements vécus', G.stats.events],
-      ['Défis réussis', `${Object.keys(G.challengesDone).length} / ${CHALLENGES.length}`],
-      ['Multiplicateur XP global', '×' + fmtMult(getMult('xp:all'))],
+      ['lignee', 'Vies transmises', G.legacy.rebirths],
+      ['sablier', 'Meilleur âge atteint', `${Math.floor(Math.max(G.stats.bestAge, ageYears()))} ans`],
+      ['ecus', 'Écus gagnés', fmt(G.stats.coinsEarned)],
+      ['parchemin', 'Événements vécus', G.stats.events],
+      ['etendard', 'Défis réussis', `${Object.keys(G.challengesDone).length} / ${CHALLENGES.length}`],
+      ['etoile', 'Multiplicateur d\'XP', '×' + fmtMult(getMult('xp:all'))],
     ];
-    const box = $('statsBox'); box.innerHTML = '';
-    const t = el('table', 'grid stats');
-    const tb = el('tbody');
-    for (const [k, v] of rows) {
-      const tr = el('tr'); tr.append(el('td', null, k), el('td', 'num', String(v))); tb.appendChild(tr);
+    if (!this.statVals) {
+      this.statVals = rows.map(([nom, libelle]) => {
+        const carte = el('div', 'stat-carte cadre'), small = el('small'), b = el('b');
+        small.append(icone(nom), libelle);
+        carte.append(small, b);
+        $('statsBox').append(carte);
+        return b;
+      });
     }
-    t.appendChild(tb);
-    const wrap = el('div', 'table-wrap cadre'); wrap.appendChild(t);
-    box.appendChild(wrap);
+    rows.forEach(([, , v], i) => { if (this.statVals[i].textContent !== String(v)) this.statVals[i].textContent = v; });
   },
 
   updateOptions() {
     const l = G.lignee;
     if (!l) return;
     const gen = l.oublies + l.vies.length + 1;
-    const txt = `${l.maison ? 'Maison ' + l.maison : 'Maison sans nom'} · génération ${gen} · ${nomComplet(l)}`;
+    const txt = `${l.maison ? 'Maison ' + l.maison : 'Maison sans nom'} · génération ${typeof romain === 'function' ? romain(gen) : gen} · ${nomComplet(l)}`;
     if ($('ligneeInfo').textContent !== txt) $('ligneeInfo').textContent = txt;
   },
 
+  // Journal : une frise, regroupée par âge, une icône par type d'entrée
   updateJournal() {
     const key = G.log.length + ':' + (G.log[0] ? G.log[0].msg : '');
     if (key === this.logKey) return;
     this.logKey = key;
-    const ul = $('journal'); ul.innerHTML = '';
+    const ol = $('journal');
+    ol.replaceChildren();
+    let age = null;
     for (const l of G.log) {
-      const li = el('li', l.type || '');
-      li.append(el('span', 'log-age', `${l.age} ans`), el('span', null, l.msg));
-      ul.appendChild(li);
+      if (l.age !== age) {
+        age = l.age;
+        const t = el('li', 'f-age');
+        t.append(el('span', 'f-point'), `${age} ans`);
+        ol.appendChild(t);
+      }
+      const li = el('li', 'f-entree ' + (l.type || ''));
+      li.append(icone(iconeJournal(l.type)), el('span', null, l.msg));
+      ol.appendChild(li);
     }
-    if (!G.log.length) ul.appendChild(el('li', 'muted', 'Rien à signaler pour l\'instant.'));
+    if (!G.log.length) ol.appendChild(el('li', 'muted', 'Rien à signaler pour l\'instant.'));
   },
 
   // ------------------------------------------------- API pour les modules
