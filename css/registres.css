@@ -1,0 +1,20 @@
+/* =====================================================================
+   Lignée — registres des métiers et compétences (js/ui.js buildTables)
+   ===================================================================== */
+
+/* en-tête de catégorie : emblème gravé */
+.grid th:first-child .icone, .lock-cat .icone { width: 15px; height: 15px; margin-right: 7px; vertical-align: -2px; }
+
+/* ligne : pastille gravée, progression en trait lumineux sous toute la ligne */
+.grid tr.row { position: relative; }
+.grid tr.row .name-cell::after { content: ''; position: absolute; left: 0; right: 0; bottom: 1px; height: 2px; background: rgba(0, 0, 0, .35); pointer-events: none; }
+.row-bar { position: absolute; left: 0; bottom: 1px; z-index: 1; height: 2px; width: 0; max-width: 100%; pointer-events: none; box-shadow: 0 0 6px currentColor; }
+.name-cell .pastille { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; margin-right: 9px; vertical-align: middle;
+  border: 1px solid var(--border); border-radius: 50%; color: var(--accent); background: #1a130f; }
+.name-cell .pastille .icone { width: 14px; height: 14px; }
+
+/* le métier (ou la compétence) en cours est mis en lumière */
+.grid tr.selected { background: linear-gradient(90deg, rgba(217, 151, 58, .15), transparent 70%); }
+.grid tr.selected .name-cell { box-shadow: inset 3px 0 0 var(--accent), inset 12px 0 14px -12px rgba(255, 190, 90, .7); }
+.grid tr.selected .pastille { border-color: var(--accent); box-shadow: 0 0 8px rgba(255, 190, 90, .45); }
+.grid tr.selected .row-name { color: #f3e3c4; }

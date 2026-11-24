@@ -127,8 +127,8 @@ const UI = {
       const table = el('table', 'grid');
       const hr = el('tr');
       cols.forEach((c, i) => {
-        const th = el('th', null, i === 0 ? cat.name : c);
-        if (i === 0) th.style.color = cat.color;
+        const th = el('th', null, i === 0 ? null : c);
+        if (i === 0) { th.style.color = cat.color; th.append(icone(ICONES_CATEGORIES[catId] || 'etoile'), cat.name); }
         hr.appendChild(th);
       });
       const thead = el('thead'); thead.appendChild(hr); table.appendChild(thead);
@@ -137,10 +137,12 @@ const UI = {
         const tr = el('tr', 'row');
         tr.title = e.desc || '';
         const nameTd = el('td', 'name-cell');
-        const bar = el('div', 'row-bar'); bar.style.background = cat.color;
+        const bar = el('div', 'row-bar'); bar.style.background = bar.style.color = cat.color;
         const badge = el('span', 'legacy-badge');
         badge.title = 'Bonus d\'héritage (meilleur niveau des vies passées)';
-        nameTd.append(bar, el('span', 'row-name', e.name), badge);
+        const pastille = el('span', 'pastille');
+        pastille.append(icone((kind === 'job' ? ICONES_METIERS : ICONES_COMPETENCES)[e.id] || 'etoile'));
+        nameTd.append(bar, pastille, el('span', 'row-name', e.name), badge);
         tr.appendChild(nameTd);
         const cells = [];
         for (let i = 1; i < cols.length; i++) { const td = el('td'); tr.appendChild(td); cells.push(td); }
@@ -513,7 +515,8 @@ const UI = {
       P.lockTr.style.display = '';
       P.lockTd.innerHTML = '';
       if (!anyUnlocked[cat]) {
-        const n = el('b', 'lock-cat', P.cat.name); n.style.color = P.cat.color;
+        const n = el('b', 'lock-cat'); n.style.color = P.cat.color;
+        n.append(icone(ICONES_CATEGORIES[cat] || 'etoile'), P.cat.name);
         P.lockTd.appendChild(n);
       }
       if (forbidden) {
