@@ -18,6 +18,9 @@ let simulating = false;   // vrai pendant la simulation hors-ligne (pas de toast
 let resetting = false;
 let slowTimer = 0;
 
+// Points d'extension pour les modules optionnels (js/sante.js, js/saisons.js…)
+const HOOKS = { init: [], newLife: [], tick: [], mult: [], ui: [] };
+
 // ------------------------------------------------------------- Formatage
 const UNITS = ['', 'k', 'M', 'Md', 'T', 'Qa', 'Qi', 'Sx', 'Sp', 'Oc', 'No'];
 function fmt(n) {
@@ -112,6 +115,7 @@ function getMult(stat) {
   }
   if (stat === 'xp:all') m *= 1 + 0.02 * Object.keys(G.achievements).length;
   for (const b of G.buffs) if (b.stat === stat) m *= b.mult;
+  for (const f of HOOKS.mult) m *= f(stat);
   const tr = currentTrait();
   if (tr) for (const e of tr.effects) if (e.stat === stat) m *= e.mult;
   const ch = currentChallenge();
@@ -536,6 +540,7 @@ function tick(dt, offline = false) {
   const tr = currentTrait(), ch = currentChallenge();
   let rate = j.cat === 'ombre' ? 3 * (tr && tr.corruption || 1) : (ch && ch.noDecay ? 0 : -1);
   G.corruption = Math.min(100, Math.max(0, G.corruption + rate * d / DAYS_PER_YEAR));
+  for (const f of HOOKS.tick) f(d);
 
   addXp(G.jobs[j.id], j.xp, jobXpPerDay(j) * d);
   addXp(G.skills[s.id], s.xp, skillXpPerDay(s) * d);
@@ -612,6 +617,7 @@ function rebirth(challengeId = null) {
     unlocked: {}, buffs: [], event: null, dead: false,
     trait: null, pendingTraits: rollTraits(), corruption: 0, challenge: challengeId,
   });
+  for (const f of HOOKS.newLife) f();
   scheduleEvent();
   checkUnlocks(true);
   log(`Une nouvelle vie commence. +${pts} point(s) d'héritage.`, 'gold');
@@ -680,6 +686,7 @@ function hardReset() {
 // ---------------------------------------------------------- Démarrage
 function main() {
   const away = load();
+  for (const f of HOOKS.init) f();
   checkUnlocks(true);
   let report = null;
   if (away > 10 && G.settings.offline && !G.dead && !G.paused) {
