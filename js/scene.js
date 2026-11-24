@@ -105,14 +105,12 @@ function setFlag(el, key, on) {
   if (on) el.dataset[key] = ''; else delete el.dataset[key];
 }
 
-// Rejoue l'animation liée à `cls` sur `el` (même si elle est déjà en cours), puis la retire.
+// Joue une fois l'animation liée à `cls` sur `el`, puis la retire.
+// Un niveau gagné pendant un éclat ne le relance pas : sinon, quand les niveaux tombent à chaque tick, le halo clignote 10 fois par seconde.
 function flash(el, cls, ms = 900) {
-  if (REDUIT.matches) return;
-  el.classList.remove(cls);
-  void el.getBoundingClientRect();   // force le recalcul pour relancer l'animation CSS
+  if (REDUIT.matches || minuteurs[cls]) return;
   el.classList.add(cls);
-  clearTimeout(minuteurs[cls]);
-  minuteurs[cls] = setTimeout(() => el.classList.remove(cls), ms);
+  minuteurs[cls] = setTimeout(() => { el.classList.remove(cls); minuteurs[cls] = null; }, ms);
 }
 
 function applyJob(jobId) {
@@ -180,4 +178,4 @@ function updateScene() {
 
 if (typeof document !== 'undefined') initScene();
 
-if (typeof module !== 'undefined') module.exports = { SCENES, REPOS, VOIES_DESSINEES, sceneFor, ageStage, isLevelUp };
+if (typeof module !== 'undefined') module.exports = { SCENES, REPOS, VOIES_DESSINEES, sceneFor, ageStage, isLevelUp, flash };
