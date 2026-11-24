@@ -107,3 +107,12 @@
 .marque-bon { color: var(--good); }
 .jauge { margin-bottom: 8px; }
 .jauge .now-head .icone { color: var(--orne-vif); }
+
+/* --------------------------------------------------------------- Lignée */
+.identite { font: 15px var(--font-titre); color: var(--text); font-weight: normal; }
+.maison-ligne { align-items: center; }
+.maison-ligne input {
+  flex: 1; min-width: 160px; background: var(--panel2); color: var(--text);
+  border: 1px solid var(--border); border-radius: var(--radius); padding: 6px 8px; font: 15px var(--font-titre);
+}
+.maison-ligne input:focus { outline: none; border-color: var(--orne); }

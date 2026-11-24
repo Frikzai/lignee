@@ -14,7 +14,7 @@
   <header class="topbar">
     <div class="brand">Lignée</div>
     <div class="age-box">
-      <div class="age-line"><span id="ageText">14 ans</span><span class="muted"><span id="lifeText">70 ans</span></span></div>
+      <div class="age-line"><span><b id="identite" class="identite"></b> <span id="ageText">14 ans</span></span><span class="muted"><span id="lifeText">70 ans</span></span></div>
       <div class="bar age-bar"><div id="ageFill"></div></div>
     </div>
     <div class="ressources">
@@ -146,6 +146,14 @@
           <textarea id="saveText" placeholder="Collez une sauvegarde ici puis cliquez sur Importer"></textarea>
         </div>
         <div class="card cadre">
+          <h3>Lignée</h3>
+          <p class="muted small" id="ligneeInfo"></p>
+          <div class="row-btns maison-ligne">
+            <input id="maisonInput" type="text" maxlength="24" placeholder="Nom de la maison" autocomplete="off">
+            <button id="maisonBtn" class="btn">Nommer la maison</button>
+          </div>
+        </div>
+        <div class="card cadre">
           <h3>Préférences</h3>
           <label class="toggle"><input type="checkbox" id="optOffline"> Progression hors-ligne</label>
           <div class="row-btns"><button id="tutoReplay" class="btn small">Revoir le tutoriel</button></div>
@@ -171,6 +179,7 @@
   <script src="js/data.js"></script>
   <script src="js/game.js"></script>
   <script src="js/ui.js"></script>
+  <script src="js/lignee.js"></script>
   <script src="js/sante.js"></script>
   <script src="js/saisons.js"></script>
   <script src="js/ambiance.js"></script>
