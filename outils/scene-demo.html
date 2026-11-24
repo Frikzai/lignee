@@ -30,6 +30,8 @@
       <label>Âge : <b id="ageTxt"></b><input type="range" id="age" min="14" max="100" step="0.5"></label>
       <label>Espérance de vie : <b id="lifeTxt"></b><input type="range" id="life" min="40" max="150"></label>
       <label>Corruption : <b id="corrTxt"></b><input type="range" id="corr" min="0" max="100"></label>
+      <label>Saison <select id="saison"><option value="printemps">Printemps</option><option value="ete">Été</option><option value="automne">Automne</option><option value="hiver">Hiver</option></select></label>
+      <label>Santé : <b id="santeTxt"></b><input type="range" id="sante" min="0" max="100"></label>
       <label class="toggle"><input type="checkbox" id="pause"> Pause</label>
       <label class="toggle"><input type="checkbox" id="dead"> Mort</label>
       <div id="objets" style="grid-column:1/-1;display:flex;flex-wrap:wrap;gap:4px 14px"></div>
@@ -52,8 +54,11 @@
       currentJob: 'artisan', currentSkill: 'discipline',
       jobs: niveaux(JOBS.map(j => j.id)), skills: niveaux([...SKILLS.map(s => s.id), 'inconnu']),
       paused: false, dead: false, corruption: 0, days: 30 * DAYS_PER_YEAR, demoLifespan: 70,
-      housing: 'etoile', items: {},
+      housing: 'etoile', items: {}, saison: 'printemps', health: 100,
     };
+    // modules saisons et santé simulés
+    const currentSeason = () => ({ id: G.saison });
+    const healthOf = () => G.health;
     const ageYears = () => G.days / DAYS_PER_YEAR;
     const lifespanYears = () => G.demoLifespan;
 
@@ -81,6 +86,8 @@
     $('age').oninput = e => { G.days = +e.target.value * DAYS_PER_YEAR; };
     $('life').oninput = e => { G.demoLifespan = +e.target.value; };
     $('corr').oninput = e => { G.corruption = +e.target.value; };
+    $('saison').onchange = e => { G.saison = e.target.value; };
+    $('sante').oninput = e => { G.health = +e.target.value; };
     $('pause').onchange = e => { G.paused = e.target.checked; };
     $('dead').onchange = e => { G.dead = e.target.checked; };
     $('jobUp').onclick = () => { G.jobs[G.currentJob].level++; };
@@ -97,8 +104,9 @@
       $('life').value = G.demoLifespan; $('lifeTxt').textContent = G.demoLifespan + ' ans';
       $('corr').value = G.corruption; $('corrTxt').textContent = Math.round(G.corruption);
       $('pause').checked = G.paused; $('dead').checked = G.dead;
+      $('saison').value = G.saison; $('sante').value = G.health; $('santeTxt').textContent = Math.round(G.health);
       const d = $('scene').dataset;
-      $('etat').textContent = `voie=${d.voie} geste=${d.geste} âge=${d.age} pause=${'pause' in d} corrompu=${'corrompu' in d}`
+      $('etat').textContent = `voie=${d.voie} geste=${d.geste} âge=${d.age} pause=${'pause' in d} corrompu=${'corrompu' in d} saison=${d.saison} santé=${d.sante}`
         + ` · métier niv. ${G.jobs[G.currentJob]?.level ?? '—'} · compétence niv. ${G.skills[G.currentSkill]?.level ?? '—'}`;
     }, 200);
   </script>
