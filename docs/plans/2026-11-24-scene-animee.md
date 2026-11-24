@@ -15,7 +15,7 @@
 - Branche `feature/scene-animee`, créée depuis `feature/direction-artistique` (ou depuis `develop` si la DA y est déjà mergée). Elle a besoin de `--font-titre` et de la palette.
 - **Ne jamais modifier** `js/data.js`, `js/game.js`, `js/ui.js`. Dans `index.html`, exactement 3 ajouts (Task 2). `scene.js` ne fait **jamais** d'écriture dans `G`.
 - Globales lues (déclarées par les scripts du jeu, accessibles depuis un autre `<script>` classique) : `G`, `ageYears()`, `lifespanYears()`, `SKILL_BY_ID`, `SKILL_CATS`, `JOBS`.
-- Aucune dépendance, aucun CDN. Tests : `node --test tests/`. Jeu : `python3 -m http.server 8765` → <http://localhost:8765>. Démo : <http://localhost:8765/outils/scene-demo.html>.
+- Aucune dépendance, aucun CDN. Tests : `node --test`. Jeu : `python3 -m http.server 8765` → <http://localhost:8765>. Démo : <http://localhost:8765/outils/scene-demo.html>.
 - **Seuls `transform` et `opacity` sont animés.** Durées de geste = `calc(<durée> * var(--tempo, 1))`.
 - Commits en français, terminés par `Co-Authored-By: Claude Opus 5.5 <noreply@anthropic.com>`. Pas de push ni de PR sans demande de l'utilisateur.
 
@@ -100,11 +100,11 @@ test('isLevelUp', () => {
 });
 ```
 
-- [ ] **Step 2 : Vérifier l'échec** — Run : `node --test tests/` → FAIL « Cannot find module '../js/scene.js' ».
+- [ ] **Step 2 : Vérifier l'échec** — Run : `node --test` → FAIL « Cannot find module '../js/scene.js' ».
 
 - [ ] **Step 3 : Implémenter** `js/scene.js` : `'use strict'`, les constantes et fonctions ci-dessus, puis en fin de fichier `if (typeof module !== 'undefined') module.exports = { SCENES, REPOS, VOIES_DESSINEES, sceneFor, ageStage, isLevelUp };`.
 
-- [ ] **Step 4 : Vérifier** — Run : `node --test tests/` → PASS (tests de contraste de la DA compris).
+- [ ] **Step 4 : Vérifier** — Run : `node --test` → PASS (tests de contraste de la DA compris).
 
 - [ ] **Step 5 : Commit** — `git add js/scene.js tests/scene.test.js && git commit -m "Scène : logique pure et tests"`
 
@@ -137,7 +137,7 @@ test('isLevelUp', () => {
 
 - [ ] **Step 4 : Chargeur** — `initScene()` : `fetch` de `new URL('scene.svg', SCENE_BASE)` (puis `medaillons.svg` à la Task 6) ; si `!res.ok` ou exception → `#scene` reçoit la classe `hidden`, `console.warn('[scène] …')`, et on s'arrête. Sinon injection (`insertAdjacentHTML`), activation du décor `neutre`, création de `div.medaillon`, `setInterval(updateScene, 100)`.
 
-- [ ] **Step 5 : Tests** — Run : `node --test tests/` → PASS (le démarrage automatique ne doit pas s'exécuter sous Node).
+- [ ] **Step 5 : Tests** — Run : `node --test` → PASS (le démarrage automatique ne doit pas s'exécuter sous Node).
 
 - [ ] **Step 6 : Vérifier dans le jeu** — ouvrir le jeu : le bandeau de 160 px apparaît au-dessus des onglets, sur tous les onglets, avec ciel, sol et silhouette immobile entière. Console sans erreur.
 
@@ -251,7 +251,7 @@ test('isLevelUp', () => {
 
 - [ ] **Step 3 : Geste `frapper`** — cycle de 1,1 s : bras avant qui monte lentement puis s'abat vite (impact à ≈ 68 % du cycle, tête de l'outil au contact de l'élément), bras arrière qui tient la pièce / s'appuie, étincelles sur l'élément à l'impact (`#effets .impact`, visibles seulement avec `data-geste="frapper"`), léger recul du buste. Le prototype validé lors du brainstorming est la référence de rythme (`.superpowers/brainstorm/*/content/ambiance.html`, s'il existe encore).
 
-- [ ] **Step 4 : Activer la voie** — `VOIES_DESSINEES = new Set(['paysannerie'])`. Run : `node --test tests/` → PASS.
+- [ ] **Step 4 : Activer la voie** — `VOIES_DESSINEES = new Set(['paysannerie'])`. Run : `node --test` → PASS.
 
 - [ ] **Step 5 : Vérifier** — démo : Artisan → forge, enclume, marteau qui frappe, étincelles synchronisées avec l'impact ; Mineur → paroi + pioche, même geste ; essayer jeune / vieux (le coup tombe toujours sur l'élément) et une largeur de 1400 px (le décor remplit tout).
 
@@ -301,7 +301,7 @@ test('isLevelUp', () => {
 
 **Files :** aucun nouveau (corrections éventuelles dans les fichiers de la scène).
 
-- [ ] **Step 1 : Tests** — Run : `node --test tests/` → PASS.
+- [ ] **Step 1 : Tests** — Run : `node --test` → PASS.
 
 - [ ] **Step 2 : Écran étroit (Review Focus 5)** — démo et jeu en 360 × 740 : pour Artisan, Pêcheur et Négociant, le personnage, l'objet et l'élément sont entiers ; `document.documentElement.scrollWidth <= innerWidth` → `true`.
 

@@ -80,7 +80,7 @@ git commit -m "Police IM Fell English SC pour les titres"
 
 **Interfaces :**
 - Consumes : rien.
-- Produces : `--ember: #e0561f` et les nouvelles valeurs de palette ; `node --test tests/` devient la commande de test du projet (réutilisée par le plan scène).
+- Produces : `--ember: #e0561f` et les nouvelles valeurs de palette ; `node --test` devient la commande de test du projet (réutilisée par le plan scène).
 
 - [ ] **Step 1 : Écrire le test qui échoue** — `tests/contrast.test.js` (CommonJS, `node:test` + `node:assert/strict`) : lit `css/style.css`, extrait les variables hexadécimales du premier bloc `:root { … }` par regex, calcule le ratio de contraste WCAG 2.x (luminance relative sRGB). Tests :
 
@@ -95,7 +95,7 @@ for (const bg of ['--bg', '--panel'])
 
 - [ ] **Step 2 : Vérifier qu'il échoue**
 
-Run : `node --test tests/`
+Run : `node --test`
 Attendu : FAIL sur « la palette définit --ember » (et les tests `--ember sur …`).
 
 - [ ] **Step 3 : Nouvelles valeurs de `:root`** — exactement le tableau §3.1 de la spec (`--bg #14100d`, `--panel #1f1813`, `--panel2 #2a2019`, `--border #3d2f24`, `--text #ead9bd`, `--muted #9a8670`, `--accent #d9973a`, `--ember #e0561f`, `--good #8fa86a`, `--bad #c4452f`, `--event #6f9fb0`, `--radius 3px`).
@@ -121,7 +121,7 @@ Les autres couleurs (puces `.req`, corruption, bordures dorées des cartes poss�
 
 - [ ] **Step 5 : Vérifier que le test passe**
 
-Run : `node --test tests/`
+Run : `node --test`
 Attendu : PASS, 12 tests. Si `--muted` échoue sur `--panel2`, l'éclaircir par petits pas (`#9e8a73`, …) et reporter la valeur retenue dans le tableau §3.1 de la spec.
 
 - [ ] **Step 6 : Contrôle visuel** — recharger le jeu, parcourir les 9 onglets : plus aucune teinte bleue « ancienne » sur les événements / défis, bouton « Tout effacer » en orange braise.
@@ -170,7 +170,7 @@ git commit -m "Palette Braise & suie et test de contraste"
 
 - [ ] **Step 8 : Tests et commit**
 
-Run : `node --test tests/` → PASS.
+Run : `node --test` → PASS.
 ```bash
 git add css/style.css
 git commit -m "Matières dark fantasy : grain, vignettage, cadres, barres, boutons, onglets"

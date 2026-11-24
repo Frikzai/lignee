@@ -211,7 +211,7 @@ Chargé dans `index.html` juste après `<script src="js/ui.js">` (l'ordre import
 
 ## 5. Vérification
 
-- **Tests unitaires** : `tests/scene.test.js` lancé par `node --test tests/` (Node ≥ 18, aucune dépendance). Couvre `sceneFor` (métier connu, inconnu), `ageStage` (24, 25, seuil 75 %, chevauchement), `isLevelUp` (+1, +3, même niveau, autre id, niveau qui baisse). `scene.js` démarre sa boucle seulement si `document` existe et s'exporte via `module.exports` sous Node.
+- **Tests unitaires** : `tests/scene.test.js` lancé par `node --test` (Node ≥ 18, aucune dépendance). Couvre `sceneFor` (métier connu, inconnu), `ageStage` (24, 25, seuil 75 %, chevauchement), `isLevelUp` (+1, +3, même niveau, autre id, niveau qui baisse). `scene.js` démarre sa boucle seulement si `document` existe et s'exporte via `module.exports` sous Node.
 - **Page de démo** `outils/scene-demo.html` : bandeau seul + contrôles (métier, compétence, âge, espérance de vie, corruption, pause, bouton « niveau +1 ») sur un faux `G`. Ne touche jamais à la sauvegarde. Sert à toutes les branches de voie et aux captures de PR.
 - **Avant chaque PR** : lancer le jeu (`python3 -m http.server 8765`), parcourir les 9 onglets, mesurer les contrastes, tester avec « réduire les animations » et en largeur < 900 px ; capture ou GIF joint à la PR.
 
