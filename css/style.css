@@ -150,8 +150,6 @@ table.grid { width: 100%; border-collapse: collapse; font-variant-numeric: tabul
 .grid.stats td.num { text-align: right; font-weight: 600; }
 
 /* ---------------------------------------------------------- Héritage / cartes */
-.legacy-head { display: flex; flex-wrap: wrap; align-items: center; gap: 24px; margin-bottom: 8px; }
-.legacy-head .reb { margin-left: auto; display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
 .grid-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 10px; margin-top: 10px; }
 .perk { display: flex; flex-direction: column; gap: 6px; }
 .perk-head { display: flex; justify-content: space-between; align-items: baseline; }
@@ -244,7 +242,6 @@ table.grid { width: 100%; border-collapse: collapse; font-variant-numeric: tabul
   .layout { grid-template-columns: 1fr; padding: 12px 16px; }
   .sidebar { order: 2; }
   .topbar { gap: 10px 16px; padding: 10px 16px; }
-  .legacy-head .reb { margin-left: 0; align-items: flex-start; }
 }
 
 /* --------------------------------------------------------- Moins d'animations */
