@@ -4,6 +4,8 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Lignée</title>
+  <link rel="icon" href="img/favicon.svg" type="image/svg+xml">
+  <meta name="theme-color" content="#14100d">
   <link rel="stylesheet" href="css/style.css">
   <link rel="stylesheet" href="css/kit.css">
   <link rel="stylesheet" href="css/ambiance.css">
@@ -14,6 +16,7 @@
   <link rel="stylesheet" href="css/registres.css">
   <link rel="stylesheet" href="css/boutique.css">
   <link rel="stylesheet" href="css/secondaires.css">
+  <link rel="stylesheet" href="css/finitions.css">
   <link rel="stylesheet" href="css/scene.css">
 </head>
 <body>
@@ -107,15 +110,15 @@
     <main>
       <div id="scene" aria-hidden="true"></div>
       <nav class="tabs">
-        <button data-tab="jobs" class="active">Métiers</button>
-        <button data-tab="skills">Compétences</button>
-        <button data-tab="shop">Boutique</button>
-        <button data-tab="legacy">Héritage</button>
-        <button data-tab="challenges">Défis</button>
-        <button data-tab="achievements">Hauts faits</button>
-        <button data-tab="journal">Journal</button>
-        <button data-tab="stats">Statistiques</button>
-        <button data-tab="options">Options</button>
+        <button data-tab="jobs" class="active"><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-marteau"/></svg>Métiers</button>
+        <button data-tab="skills"><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-livre"/></svg>Compétences</button>
+        <button data-tab="shop"><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-revenu"/></svg>Boutique</button>
+        <button data-tab="legacy"><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-lignee"/></svg>Héritage</button>
+        <button data-tab="challenges"><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-etendard"/></svg>Défis</button>
+        <button data-tab="achievements"><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-etoile"/></svg>Hauts faits</button>
+        <button data-tab="journal"><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-parchemin"/></svg>Journal</button>
+        <button data-tab="stats"><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-balance"/></svg>Statistiques</button>
+        <button data-tab="options"><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-cle"/></svg>Options</button>
       </nav>
 
       <section id="tab-jobs" class="tab active"></section>
@@ -226,7 +229,7 @@
   </div>
 
   <div id="tuto" class="tuto cadre-noble hidden">
-    <div class="tuto-step muted small" id="tutoStep"></div>
+    <div class="tuto-tete"><span class="tuto-step" id="tutoStep"></span><span class="pips tuto-pips" id="tutoPips" aria-hidden="true"></span></div>
     <p id="tutoText"></p>
     <div class="tuto-wait small" id="tutoWait"></div>
     <div class="row-btns">

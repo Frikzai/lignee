@@ -777,7 +777,9 @@ const UI = {
     box.classList.remove('hidden');
     if (this.tutoShown !== G.tutorial) {
       this.tutoShown = G.tutorial;
-      $('tutoStep').textContent = `Tutoriel ${G.tutorial + 1} / ${TUTO.length}`;
+      $('tutoStep').textContent = `Tutoriel · ${G.tutorial + 1} / ${TUTO.length}`;
+      // une petite lanterne par étape : allumées jusqu'à l'étape en cours
+      $('tutoPips').replaceChildren(...TUTO.map((_, i) => el('i', i < G.tutorial ? 'fait' : i === G.tutorial ? 'en-cours' : null)));
       $('tutoText').textContent = st.text;
       $('tutoWait').textContent = st.wait ? st.waitText : '';
       $('tutoNext').textContent = G.tutorial === TUTO.length - 1 ? 'Terminer' : 'Suivant';
@@ -846,8 +848,10 @@ const UI = {
       [{ label: 'Continuer', cls: 'primary' }]);
   },
 
+  // Notification : cartouche gravé, une icône par type (les mêmes que le journal)
   toast(msg, type) {
-    const t = el('div', 'toast ' + (type || ''), msg);
+    const t = el('div', 'toast ' + (type || ''));
+    t.append(icone(typeof iconeJournal === 'function' ? iconeJournal(type) : 'etoile'), el('span', null, msg));
     $('toasts').appendChild(t);
     setTimeout(() => t.classList.add('out'), 3500);
     setTimeout(() => t.remove(), 4000);

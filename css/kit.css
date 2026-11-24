@@ -93,6 +93,7 @@
   box-shadow: 0 20px 60px rgba(0, 0, 0, .6), inset 0 0 0 3px var(--panel), inset 0 0 0 4px var(--filet);
 }
 .tuto.cadre-noble {
+  position: fixed;   /* .cadre-noble le passerait en relative : la bulle tomberait en bas de page */
   border-radius: var(--radius); border-color: var(--orne);
   box-shadow: 0 12px 40px rgba(0, 0, 0, .6), inset 0 0 0 3px var(--panel), inset 0 0 0 4px var(--filet);
 }
