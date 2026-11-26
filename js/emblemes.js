@@ -9,6 +9,7 @@ const ICONES_METIERS = {
   recrue: 'lance', garde: 'tour', veteran: 'epee', chevalier: 'heaume', capitaine: 'etendard', general: 'carte', connetable: 'couronne',
   novice: 'balai', alchimiste: 'alambic', enchanteur: 'baton', sage: 'parchemin', archimage: 'orbe', gardien: 'sablier',
   tirelaine: 'ciseaux', contrebandier: 'tonneau', voleur: 'grappin', assassin: 'dague', chefguilde: 'masque', necromancien: 'crane', seigneur: 'lune',
+  sonneur: 'cloche', moine: 'lotus', pretre: 'goutte', inquisiteur: 'oeil', eveque: 'baton', cardinal: 'mitre', saint: 'aureole',
 };
 
 const ICONES_COMPETENCES = {
@@ -16,20 +17,23 @@ const ICONES_COMPETENCES = {
   force: 'poing', tactique: 'pion', endurance: 'bouclier',
   meditation: 'lotus', mana: 'etincelle', vitalite: 'automne', transmutation: 'cercle', chronomancie: 'horloge',
   discretion: 'capuche', cruaute: 'dague', magienoire: 'crane', pacte: 'goutte',
+  priere: 'cloche', charite: 'soin', miracles: 'etincelle',
 };
 
 const ICONES_CATEGORIES = {
-  paysannerie: 'epi', milice: 'epee', arcanes: 'etoile', ombre: 'capuche',
-  fondamentaux: 'livre', combat: 'poing', mystique: 'oeil', tenebres: 'lune',
+  paysannerie: 'epi', milice: 'epee', arcanes: 'etoile', ombre: 'capuche', clerge: 'mitre',
+  fondamentaux: 'livre', combat: 'poing', mystique: 'oeil', tenebres: 'lune', foi: 'aureole',
 };
 
 const ICONES_OBJETS = {
   livre: 'livre', outils: 'marteau', pierres: 'pierre', cheval: 'cheval', serviteur: 'plateau',
   grimoire: 'grimoire', atelier: 'alambic', bibliotheque: 'etagere', jardin: 'feuille', observatoire: 'lunette',
+  flotte: 'navire', academie: 'parchemin', pierrephilo: 'cercle', horloge: 'horloge',
 };
 
 const ICONES_DEFIS = {
   ascete: 'lotus', ephemere: 'sablier', pauvrete: 'revenu', amnesique: 'oeil', pacifiste: 'feuille', renegat: 'masque',
+  ascete2: 'lotus', ephemere2: 'sablier', pauvrete2: 'revenu', amnesique2: 'oeil', pacifiste2: 'feuille', renegat2: 'masque',
 };
 
 // Médaille de chaque haut fait (game.js et modules)
@@ -42,6 +46,7 @@ const ICONES_HAUTS_FAITS = {
   reb1: 'lignee', reb5: 'lignee', reb20: 'lignee', ev10: 'carte', ev50: 'parchemin',
   assassin: 'dague', seigneur: 'lune', corrompu: 'crane', defi1: 'etendard', defiAll: 'bouclier',
   bonpied: 'sante', increvable: 'soin',
+  saint: 'aureole', foi100: 'aureole', floraison1: 'graine', floraison5: 'fleur', couronne: 'couronne',
 };
 
 // Icône d'une entrée du journal selon son type (log(msg, type) dans game.js)

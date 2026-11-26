@@ -22,13 +22,13 @@ function choisirPrenom(precedent, alea = Math.random) {
 }
 
 // Résumé d'une vie : âge, métier le plus haut (à égalité, le plus avancé dans la liste), trait, fin.
-function resumeVie({ age, jobs, trait, mort }, metiers) {
+function resumeVie({ age, jobs, trait, mort, alliance }, metiers) {
   let meilleur = metiers[0], niveau = 0;
   for (const m of metiers) {
     const lv = (jobs[m.id] && jobs[m.id].level) || 0;
     if (lv > niveau || (lv === niveau && lv > 0)) { meilleur = m; niveau = lv; }   // tout à 0 : le premier métier
   }
-  return { age: Math.floor(age), metier: meilleur.name, niveau, trait: trait || null, fin: mort ? 'mort' : 'transmission' };
+  return { age: Math.floor(age), metier: meilleur.name, niveau, trait: trait || null, fin: mort ? 'mort' : 'transmission', ...(alliance ? { alliance } : {}) };
 }
 
 // oublies : vies transmises avant l'arrivée de la lignée (vieilles sauvegardes) — des lanternes sans nom.
@@ -61,7 +61,8 @@ if (typeof HOOKS !== 'undefined') {
   });
   HOOKS.ui.push(() => {
     const t = currentTrait();
-    derniereVie = resumeVie({ age: ageYears(), jobs: G.jobs, trait: t && t.name, mort: G.dead }, JOBS);
+    const cj = G.conjoint && G.conjoint.trait ? `${G.conjoint.prenom} ${G.conjoint.maison}` : null;
+    derniereVie = resumeVie({ age: ageYears(), jobs: G.jobs, trait: t && t.name, mort: G.dead, alliance: cj }, JOBS);
   });
   HOOKS.newLife.push(() => {
     const resume = derniereVie || resumeVie({ age: START_AGE, jobs: {}, trait: null, mort: false }, JOBS);

@@ -36,10 +36,18 @@ const SCENES = {
   chefguilde:    { voie: 'ombre',       geste: 'commander',  objet: 'dague',         element: null },
   necromancien:  { voie: 'ombre',       geste: 'incanter',   objet: 'crane',         element: 'tombe' },
   seigneur:      { voie: 'ombre',       geste: 'incanter',   objet: 'orbe-noir',     element: null },
+
+  sonneur:       { voie: 'clerge',      geste: 'hacher',     objet: null,            element: 'cloche' },
+  moine:         { voie: 'clerge',      geste: 'lire',       objet: 'grimoire',      element: 'pupitre' },
+  pretre:        { voie: 'clerge',      geste: 'incanter',   objet: 'fiole',         element: 'autel' },
+  inquisiteur:   { voie: 'clerge',      geste: 'commander',  objet: 'baton',         element: 'torche' },
+  eveque:        { voie: 'clerge',      geste: 'incanter',   objet: 'baton',         element: 'autel' },
+  cardinal:      { voie: 'clerge',      geste: 'lire',       objet: 'grimoire',      element: 'pupitre' },
+  saint:         { voie: 'clerge',      geste: 'incanter',   objet: null,            element: null },
 };
 
 const REPOS = Object.freeze({ voie: 'neutre', geste: 'repos', objet: null, element: null });
-const VOIES_DESSINEES = new Set(['paysannerie', 'milice', 'arcanes', 'ombre']);
+const VOIES_DESSINEES = new Set(['paysannerie', 'milice', 'arcanes', 'ombre', 'clerge']);
 
 function sceneFor(jobId, voies = VOIES_DESSINEES) {
   const s = SCENES[jobId];

@@ -41,6 +41,8 @@
     <g class="logis" data-logis="manoir"><path class="logis-sil" d="M322 92 V71 H368 V92 Z M318 72 L345 58 L372 72 Z M313 92 V76 H322 V92 Z M368 92 V76 H377 V92 Z M311.5 77 L317.5 71 L323.5 77 Z M366.5 77 L372.5 71 L378.5 77 Z"/><rect class="fenetre" x="328" y="76" width="3" height="3.6"/><rect class="fenetre" x="343.5" y="74" width="3" height="4" style="animation-delay:-1s"/><rect class="fenetre" x="359" y="76" width="3" height="3.6" style="animation-delay:-1.7s"/><rect class="fenetre" x="316" y="82" width="2.6" height="3" style="animation-delay:-.4s"/><rect class="fenetre" x="371.4" y="82" width="2.6" height="3" style="animation-delay:-2.3s"/></g>
     <g class="logis" data-logis="chateau"><path class="logis-sil" d="M314 92 V74 H320 V70 H324 V74 H328 V78 H360 V74 H364 V70 H368 V74 H374 V92 Z M334 78 V60 H337.5 V56.5 H341 V60 H347 V56.5 H350.5 V60 H354 V78 Z"/><path class="logis-sil" d="M344 56.5 V48 L351.5 50.6 L344 53.2"/><rect class="fenetre" x="342.6" y="64" width="2.6" height="3.6"/><rect class="fenetre" x="320.5" y="80" width="2.6" height="3" style="animation-delay:-1.2s"/><rect class="fenetre" x="364.5" y="80" width="2.6" height="3" style="animation-delay:-2s"/></g>
     <g class="logis flotte" data-logis="palais"><ellipse class="halo-palais" cx="345" cy="72" rx="30" ry="20"/><path class="logis-sil" d="M326 82 H364 L358 88 H332 Z M330 82 L334 60 L338 82 Z M341 82 L345.5 50 L350 82 Z M352.5 82 L356.5 62 L360.5 82 Z"/><rect class="fenetre" x="344.4" y="66" width="2.4" height="4"/><rect class="fenetre" x="333.2" y="72" width="1.8" height="3" style="animation-delay:-1s"/><rect class="fenetre" x="355.8" y="73" width="1.8" height="3" style="animation-delay:-1.8s"/></g>
+    <g class="logis flotte" data-logis="citadelle"><ellipse class="halo-palais" cx="345" cy="70" rx="34" ry="22"/><path class="logis-sil" d="M322 84 Q334 80 345 81 Q358 80 368 84 Q358 89 345 88 Q332 89 322 84 Z M327 82 V66 H332 V62 H336 V66 H354 V62 H358 V66 H363 V82 Z M341 66 V52 L345 46 L349 52 V66 Z"/><rect class="fenetre" x="344" y="56" width="2.2" height="4"/><rect class="fenetre" x="330.4" y="71" width="2" height="3" style="animation-delay:-1s"/><rect class="fenetre" x="357.6" y="71" width="2" height="3" style="animation-delay:-1.6s"/></g>
+    <g class="logis flotte" data-logis="cite"><ellipse class="halo-palais" cx="345" cy="66" rx="40" ry="26"/><path class="logis-sil" d="M318 84 H372 L364 89 H326 Z M322 84 L326 62 L330 84 Z M332 84 L337 52 L342 84 Z M343 84 L348 40 L353 84 Z M355 84 L359 56 L363 84 Z M365 84 L368 66 L371 84 Z"/><circle class="fenetre" cx="348" cy="46" r="1.3"/><circle class="fenetre" cx="337" cy="58" r="1" style="animation-delay:-.8s"/><circle class="fenetre" cx="359" cy="62" r="1" style="animation-delay:-1.6s"/><circle class="fenetre" cx="326" cy="68" r=".9" style="animation-delay:-2.2s"/></g>
   </g>
 
   <g id="decors">
@@ -99,6 +101,20 @@
       <circle class="rune" cx="92" cy="46" r=".9"/><circle class="rune" cx="54" cy="58" r=".8" style="animation-delay:-1.6s"/><circle class="rune" cx="96" cy="66" r=".7" style="animation-delay:-3.1s"/>
       <!-- cristaux -->
       <path class="cristal" d="M402 100 L406 86 L410 100 Z M408 100 L414 79 L420 100 Z M418 100 L421 90 L424 100 Z M460 100 L464 88 L468 100 Z"/>
+    </g>
+    <g class="decor" data-voie="clerge">
+      <!-- collines au loin -->
+      <path class="lointain" d="M0 100 V86 L40 80 L90 84 L140 78 L190 85 L240 81 L300 86 L350 79 L410 84 L480 80 V100 Z"/>
+      <!-- l'abbaye : nef, clocher, rosace et vitrail qui luisent -->
+      <ellipse cx="62" cy="76" rx="32" ry="22" fill="url(#scene-lueur)" class="forge-lueur"/>
+      <path class="sil-decor" d="M30 100 V74 L52 62 L74 74 V100 Z M74 100 V50 H90 V100 Z M72 50.6 L82 32 L92 50.6 Z M81.2 32 V24 H82.8 V32 Z M79 26.6 H85 V28 H79 Z"/>
+      <circle class="vitrail" cx="52" cy="76" r="4.2"/>
+      <rect class="vitrail" x="79.4" y="56" width="5.2" height="8" rx="2.6" style="animation-delay:-1.2s"/>
+      <!-- cyprès -->
+      <path class="sil-decor" d="M100 100 Q95 84 102 66 Q109 84 104 100 Z M112 100 Q108 88 113 76 Q118 88 115 100 Z"/>
+      <!-- calvaire et tombes, des lucioles dans le soir -->
+      <path class="sil-decor" d="M420 100 V70 H423 V100 Z M413 77 H430 V80 H413 Z M440 100 V92 Q444 88 448 92 V100 Z M456 100 V94 Q459 91 462 94 V100 Z"/>
+      <circle class="luciole" cx="104" cy="60" r=".8"/><circle class="luciole" cx="132" cy="72" r=".7" style="animation-delay:-1.7s"/><circle class="luciole" cx="410" cy="64" r=".8" style="animation-delay:-2.9s"/><circle class="luciole" cx="452" cy="78" r=".7" style="animation-delay:-.9s"/>
     </g>
     <g class="decor" data-voie="ombre">
       <!-- nuages qui voilent la lune -->
@@ -181,6 +197,21 @@
       <path class="flamme-torche" d="M269.2 77.6 Q270.6 79.8 270 81 Q269.2 81.6 268.4 81 Q267.8 79.8 269.2 77.6 Z"/>
     </g>
     <!-- Novice, Sage : pupitre et grimoire ouvert (la main tourne les pages vers 236,75) -->
+    <!-- Sonneur : la cloche sur son portique, la corde dans les mains -->
+    <g class="element" data-element="cloche">
+      <path class="sil-decor" d="M252 100 V34 H254 V100 Z M232 33 H255 V35 H232 Z M248 100 L253 92 L258 100 Z"/>
+      <g class="cloche-balance">
+        <path class="sil-decor" d="M237.3 35 H238.7 V37.6 H237.3 Z M233 45.6 Q233 38 238 37.4 Q243 38 243 45.6 H244 V47 H232 V45.6 Z"/>
+        <path class="corde-cloche" d="M238 47 V80"/>
+      </g>
+    </g>
+    <!-- Prêtre, Évêque : l'autel, ses cierges et le calice -->
+    <g class="element" data-element="autel">
+      <path class="sil-decor" d="M240 100 V86 H268 V100 H265 V88 H243 V100 Z M238 84.4 H270 V86 H238 Z"/>
+      <path class="sil-decor" d="M244 84.4 V78 H245.6 V84.4 Z M262.4 84.4 V78 H264 V84.4 Z M252.4 84.4 L253.2 81 Q251 80 251 77.4 H257 Q257 80 254.8 81 L255.6 84.4 Z"/>
+      <path class="flamme-torche" d="M244.8 74 Q246 76 245.6 77.2 Q244.8 77.8 244 77.2 Q243.6 76 244.8 74 Z"/>
+      <path class="flamme-torche" d="M263.2 74 Q264.4 76 264 77.2 Q263.2 77.8 262.4 77.2 Q262 76 263.2 74 Z" style="animation-delay:-.2s"/>
+    </g>
     <g class="element" data-element="pupitre">
       <path class="sil-decor" d="M241 100 L243.4 77 H245 L247 100 Z M238 100 H250 V98.6 H238 Z M233.6 78 L249 73 L249.6 74.6 L234.2 79.6 Z"/>
       <g class="objet" data-objet="grimoire">
@@ -221,6 +252,10 @@
     <g class="possession" data-item="jardin"><path class="tiges" d="M353 100 Q355 92 357 100 M359 100 Q360 90 363 100 M365 100 Q367 93 369 100 M371 100 Q372 91 375 100"/><g class="fleurs"><circle cx="357" cy="93" r="1.6"/><circle cx="362.6" cy="90.6" r="1.4"/><circle cx="368.2" cy="93.4" r="1.4"/><circle cx="373.6" cy="91.6" r="1.5"/></g></g>
     <g class="possession" data-item="bibliotheque"><path class="sil-poss" d="M377 100 V80 H391 V100 Z"/><path class="rayons" d="M378.4 85 H389.6 M378.4 90 H389.6 M378.4 95 H389.6 M380 81.6 V84.4 M382 81.4 V84.4 M385.4 86.4 V89.4 M387.2 86.6 V89.4 M379.6 91.4 V94.4 M381.6 91.6 V94.4 M384 91.4 V94.4"/></g>
     <g class="possession" data-item="observatoire"><path class="logis-sil" d="M438 92 V68 H452 V92 Z M436 69 Q445 57 454 69 Z"/><path class="lunette" d="M447 61 L458 54.6"/><rect class="fenetre" x="443.6" y="76" width="2.6" height="3.6"/></g>
+    <g class="possession" data-item="flotte"><path class="sil-poss" d="M398 96 H432 L428 100 H402 Z M414.4 96 V76 H415.8 V96 Z M415.8 77.6 Q425 85 415.8 94 Z M414.4 79 Q406 86 414.4 93 Z"/></g>
+    <g class="possession" data-item="academie"><path class="logis-sil" d="M95 100 V85 H123 V100 Z M93 85.6 L109 77 L125 85.6 Z"/><path class="sil-poss" d="M98 100 V87 H100 V100 Z M103.6 100 V87 H105.6 V100 Z M112.4 100 V87 H114.4 V100 Z M118 100 V87 H120 V100 Z"/></g>
+    <g class="possession flotte" data-item="pierrephilo"><circle class="halo-pierre" cx="182" cy="50" r="6"/><path class="pierre-philo" d="M182 45 L186 49 L183.6 55 H180.4 L178 49 Z"/></g>
+    <g class="possession" data-item="horloge"><path class="logis-sil" d="M6 100 V58 H20 V100 Z M5 58.6 L13 48 L21 58.6 Z"/><circle class="cadran" cx="13" cy="66" r="4"/><path class="aiguille" d="M13 66 V62.8"/></g>
   </g>
 
   <!-- derrière le personnage : fumée de corruption et halo de montée de niveau -->

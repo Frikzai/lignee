@@ -9,7 +9,9 @@
 const EMBLEMES_TALENTS = {
   intendant: 'cle', precepteur: 'livre', majordome: 'cloche',
   memoire: 'lignee', vigueur: 'sante', prodige: 'eclair', heritier: 'couronne', mecene: 'revenu',
-  fortune: 'ecus', destin: 'fuseau', sablier: 'sablier', horstemps: 'lune',
+  fortune: 'ecus', destin: 'fuseau', sablier: 'sablier', horstemps: 'lune', ancetres: 'oeil',
+  // racines (Floraison)
+  seve: 'goutte', ecorce: 'bouclier', fruits: 'fleur', bourgeons: 'feuille', cime: 'eclair', profondes: 'graine',
 };
 
 function romain(n) {

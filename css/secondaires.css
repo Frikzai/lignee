@@ -66,3 +66,6 @@
 #tab-options h3 .icone { width: 14px; height: 14px; margin-right: 4px; vertical-align: -2px; color: var(--orne-vif); }
 .raccourcis kbd { padding: 0 5px; border: 1px solid var(--border); border-bottom-width: 2px; border-radius: 3px; background: var(--panel2); font: 11px ui-monospace, Consolas, monospace; color: var(--text); }
 #tab-options .card + .card { margin-top: 12px; }
+
+/* Défis du second palier : verrouillés tant que le premier n'est pas réussi */
+.epreuve.verrou { opacity: .55; border-style: dashed; }

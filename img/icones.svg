@@ -77,4 +77,10 @@
   <symbol id="i-etagere" viewBox="0 0 24 24"><path d="M4 3 V21 M20 3 V21 M4 9 H20 M4 15 H20 M4 21 H20"/><path d="M6.5 9 V5 M8.5 9 V4.5 M11 9 L12.5 5 M6.5 15 V11 M9 15 V11.5 M14 15 V11 M16.5 15 V12 M7 21 V17 M10 21 V17.5"/></symbol>
   <symbol id="i-feuille" viewBox="0 0 24 24"><path d="M5 19 Q4 7 19 5 Q19 18 7 18 Z M5 19 L13 11"/></symbol>
   <symbol id="i-lunette" viewBox="0 0 24 24"><path d="M4 13 L17 6 L19 9.5 L6 16.5 Z M10 14 L7 21 M10 14 L13 21 M17 6 L18.5 5"/></symbol>
+  <!-- Fin de partie : voie Clergé, Floraison, flotte -->
+  <symbol id="i-aureole" viewBox="0 0 24 24"><ellipse cx="12" cy="5.5" rx="6" ry="2"/><circle cx="12" cy="12.5" r="3.8"/><path d="M5 21 Q12 15 19 21"/></symbol>
+  <symbol id="i-graine" viewBox="0 0 24 24"><path d="M12 21 Q7 20 7.6 15.6 Q12 13.4 16.4 15.6 Q17 20 12 21 Z M12 14.4 V9 M12 10 Q7.5 10.4 6.5 5.5 Q11 5 12 10 Z M12 9 Q13.5 5 17.5 5.5 Q16.5 9.6 12 9.6"/></symbol>
+  <symbol id="i-fleur" viewBox="0 0 24 24"><circle cx="12" cy="5.5" r="2.6"/><circle cx="16.3" cy="8.6" r="2.6"/><circle cx="14.7" cy="13.6" r="2.6"/><circle cx="9.3" cy="13.6" r="2.6"/><circle cx="7.7" cy="8.6" r="2.6"/><circle cx="12" cy="10" r="1.5" style="fill:currentColor"/><path d="M12 16.2 V21.5 M12 19.5 Q9.5 17.5 8 18.5"/></symbol>
+  <symbol id="i-mitre" viewBox="0 0 24 24"><path d="M7 20.5 L6.4 9.5 L10.5 4.5 L12 7.5 L13.5 4.5 L17.6 9.5 L17 20.5 Z M12 11 V18 M9.5 13.6 H14.5"/></symbol>
+  <symbol id="i-navire" viewBox="0 0 24 24"><path d="M3.5 15.5 H20.5 L18 20 H6 Z M12 15.5 V3.5 M12 4.5 L18 13 H12 M12 6.5 L7 13 H12 M3 21.5 Q6 20.5 9 21.5 Q12 22.5 15 21.5 Q18 20.5 21 21.5"/></symbol>
 </svg>

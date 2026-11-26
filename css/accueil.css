@@ -67,3 +67,9 @@ body.accueil-ouvert .modal.au-dessus { z-index: 90; }   /* seule la confirmation
   .accueil-voile { display: none; }
   .accueil-titre input { font-size: 18px; }
 }
+
+/* Floraison : les fleurs de l'arbre (js/accueil.js, Arbre.fleurir) */
+.arbre-lignee .fleur-arbre { opacity: .9; animation: fleur-balance 5s ease-in-out infinite alternate; }
+.arbre-lignee .fleur-arbre .coeur { fill: #ffcf7a; }
+@keyframes fleur-balance { from { transform: rotate(-8deg) scale(.94); } to { transform: rotate(8deg) scale(1.04); } }
+@media (prefers-reduced-motion: reduce) { .arbre-lignee .fleur-arbre { animation: none; } }

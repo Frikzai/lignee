@@ -547,3 +547,24 @@
 @keyframes battement { 0%, 40%, 100% { opacity: .15; } 10% { opacity: .9; } 25% { opacity: .55; } }
 #scene[data-pause]::after { animation-play-state: paused; }
 @media (prefers-reduced-motion: reduce) { #scene[data-sante="critique"]::after { opacity: .6; } }
+
+/* ---------------------------------------------------- Voie du Clergé */
+#scene[data-voie="clerge"] { --ciel-haut: #171320; --ciel-bas: #5e4a2c; --lueur: #c9a24e; --lointain: #2a2118; --magie: #ffe9a8; }
+#scene .vitrail { fill: #f3c86a; animation: feu 2.2s ease-in-out infinite alternate; }
+#scene .luciole { fill: #ffe9a8; transform-box: fill-box; animation: rune calc(4s * var(--tempo, 1)) ease-in-out infinite; }
+#scene .corde-cloche { fill: none; stroke: var(--sil); stroke-width: .7; }
+#scene .cloche-balance { transform-origin: 238px 35px; animation: cloche-balance calc(1.3s * var(--tempo, 1)) ease-in-out infinite alternate; }
+@keyframes cloche-balance { from { transform: rotate(-9deg); } to { transform: rotate(9deg); } }
+#scene[data-voie="clerge"] .copeaux { display: none; }   /* le geste « hacher » du sonneur tire la corde : pas de copeaux */
+
+/* Possessions de fin de partie */
+#scene .halo-pierre { fill: rgba(255, 90, 60, .25); animation: fenetre 2.4s ease-in-out infinite; }
+#scene .pierre-philo { fill: #b8402a; stroke: #ffb38a; stroke-width: .4; }
+#scene .cadran { fill: #e8d9a8; }
+#scene .aiguille { fill: none; stroke: var(--sil); stroke-width: .8; stroke-linecap: round; transform-origin: 13px 66px; animation: ailes 12s linear infinite; }
+
+/* Médaillons de la Foi */
+#scene .cloche-med { transform-origin: 20px 9px; animation: med-faucille 1.4s ease-in-out infinite alternate; }
+#scene .piece-tombe { animation: med-tombe 1.6s ease-in infinite; }
+@keyframes med-tombe { 0% { transform: translateY(-4px); opacity: 0; } 20% { opacity: 1; } 80% { transform: translateY(8px); opacity: 1; } 100% { transform: translateY(9px); opacity: 0; } }
+#scene .rayons-med { transform-origin: 20px 20px; animation: ailes 8s linear infinite; }

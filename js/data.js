@@ -15,6 +15,7 @@ const JOB_CATS = {
   milice:      { name: 'Milice',      color: '#c8553d' },
   arcanes:     { name: 'Arcanes',     color: '#8a6fd1' },
   ombre:       { name: 'Ombre',       color: '#7d8a9c' },
+  clerge:      { name: 'Clergé',      color: '#e0cf9a' },
 };
 
 const JOBS = [
@@ -73,7 +74,26 @@ const JOBS = [
     desc: 'Les morts travaillent gratuitement.' },
   { id: 'seigneur',      cat: 'ombre', name: 'Seigneur des ombres',  income: 120000, xp: 2e9,   req: [{ job: 'necromancien', level: 10 }, { skill: 'magienoire', level: 400 }, { corruption: 90 }],
     desc: 'Même la nuit vous obéit.' },
+
+  // Clergé : la Foi (js/foi.js) monte en servant l'Église et fait le contrepoids de la corruption
+  { id: 'sonneur',     cat: 'clerge', name: 'Sonneur de cloches', income: 6,      xp: 70,    req: [{ skill: 'priere', level: 5 }],
+    desc: 'Tirer la corde à l\'aube, à midi et au soir. Fait monter la foi.' },
+  { id: 'moine',       cat: 'clerge', name: 'Moine',              income: 55,     xp: 1100,  req: [{ job: 'sonneur', level: 10 }, { skill: 'priere', level: 25 }],
+    desc: 'Le silence, la prière et la bière de l\'abbaye.' },
+  { id: 'pretre',      cat: 'clerge', name: 'Prêtre',             income: 250,    xp: 2.5e4, req: [{ job: 'moine', level: 10 }, { skill: 'charite', level: 30 }],
+    desc: 'Baptiser, marier, enterrer. Recommencer.' },
+  { id: 'inquisiteur', cat: 'clerge', name: 'Inquisiteur',        income: 1200,   xp: 5e5,   req: [{ job: 'pretre', level: 10 }, { skill: 'priere', level: 120 }, { foi: 30 }],
+    desc: 'Traquer l\'hérésie, surtout chez les autres.' },
+  { id: 'eveque',      cat: 'clerge', name: 'Évêque',             income: 6000,   xp: 8e6,   req: [{ job: 'inquisiteur', level: 10 }, { skill: 'charite', level: 150 }],
+    desc: 'Une crosse, une mitre et tout un diocèse.' },
+  { id: 'cardinal',    cat: 'clerge', name: 'Cardinal',           income: 30000,  xp: 1.5e8, req: [{ job: 'eveque', level: 10 }, { skill: 'miracles', level: 150 }, { foi: 60 }],
+    desc: 'La pourpre, et l\'oreille des rois.' },
+  { id: 'saint',       cat: 'clerge', name: 'Saint',              income: 150000, xp: 3e9,   req: [{ job: 'cardinal', level: 10 }, { skill: 'miracles', level: 350 }, { foi: 90 }],
+    desc: 'On priera votre nom bien après votre mort.' },
 ];
+
+// Le sommet de chaque grande voie : l'atteindre rend la Floraison possible (game.js)
+const SOMMETS = { milice: 'connetable', arcanes: 'gardien', ombre: 'seigneur', clerge: 'saint' };
 
 // ------------------------------------------------------------ Compétences
 const SKILL_CATS = {
@@ -81,6 +101,7 @@ const SKILL_CATS = {
   combat:       { name: 'Combat',       color: '#c8553d' },
   mystique:     { name: 'Mystique',     color: '#8a6fd1' },
   tenebres:     { name: 'Ténèbres',     color: '#7d8a9c' },
+  foi:          { name: 'Foi',          color: '#e0cf9a' },
 };
 
 // effects: per = gain par niveau (multiplicateur 1 + per × niveau) ; inverse = réduction
@@ -120,6 +141,13 @@ const SKILLS = [
     effects: [{ stat: 'xp:all', per: 0.003 }], desc: 'Un savoir interdit, terriblement efficace.' },
   { id: 'pacte',      cat: 'tenebres', name: 'Pacte de sang', xp: 3000, req: [{ skill: 'magienoire', level: 100 }, { corruption: 50 }],
     effects: [{ stat: 'lifespan', per: 0.001 }], desc: 'Quelques années volées à d\'autres.' },
+
+  { id: 'priere',   cat: 'foi', name: 'Prière',   xp: 100,  req: [{ skill: 'discipline', level: 10 }],
+    effects: [{ stat: 'xp:clerge', per: 0.01 }], desc: 'Des mots répétés jusqu\'à ce qu\'ils deviennent vrais.' },
+  { id: 'charite',  cat: 'foi', name: 'Charité',  xp: 300,  req: [{ job: 'moine', level: 10 }],
+    effects: [{ stat: 'income:clerge', per: 0.01 }], desc: 'Donner un peu, recevoir beaucoup.' },
+  { id: 'miracles', cat: 'foi', name: 'Miracles', xp: 5000, req: [{ job: 'eveque', level: 10 }, { foi: 50 }],
+    effects: [{ stat: 'xp:all', per: 0.003 }], desc: 'Le pendant lumineux de la magie noire.' },
 ];
 
 // ---------------------------------------------------------------- Boutique
@@ -131,6 +159,8 @@ const HOUSING = [
   { id: 'manoir',    name: 'Manoir',            cost: 15000,  happiness: 6 },
   { id: 'chateau',   name: 'Château',           cost: 300000, happiness: 12 },
   { id: 'palais',    name: 'Palais céleste',    cost: 5e6,    happiness: 25 },
+  { id: 'citadelle', name: 'Citadelle des nuées', cost: 2e8,  happiness: 50 },
+  { id: 'cite',      name: 'Cité d\'étoiles',     cost: 1e10,   happiness: 100 },
 ];
 
 const ITEMS = [
@@ -144,6 +174,10 @@ const ITEMS = [
   { id: 'bibliotheque', name: 'Bibliothèque privée',  cost: 1e5,    effects: [{ stat: 'xp:skills', mult: 1.5 }] },
   { id: 'jardin',       name: 'Jardin des simples',   cost: 1e6,    effects: [{ stat: 'lifespan', mult: 1.1 }] },
   { id: 'observatoire', name: 'Observatoire',         cost: 2e7,    effects: [{ stat: 'xp:all', mult: 2 }] },
+  { id: 'flotte',       name: 'Flotte marchande',     cost: 1e8,    effects: [{ stat: 'income:all', mult: 1.5 }] },
+  { id: 'academie',     name: 'Académie',             cost: 1e9,    effects: [{ stat: 'xp:skills', mult: 2 }] },
+  { id: 'pierrephilo',  name: 'Pierre philosophale',  cost: 3e10,   effects: [{ stat: 'income:all', mult: 2 }] },
+  { id: 'horloge',      name: 'Horloge astronomique', cost: 2e11,   effects: [{ stat: 'speed', mult: 1.25 }] },
 ];
 
 // ---------------------------------------------------- Talents d'héritage
@@ -160,6 +194,19 @@ const PERKS = [
   { id: 'destin',    name: 'Fil du destin',      desc: 'Multiplicateurs d\'héritage +10 % par rang', max: 10, base: 5, growth: 1.6 },
   { id: 'sablier',   name: 'Sablier',            desc: '+10 % de vitesse du temps par rang',         max: 5,  base: 8, growth: 2,   stat: 'speed', per: 0.1 },
   { id: 'horstemps', name: 'Hors du temps',      desc: '+4 h de progression hors-ligne par rang',    max: 5,  base: 2, growth: 1.5 },
+  // sans limite : les points d'héritage ont toujours un usage
+  { id: 'ancetres',  name: 'Veille des ancêtres', desc: '+10 % d\'XP (tout) par rang, sans limite',  max: Infinity, base: 25, growth: 1.25, stat: 'xp:all', per: 0.1 },
+];
+
+// ---------------------------------------------- Racines (Floraison, game.js)
+// Achetées avec les graines ; elles survivent à la Floraison.
+const RACINES = [
+  { id: 'seve',      name: 'Sève ancienne',     desc: '+100 % d\'XP (tout) par rang',                       max: 10, base: 1, growth: 1.6, stat: 'xp:all', per: 1 },
+  { id: 'ecorce',    name: 'Écorce',            desc: 'Multiplicateurs d\'héritage +25 % par rang',         max: 10, base: 1, growth: 1.6 },
+  { id: 'fruits',    name: 'Fruits mûrs',       desc: 'Points d\'héritage +50 % par rang',                  max: 10, base: 2, growth: 1.6 },
+  { id: 'bourgeons', name: 'Bourgeons',         desc: 'Les serviteurs de la maison survivent à la Floraison', max: 1, base: 2, growth: 1 },
+  { id: 'cime',      name: 'Cime',              desc: '+10 % de vitesse du temps par rang',                 max: 5,  base: 3, growth: 2, stat: 'speed', per: 0.1 },
+  { id: 'profondes', name: 'Racines profondes', desc: '+25 % de revenus par rang, sans limite',             max: Infinity, base: 5, growth: 1.4, stat: 'income:all', per: 0.25 },
 ];
 
 const STAT_LABELS = {
@@ -170,6 +217,7 @@ const STAT_LABELS = {
   'income:arcanes': 'revenus Arcanes', 'happiness': 'bonheur', 'lifespan': 'espérance de vie',
   'speed': 'vitesse du temps', 'expenses': 'dépenses',
   'xp:ombre': 'XP Ombre', 'xp:tenebres': 'XP Ténèbres', 'income:ombre': 'revenus Ombre',
+  'xp:clerge': 'XP Clergé', 'xp:foi': 'XP Foi', 'income:clerge': 'revenus Clergé',
 };
 
 // ------------------------------------------------------ Traits de naissance
@@ -186,7 +234,13 @@ const TRAITS = [
   { id: 'ambitieux',   name: 'Ambitieux',          desc: 'Revenus ×1,3, bonheur ×0,85',                 effects: [{ stat: 'income:all', mult: 1.3 }, { stat: 'happiness', mult: 0.85 }] },
   { id: 'sombre',      name: 'Âme sombre',         desc: 'XP Ombre et Ténèbres ×1,75, corruption ×2',   effects: [{ stat: 'xp:ombre', mult: 1.75 }, { stat: 'xp:tenebres', mult: 1.75 }], corruption: 2 },
   { id: 'genie',       name: 'Génie fragile',      desc: 'XP (tout) ×1,3, espérance de vie ×0,85',      effects: [{ stat: 'xp:all', mult: 1.3 }, { stat: 'lifespan', mult: 0.85 }] },
-  { id: 'pieux',       name: 'Pieux',              desc: 'Bonheur ×1,15, corruption ×0,5',              effects: [{ stat: 'happiness', mult: 1.15 }], corruption: 0.5 },
+  { id: 'pieux',       name: 'Pieux',              desc: 'Bonheur ×1,15, corruption ×0,5, foi ×2',      effects: [{ stat: 'happiness', mult: 1.15 }], corruption: 0.5, foi: 2 },
+  // Dons de l'arbre : un destin par voie fleurie (Floraison), et un pour l'arbre couronné
+  { id: 'lame',      voie: 'milice',   name: 'Lame héréditaire',    desc: 'XP Milice ×2, revenus Milice ×1,5',      effects: [{ stat: 'xp:milice', mult: 2 }, { stat: 'income:milice', mult: 1.5 }] },
+  { id: 'temps',     voie: 'arcanes',  name: 'Enfant du sablier',   desc: 'XP Arcanes ×2, vitesse du temps ×1,1',   effects: [{ stat: 'xp:arcanes', mult: 2 }, { stat: 'speed', mult: 1.1 }] },
+  { id: 'nuit',      voie: 'ombre',    name: 'Héritier de la nuit', desc: 'XP Ombre ×2, revenus Ombre ×1,5',        effects: [{ stat: 'xp:ombre', mult: 2 }, { stat: 'income:ombre', mult: 1.5 }] },
+  { id: 'saintete',  voie: 'clerge',   name: 'Sang de saint',       desc: 'XP Clergé ×2, foi ×2',                   effects: [{ stat: 'xp:clerge', mult: 2 }], foi: 2 },
+  { id: 'fleur',     voie: 'couronne', name: 'Fleur de l\'arbre',   desc: 'XP (tout) ×1,5, espérance de vie ×1,1',  effects: [{ stat: 'xp:all', mult: 1.5 }, { stat: 'lifespan', mult: 1.1 }] },
 ];
 
 // --------------------------------------------------------------------- Défis
@@ -208,7 +262,27 @@ const CHALLENGES = [
   { id: 'pacifiste', name: 'Pacifiste', rules: 'Milice, Ombre et compétences de Combat interdites.',
     goalText: 'Débloquer le métier Novice', goal: () => !!G.unlocked['job:novice'],
     forbid: ['milice', 'ombre', 'combat'], reward: [{ stat: 'xp:arcanes', mult: 1.5 }], rewardText: 'XP Arcanes ×1,5 pour toujours' },
-  { id: 'renegat', name: 'Renégat', rules: 'Milice et Arcanes interdites. La corruption ne redescend jamais.',
+  { id: 'renegat', name: 'Renégat', rules: 'Milice, Arcanes et Clergé interdits. La corruption ne redescend jamais.',
     goalText: 'Débloquer le métier Assassin', goal: () => !!G.unlocked['job:assassin'],
-    forbid: ['milice', 'arcanes'], noDecay: true, reward: [{ stat: 'xp:ombre', mult: 1.5 }, { stat: 'xp:tenebres', mult: 1.5 }], rewardText: 'XP Ombre et Ténèbres ×1,5 pour toujours' },
+    forbid: ['milice', 'arcanes', 'clerge'], noDecay: true, reward: [{ stat: 'xp:ombre', mult: 1.5 }, { stat: 'xp:tenebres', mult: 1.5 }], rewardText: 'XP Ombre et Ténèbres ×1,5 pour toujours' },
+
+  // Second palier : mêmes règles, objectifs de fin de partie (requires : le défi du premier palier)
+  { id: 'ascete2', requires: 'ascete', name: 'Ascète II', rules: 'La boutique est interdite : ni logement, ni possessions.',
+    goalText: 'Débloquer le métier Archimage', goal: () => !!G.unlocked['job:archimage'],
+    forbid: ['shop'], reward: [{ stat: 'xp:skills', mult: 1.5 }], rewardText: 'XP compétences ×1,5 pour toujours' },
+  { id: 'ephemere2', requires: 'ephemere', name: 'Vie éphémère II', rules: 'Votre espérance de vie est divisée par 2.',
+    goalText: 'Débloquer le métier Connétable', goal: () => !!G.unlocked['job:connetable'],
+    penalty: [{ stat: 'lifespan', mult: 0.5 }], reward: [{ stat: 'speed', mult: 1.1 }], rewardText: 'Vitesse du temps ×1,1 pour toujours' },
+  { id: 'pauvrete2', requires: 'pauvrete', name: 'Vœu de pauvreté II', rules: 'Tous vos revenus sont divisés par 4.',
+    goalText: 'Posséder 1 Md d\'écus', goal: () => G.coins >= 1e9, progress: () => `${fmt(G.coins)} / 1 Md écus`,
+    penalty: [{ stat: 'income:all', mult: 0.25 }], reward: [{ stat: 'income:all', mult: 1.5 }], rewardText: 'Revenus ×1,5 pour toujours' },
+  { id: 'amnesique2', requires: 'amnesique', name: 'Amnésique II', rules: 'Vos multiplicateurs d\'héritage sont désactivés.',
+    goalText: 'Débloquer le métier Capitaine', goal: () => !!G.unlocked['job:capitaine'],
+    noLegacy: true, rewardText: 'Multiplicateurs d\'héritage +20 % pour toujours' },
+  { id: 'pacifiste2', requires: 'pacifiste', name: 'Pacifiste II', rules: 'Milice, Ombre et compétences de Combat interdites.',
+    goalText: 'Débloquer le métier Gardien du Temps', goal: () => !!G.unlocked['job:gardien'],
+    forbid: ['milice', 'ombre', 'combat'], reward: [{ stat: 'xp:mystique', mult: 1.5 }], rewardText: 'XP Mystique ×1,5 pour toujours' },
+  { id: 'renegat2', requires: 'renegat', name: 'Renégat II', rules: 'Milice, Arcanes et Clergé interdits. La corruption ne redescend jamais.',
+    goalText: 'Débloquer le métier Nécromancien', goal: () => !!G.unlocked['job:necromancien'],
+    forbid: ['milice', 'arcanes', 'clerge'], noDecay: true, reward: [{ stat: 'income:ombre', mult: 2 }], rewardText: 'Revenus Ombre ×2 pour toujours' },
 ];
