@@ -99,7 +99,7 @@ const UI = {
   ready: false,
   tab: 'jobs',
   jobRows: {}, skillRows: {}, catParts: {},
-  housingRows: {}, itemRows: {}, perkCards: {}, achCards: {}, challengeCards: {},
+  housingRows: {}, itemRows: {}, perkCards: {}, racineCards: {}, fleurs: {}, achCards: {}, challengeCards: {},
   eventUid: null, logKey: null, modalKind: null, tutoShown: null, focusEls: [],
   vues: new Map(), alertes: {},
 
@@ -195,27 +195,54 @@ const UI = {
     }
   },
 
-  // Talents : « serviteurs de la maison » (automatisation) et « vertus de la lignée », emblème et rangs en lanternes
+  // Talents : « serviteurs de la maison » (automatisation) et « vertus de la lignée », emblème et rangs en lanternes.
+  // Les racines de la Floraison réutilisent les mêmes cartes, payées en graines.
   buildPerks() {
-    for (const p of PERKS) {
+    this.perkCards = this.buildVertus(PERKS, p => (p.setting ? 'perkGridAuto' : 'perkGrid'), id => buyPerk(id));
+    this.racineCards = this.buildVertus(RACINES, () => 'racineGrid', id => buyRacine(id));
+    for (const v in SOMMETS) {
+      const f = el('span', 'voie-fleur');
+      f.append(icone(ICONES_CATEGORIES[v] || 'fleur'), JOB_CATS[v].name);
+      const don = TRAITS.find(t => t.voie === v);
+      if (don) f.title = `En fleurissant, débloque le destin « ${don.name} » (${don.desc})`;
+      $('voiesFleuries').append(f);
+      this.fleurs[v] = f;
+    }
+    $('floraisonBtn').addEventListener('click', () => {
+      if (!floraisonPossible()) return;
+      const g = grainesPreview(), choix = voiesAFleurir(), nom = v => JOB_CATS[v].name;
+      const voie = choix.length > 1 ? ', et <b>une</b> des voies atteintes fleurit pour toujours : choisissez-la. Les autres sommets devront être atteints à nouveau.'
+        : choix.length ? `, et la voie <b>${nom(choix[0])}</b> fleurit pour toujours.` : '. Aucune nouvelle voie ne fleurit.';
+      const fleurir = v => () => { floraison(v); this.setTab('legacy'); };
+      this.openModal('confirm', `<h2>Faire fleurir l'arbre ?</h2><p>La vie en cours s'achève. Vos points d'héritage, vos talents${racineRank('bourgeons') ? ' (sauf les serviteurs)' : ''} et vos meilleurs niveaux repartent de zéro.<br><br>`
+        + `Vous gagnez <b>${g} graine${g > 1 ? 's' : ''}</b>${voie}</p>`,
+        [{ label: 'Annuler', cls: 'ghost' }, ...(choix.length > 1
+          ? choix.map(v => ({ label: 'Fleurir : ' + nom(v), cls: 'danger', run: fleurir(v) }))
+          : [{ label: 'Confirmer', cls: 'danger', run: fleurir(choix[0]) }])]);
+    });
+  },
+  buildVertus(list, grille, acheter) {
+    const cards = {};
+    for (const p of list) {
       const card = el('div', 'perk vertu cadre' + (p.setting ? ' auto' : ''));
       const emb = el('span', 'v-emb');
       emb.append(icone((typeof EMBLEMES_TALENTS !== 'undefined' && EMBLEMES_TALENTS[p.id]) || 'etoile'));
       const rank = el('span', 'rank');
       const head = el('div', 'perk-head'); head.append(emb, el('h4', null, p.name), rank);
       const btn = el('button', 'btn small');
-      btn.addEventListener('click', () => { buyPerk(p.id); this.update(); });
+      btn.addEventListener('click', () => { acheter(p.id); this.update(); });
       card.append(head, el('p', 'muted small', p.desc));
       let pips = null;
-      if (p.max > 1) {
+      if (p.max > 1 && isFinite(p.max)) {
         pips = el('div', 'pips');
         for (let k = 0; k < p.max; k++) pips.append(el('i'));
         card.append(pips);
       }
       card.append(btn);
-      $(p.setting ? 'perkGridAuto' : 'perkGrid').appendChild(card);
-      this.perkCards[p.id] = { card, rank, btn, pips };
+      $(grille(p)).appendChild(card);
+      cards[p.id] = { card, rank, btn, pips };
     }
+    return cards;
   },
 
   // Défis : « les épreuves », un sceau de cire sur celles qu'on a réussies
@@ -239,7 +266,9 @@ const UI = {
       btn.addEventListener('click', () => this.confirm(`Commencer le défi « ${c.name} » ?`,
         `Votre vie actuelle s'achève (+${legacyPointsPreview()} point(s) d'héritage) et une nouvelle commence.<br><br><b>Règles :</b> ${c.rules}<br><b>Objectif :</b> ${c.goalText}`,
         () => startChallenge(c.id)));
-      card.append(sceau, tete, ligne('cadenas', c.rules), ligne('etendard', 'Objectif : ' + c.goalText), ligne('etoile', c.rewardText, 'gold'), btn);
+      card.append(sceau, tete, ligne('cadenas', c.rules), ligne('etendard', 'Objectif : ' + c.goalText), ligne('etoile', c.rewardText, 'gold'));
+      if (c.requires) card.append(ligne('interdit', `Après « ${CHALLENGE_BY_ID[c.requires].name} »`));
+      card.append(btn);
       grid.appendChild(card);
       this.challengeCards[c.id] = { card, btn };
     }
@@ -354,6 +383,9 @@ const UI = {
     else if (G.dead) { if (this.modalKind !== 'death') this.showDeath(); }
     // la naissance attend que l'écran d'accueil soit refermé
     else if (G.pendingTraits && !this.modalKind && !(typeof Accueil !== 'undefined' && Accueil.ouvert)) this.showTraits();
+    // épilogue : une seule fois, quand les quatre voies ont fleuri et que plus rien n'est à l'écran
+    if (G.floraison.fin && !G.floraison.epilogue && !this.modalKind && !G.pendingTraits
+      && !(typeof Rituel !== 'undefined' && Rituel.phase) && !(typeof Accueil !== 'undefined' && Accueil.ouvert)) this.showEpilogue();
     this.updateTuto();
   },
 
@@ -412,6 +444,14 @@ const UI = {
       const d = typeof DESTINS !== 'undefined' && DESTINS[tr.id];
       badge.replaceChildren(icone(d ? d.embleme : 'etoile'), tr.name);
       badge.title = tr.desc;
+    }
+    const cj = G.conjoint && G.conjoint.trait ? G.conjoint : null, lien = $('conjointLine');
+    lien.classList.toggle('hidden', !cj);
+    if (cj && lien._cle !== cj.prenom + cj.maison) {
+      const t = TRAIT_BY_ID[cj.trait];
+      lien._cle = cj.prenom + cj.maison;
+      lien.replaceChildren(icone('lignee'), `${cj.prenom} ${cj.maison}`);
+      lien.title = `Alliance : ${t.name} (${t.desc}). L'enfant pourra hériter de ce destin.`;
     }
 
     const j = JOB_BY_ID[G.currentJob], je = G.jobs[j.id];
@@ -575,13 +615,14 @@ const UI = {
       if (r.info.lastChild.textContent !== texte) r.info.lastChild.textContent = texte;
     }
     for (const it of ITEMS) {
-      const r = this.itemRows[it.id], pris = !!G.items[it.id];
-      r.carte.classList.toggle('hidden', !G.unlocked['shop:' + it.id]);
-      r.carte.classList.toggle('pris', pris);
-      r.carte.classList.toggle('cher', !pris && net - it.cost * em < 0);
+      // la relique de famille (léguée à la mort, js/rituel.js) agit sans être achetée ni entretenue
+      const r = this.itemRows[it.id], pris = !!G.items[it.id], relique = G.relique === it.id && !pris;
+      r.carte.classList.toggle('hidden', !G.unlocked['shop:' + it.id] && !relique);
+      r.carte.classList.toggle('pris', pris || relique);
+      r.carte.classList.toggle('cher', !pris && !relique && net - it.cost * em < 0);
       r.carte.disabled = ferme;
       r.carte.setAttribute('aria-pressed', pris);
-      const texte = pris ? `Possédé · ${fmt(it.cost * em)}/j` : `${fmt(it.cost * em)} / jour`;
+      const texte = pris ? `Possédé · ${fmt(it.cost * em)}/j` : relique ? 'Relique de famille · sans entretien' : `${fmt(it.cost * em)} / jour`;
       if (r._pris !== pris) { r._pris = pris; r.prix.replaceChildren(icone(pris ? 'acquis' : 'ecus'), el('span')); }
       if (r.prix.lastChild.textContent !== texte) r.prix.lastChild.textContent = texte;
     }
@@ -593,26 +634,49 @@ const UI = {
     const canReb = ageYears() >= 30 && !G.dead;
     $('rebirthBtn').disabled = !canReb;
     $('rebirthHint').textContent = canReb ? '' : 'Possible dès 30 ans.';
-    for (const p of PERKS) {
-      const c = this.perkCards[p.id], r = perkRank(p.id), cost = perkCost(p);
-      if (p.max > 1) c.rank.textContent = `${r} / ${p.max}`;
-      if (c.pips && c._r !== r) { c._r = r; [...c.pips.children].forEach((pip, k) => pip.classList.toggle('on', k < r)); }
-      else if (c.rank._acquis !== !!r) { c.rank._acquis = !!r; c.rank.replaceChildren(...(r ? [icone('acquis')] : [])); }
-      if (r >= p.max) { c.btn.textContent = p.max > 1 ? 'Maximum' : 'Acquis'; c.btn.disabled = true; }
-      else { c.btn.textContent = `Accorder — ${cost} pt${cost > 1 ? 's' : ''}`; c.btn.disabled = G.legacy.points < cost; }
-      c.card.classList.toggle('owned', r > 0);
+    this.majVertus(PERKS, this.perkCards, perkRank, perkCost, G.legacy.points, 'pt');
+
+    // Floraison : visible dès qu'un sommet est atteint
+    const F = G.floraison, possible = floraisonPossible();
+    $('floraison').classList.toggle('hidden', !possible && !F.fois);
+    if (possible || F.fois) {
+      $('grGraines').textContent = F.graines;
+      $('grPreview').textContent = '+' + grainesPreview();
+      $('grFois').textContent = F.fois;
+      $('floraisonBtn').disabled = !possible || G.dead;
+      const choix = voiesAFleurir().map(v => JOB_CATS[v].name);
+      const hint = !possible ? 'Atteignez un sommet : Connétable, Gardien du Temps, Seigneur des ombres ou Saint.'
+        : choix.length > 1 ? `Une voie au choix : ${choix.join(' ou ')}` : choix.length ? `Fleurira : ${choix[0]}` : 'Aucune nouvelle voie : seulement des graines';
+      if ($('floraisonHint').textContent !== hint) $('floraisonHint').textContent = hint;
+      for (const v in this.fleurs) {
+        this.fleurs[v].classList.toggle('fleurie', !!F.fleuries[v]);
+        this.fleurs[v].classList.toggle('atteinte', !F.fleuries[v] && !!F.cycle[v]);
+      }
+      this.majVertus(RACINES, this.racineCards, racineRank, racineCost, F.graines, 'graine');
     }
     if (typeof Heritage !== 'undefined') Heritage.maj();
+  },
+  majVertus(list, cards, rang, cout, solde, unite) {
+    for (const p of list) {
+      const c = cards[p.id], r = rang(p.id), cost = cout(p);
+      if (p.max > 1) c.rank.textContent = isFinite(p.max) ? `${r} / ${p.max}` : `rang ${r}`;
+      if (c.pips && c._r !== r) { c._r = r; [...c.pips.children].forEach((pip, k) => pip.classList.toggle('on', k < r)); }
+      else if (p.max === 1 && c.rank._acquis !== !!r) { c.rank._acquis = !!r; c.rank.replaceChildren(...(r ? [icone('acquis')] : [])); }
+      if (r >= p.max) { c.btn.textContent = p.max > 1 ? 'Maximum' : 'Acquis'; c.btn.disabled = true; }
+      else { c.btn.textContent = `Accorder — ${cost} ${unite}${cost > 1 ? 's' : ''}`; c.btn.disabled = solde < cost; }
+      c.card.classList.toggle('owned', r > 0);
+    }
   },
 
   updateChallenges() {
     for (const c of CHALLENGES) {
       const r = this.challengeCards[c.id];
-      const done = !!G.challengesDone[c.id], active = G.challenge === c.id;
+      const done = !!G.challengesDone[c.id], active = G.challenge === c.id, ouvert = challengeOpen(c);
       r.card.classList.toggle('done', done);
       r.card.classList.toggle('active', active);
-      r.btn.textContent = done ? 'Réussi' : active ? 'En cours…' : 'Relever le défi';
-      r.btn.disabled = done || active || G.dead;
+      r.card.classList.toggle('verrou', !ouvert);
+      r.btn.textContent = done ? 'Réussi' : active ? 'En cours…' : ouvert ? 'Relever le défi' : 'Verrouillé';
+      r.btn.disabled = done || active || !ouvert || G.dead;
     }
   },
 
@@ -636,6 +700,7 @@ const UI = {
       ['parchemin', 'Événements vécus', G.stats.events],
       ['etendard', 'Défis réussis', `${Object.keys(G.challengesDone).length} / ${CHALLENGES.length}`],
       ['etoile', 'Multiplicateur d\'XP', '×' + fmtMult(getMult('xp:all'))],
+      ['fleur', 'Floraisons', G.floraison.fois],
     ];
     if (!this.statVals) {
       this.statVals = rows.map(([nom, libelle]) => {
@@ -730,6 +795,7 @@ const UI = {
     v.fill.style.background = TONS[e.ton] || TONS.moyen;
     v.info.textContent = e.info || '';
     v.n.title = e.titre || '';
+    v.n.classList.toggle('hidden', !!e.cache);
   },
 
   rendreMarque(d) {
@@ -839,6 +905,17 @@ const UI = {
       b.addEventListener('click', () => { chooseTrait(id); this.closeModal(); this.update(); });
       $('traitList').appendChild(b);
     }
+  },
+  showEpilogue() {
+    G.floraison.epilogue = true;
+    const l = G.lignee, gen = l ? l.oublies + l.vies.length + 1 : G.legacy.rebirths + 1;
+    const maison = l && l.maison ? `la maison <b>${echapper(l.maison)}</b>` : 'votre maison';
+    this.openModal('epilogue', `
+      <h2>L'arbre couronné</h2>
+      <p>La Milice, les Arcanes, l'Ombre et le Clergé ont fleuri. Au-dessus des lanternes de ${maison}, l'arbre mort s'est couvert de fleurs de braise.</p>
+      <p><b>${gen - 1}</b> générations ont porté la flamme, des glaneurs des premiers jours aux saints et aux seigneurs des ombres. On chantera longtemps leurs noms.</p>
+      <p class="muted">L'histoire est accomplie, mais l'arbre peut fleurir encore : la lignée continue.</p>`,
+      [{ label: 'Continuer la lignée', cls: 'primary' }]);
   },
   showOffline(r) {
     this.openModal('offline', `

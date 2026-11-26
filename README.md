@@ -24,20 +24,24 @@ Il faut Node 20 ou plus récent. Écrivez bien `node --test` sans dossier : `nod
 
 ### Outils
 
-- **Panneau de debug** : **Ctrl + Maj + D** en jeu, ou <http://localhost:8765/?debug>. Il permet d'accélérer le temps (×10 à ×1000), de donner des écus ou des points d'héritage, de monter des niveaux, de tout débloquer, de vieillir, de mourir ou de lancer un événement. Le code est dans `js/debug.js`.
+- **Panneau de debug** : **Ctrl + Maj + D** en jeu, ou <http://localhost:8765/?debug>. Il permet d'accélérer le temps (×10 à ×1000), de donner des écus ou des points d'héritage, de monter des niveaux, de tout débloquer, de vieillir, de mourir, de lancer un événement, ou de tester la fin de partie (foi, graines, sommets atteints, Floraison, arbre couronné). Le code est dans `js/debug.js`.
 - **Démo de la scène** : <http://localhost:8765/outils/scene-demo.html>. On y choisit le métier, la compétence, le logement, les possessions, l'âge, la corruption, la saison et la santé, et la bannière animée réagit en direct.
 - **Planches** : <http://localhost:8765/outils/icones.html> affiche toutes les icônes du sprite, `outils/kit.html` les cadres et boutons du kit.
 - **Arbre de l'accueil** : `python3 outils/arbre.py` régénère `img/accueil.svg` (même graine, même arbre).
+- **Simulation d'équilibrage** : `node outils/simulation.js` joue 4 parties complètes avec un joueur automatique et affiche, pour chaque jalon (sommets, voies fleuries, épilogue, 100 %), le temps de jeu médian (min–max). `node outils/simulation.js 1h 2` joue 2 parties à 1 h par jour, hors-ligne compris, et compte en jours. À relancer après chaque changement d'équilibrage ; les durées sont celles d'un joueur parfait, compter 1,5 à 2 fois plus pour un humain.
 
 ## Contenu
 
-- **4 voies de métiers** : Paysannerie, Milice, Arcanes et Ombre (avec sa jauge de corruption).
-- **16 compétences** qui donnent des bonus pour la vie en cours.
-- **Boutique** : logements (bonheur) et possessions.
+- **5 voies de métiers** : Paysannerie, Milice, Arcanes, Ombre (avec sa jauge de corruption) et Clergé (avec sa jauge de foi, le contrepoids de la corruption).
+- **19 compétences** qui donnent des bonus pour la vie en cours.
+- **Boutique** : 9 logements (bonheur) et 14 possessions. À la mort, on lègue une possession à l'enfant : la **relique de famille** agit sans entretien.
 - **La lignée** : une maison qu'on nomme, un prénom par génération et l'arbre aux lanternes des ancêtres.
-- **Héritage** : à la mort, les meilleurs niveaux deviennent des multiplicateurs d'XP et rapportent des points à dépenser en talents (dont l'automatisation).
+- **Alliances** : vers 20 ans, trois maisons proposent un conjoint. Son destin s'ajoute à celui de la vie en cours, et l'enfant pourra en hériter (il est proposé parmi les destins de naissance). L'alliance entre dans la chronique.
+- **Héritage** : à la mort, les meilleurs niveaux deviennent des multiplicateurs d'XP et rapportent des points à dépenser en talents (dont l'automatisation, et la Veille des ancêtres, sans limite).
+- **Floraison** (fin de partie) : une fois le sommet d'une grande voie atteint (Connétable, Gardien du Temps, Seigneur des ombres, Saint), l'arbre peut fleurir. L'héritage repart de zéro contre des graines, qui achètent des racines permanentes. Une seule voie fleurit à chaque Floraison (au choix si plusieurs sommets sont atteints) : faire fleurir les quatre couronne l'arbre et déclenche l'épilogue ; la partie continue ensuite. Chaque voie fleurie débloque un **don de l'arbre** (un destin de naissance exclusif, toujours proposé), et l'arbre aux lanternes se couvre de fleurs à ses couleurs.
+- **Espérance de vie** : au-delà de 100 ans, chaque année gagnée compte de moins en moins (`LIFESPAN_SOFTCAP`, `js/game.js`).
 - **Santé** et **saisons** (modules `js/sante.js` et `js/saisons.js`).
-- **Traits de naissance**, **défis**, **événements à choix**, hauts faits, progression hors-ligne et tutoriel.
+- **Traits de naissance**, **défis** (deux paliers), **61 événements à choix** (par âge, par voie, par logis, par fortune, par lignée, et en chaîne via `G.suite` ; les 5 derniers tirés ne reviennent pas tout de suite), hauts faits, progression hors-ligne et tutoriel.
 
 ## Direction artistique
 
@@ -56,7 +60,8 @@ Dark fantasy « Braise & suie ». Le fil conducteur est **l'Arbre aux Lanternes*
 | `index.html` | Page du jeu (ordre de chargement des scripts en bas) |
 | `js/data.js` | Contenu et équilibrage : métiers, compétences, boutique, talents, traits, défis |
 | `js/game.js` | Moteur : boucle, calculs, sauvegarde, événements, hauts faits, `HOOKS` |
-| `js/sante.js`, `js/saisons.js` | Modules de jeu : santé, saisons |
+| `js/sante.js`, `js/saisons.js`, `js/foi.js` | Modules de jeu : santé, saisons, foi |
+| `js/evenements.js` | Événements supplémentaires et alliances |
 | `js/debug.js` | Panneau de debug |
 | `js/ui.js` | Interface : construction et mise à jour des écrans, tutoriel, API pour les modules |
 | `js/emblemes.js` | Icône de chaque métier, compétence, catégorie, objet, défi et haut fait |
@@ -75,16 +80,16 @@ Dark fantasy « Braise & suie ». Le fil conducteur est **l'Arbre aux Lanternes*
 
 ## Qui fait quoi
 
-- **Moteur** (`js/game.js`, `js/data.js`, modules `sante.js`, `saisons.js`, `debug.js`) : les règles du jeu et l'équilibrage.
+- **Moteur** (`js/game.js`, `js/data.js`, modules `sante.js`, `saisons.js`, `foi.js`, `evenements.js`, `debug.js`) : les règles du jeu et l'équilibrage.
 - **Interface** (`index.html`, `js/ui.js` et les autres fichiers de `js/`, `css/`, `img/`) : l'affichage. Elle lit l'état du jeu (`G`) et ne change jamais les règles.
 
 Un module peut s'afficher sans toucher à l'interface, grâce à l'API de `js/ui.js` :
 
 - `UI.ajouterRessource({ id, icone, libelle, valeur })` : une inscription dans la barre du haut ;
-- `UI.ajouterJauge({ id, icone, libelle, etat })` : une jauge dans la colonne du personnage ;
+- `UI.ajouterJauge({ id, icone, libelle, etat })` : une jauge dans la colonne du personnage (`etat()` peut renvoyer `cache: true` pour la masquer) ;
 - `UI.ajouterMarque({ cible: 'job' | 'housing' | 'item', id, icone, … })` : une marque sur une ligne ou une carte.
 
-`js/sante.js` et `js/saisons.js` servent d'exemples.
+`js/sante.js`, `js/saisons.js` et `js/foi.js` servent d'exemples.
 
 ## Ajouter du contenu
 
@@ -95,7 +100,8 @@ Les tests vérifient que chaque élément du jeu a son visuel. Si vous ajoutez d
 | un métier | son icône dans `ICONES_METIERS` (`js/emblemes.js`) et sa scène dans `SCENES` (`js/scene.js`) |
 | une compétence | son icône dans `ICONES_COMPETENCES` et son médaillon dans `img/medaillons.svg` |
 | une catégorie | son emblème dans `ICONES_CATEGORIES` |
-| un talent | son emblème dans `EMBLEMES_TALENTS` (`js/heritage.js`) |
+| un talent ou une racine | son emblème dans `EMBLEMES_TALENTS` (`js/heritage.js`) |
+| une voie | son décor (`data-voie`) dans `img/scene.svg`, ses couleurs dans `css/scene.css`, et l'ajouter à `VOIES_DESSINEES` (`js/scene.js`) ; son sommet dans `SOMMETS` (`js/data.js`) si elle compte pour la Floraison |
 | un trait de naissance | son destin dans `DESTINS` (`js/rituel.js`) |
 | un logement | sa silhouette dans `img/logis.svg` et son dessin dans `img/scene.svg` |
 | une possession | son icône dans `ICONES_OBJETS` et son dessin dans `img/scene.svg` |

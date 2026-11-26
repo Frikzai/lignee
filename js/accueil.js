@@ -31,7 +31,7 @@ function texteAncetre(v) {
   return {
     nom: v.prenom,
     vie: v.fin === 'mort' ? `a vécu ${v.age} ans` : `a transmis l'héritage à ${v.age} ans`,
-    detail: `${v.metier} niv. ${v.niveau}` + (v.trait ? ` · « ${v.trait} »` : ''),
+    detail: `${v.metier} niv. ${v.niveau}` + (v.trait ? ` · « ${v.trait} »` : '') + (v.alliance ? ` · alliance : ${v.alliance}` : ''),
   };
 }
 
@@ -78,7 +78,29 @@ const Arbre = {
       lant.addEventListener('blur', () => this.cacher());
       if (item.type === 'courante') courante = lant;
     }
+    this.fleurir(g, places);
     return { svg, courante };
+  },
+
+  // Floraison : des grappes de fleurs sur les branches des lanternes, aux couleurs des voies fleuries.
+  // Un quart des branches par voie ; l'arbre couronné en porte davantage. Positions fixes (pas de hasard).
+  fleurir(g, places) {
+    const F = typeof G !== 'undefined' && G && G.floraison;
+    const voies = F ? Object.keys(SOMMETS).filter(v => F.fleuries[v]) : [];
+    if (!voies.length) return;
+    const petales = [[0, -4.5], [4.3, -1.4], [2.6, 3.6], [-2.6, 3.6], [-4.3, -1.4]];
+    let html = '';
+    places.forEach(([x, y], i) => {
+      if (i % 4 >= voies.length) return;
+      const coul = JOB_CATS[voies[i % voies.length]].color;
+      for (let k = 0; k < (F.fin ? 5 : 3); k++) {
+        const fx = x + ((i * 37 + k * 53) % 47) - 23, fy = y - 4 - ((i * 23 + k * 31) % 21);
+        html += `<g class="fleur-arbre" style="fill:${coul};transform-origin:${fx}px ${fy}px;animation-delay:${(-(i + k) * 0.7).toFixed(1)}s">`
+          + petales.map(([dx, dy]) => `<circle cx="${fx + dx}" cy="${fy + dy}" r="3.6"/>`).join('')
+          + `<circle class="coeur" cx="${fx}" cy="${fy}" r="2.2"/></g>`;
+      }
+    });
+    g.insertAdjacentHTML('beforebegin', `<g class="fleurs-arbre" aria-hidden="true">${html}</g>`);   // nombres et couleurs de data.js uniquement
   },
   bulle() {
     if (!this._bulle) { this._bulle = el('div', 'arbre-bulle cadre-noble hidden'); document.body.append(this._bulle); }

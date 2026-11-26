@@ -46,6 +46,7 @@
           <div id="portraitNom" class="portrait-nom"></div>
           <div id="portraitSous" class="muted small"></div>
           <div id="traitLine" class="trait-badge hidden"></div>
+          <div id="conjointLine" class="trait-badge hidden"></div>
         </div>
         <div class="sep"></div>
         <div id="jauges"></div>
@@ -160,6 +161,24 @@
           </div>
           <div id="arbreLignee" class="maison-arbre" aria-hidden="true"></div>
         </div>
+        <div id="floraison" class="floraison cadre-noble hidden">
+          <h3><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-fleur"/></svg> L'arbre en fleurs</h3>
+          <p class="muted small">Quand la maison atteint le sommet d'une grande voie, l'arbre peut fleurir : la vie en cours s'achève, l'héritage repart de zéro, et vous gagnez des graines pour des racines qui ne disparaissent jamais. Une seule voie fleurit à chaque Floraison : faites fleurir les quatre pour couronner l'arbre.</p>
+          <div class="maison-ins">
+            <span class="inscription"><small><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-graine"/></svg>Graines</small><b id="grGraines">0</b></span>
+            <span class="brin"></span>
+            <span class="inscription"><small><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-etoile"/></svg>Gain à la floraison</small><b id="grPreview" class="gold">0</b></span>
+            <span class="brin"></span>
+            <span class="inscription"><small><svg class="icone" aria-hidden="true"><use href="img/icones.svg#i-fleur"/></svg>Floraisons</small><b id="grFois">0</b></span>
+          </div>
+          <div id="voiesFleuries" class="voies-fleuries"></div>
+          <div class="reb">
+            <button id="floraisonBtn" class="btn btn-noble">Faire fleurir l'arbre</button>
+            <span id="floraisonHint" class="muted small"></span>
+          </div>
+          <h3>Racines</h3>
+          <div id="racineGrid" class="vertus"></div>
+        </div>
         <div class="heritage-cols">
           <div>
             <h3>Serviteurs de la maison</h3>
@@ -253,6 +272,8 @@
   <script src="js/heritage.js"></script>
   <script src="js/sante.js"></script>
   <script src="js/saisons.js"></script>
+  <script src="js/foi.js"></script>
+  <script src="js/evenements.js"></script>
   <script src="js/ambiance.js"></script>
   <script src="js/scene.js"></script>
   <script>main();</script>

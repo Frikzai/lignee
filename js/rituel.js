@@ -22,6 +22,12 @@ const DESTINS = {
   sombre:      { embleme: 'lune',     saveur: 'Les ombres l\'appellent par son nom.' },
   genie:       { embleme: 'eclair',   saveur: 'Un esprit qui brûle trop vite.' },
   pieux:       { embleme: 'age',      saveur: 'Une prière pour chaque pas.' },
+  // dons de l'arbre (Floraison)
+  lame:        { embleme: 'epee',     saveur: 'Une épée veille au-dessus du berceau.' },
+  temps:       { embleme: 'sablier',  saveur: 'Ses premiers mots furent prononcés avant sa naissance.' },
+  nuit:        { embleme: 'capuche',  saveur: 'Les chats noirs suivent ses pas.' },
+  saintete:    { embleme: 'aureole',  saveur: 'Une lumière pâle veille sur son sommeil.' },
+  fleur:       { embleme: 'fleur',    saveur: 'Le jour de sa naissance, l\'arbre était en fleurs.' },
 };
 
 function epitaphe(resume, mort, points) {
@@ -109,9 +115,11 @@ const Rituel = {
     const ligne2 = el('div', 'rituel-resume');
     ligne2.append('Héritage transmis : ', el('span', 'gold', e.heritage), ' · ses niveaux deviennent des bonus pour toujours');
     const actions = el('div', 'rituel-actions');
+    const reliques = this.reliques();
     const ok = el('button', 'btn btn-noble', mort ? 'Allumer la lanterne suivante' : 'Transmettre l\'héritage');
     ok.addEventListener('click', () => {
       this.fermer();
+      if (reliques) G.relique = reliques.choix;
       rebirth();
       UI.setTab('legacy');
     });
@@ -122,8 +130,29 @@ const Rituel = {
       actions.append(non);
     }
     box.append(this.decor([{ x: 800, y: 90, etat: mort ? 'mourante' : 'vive' }]),
-      this.texte(e.titre, nomComplet(G.lignee), ligne1, ligne2, actions));
+      this.texte(e.titre, nomComplet(G.lignee), ligne1, ligne2, ...(reliques ? [reliques.box] : []), actions));
     ok.focus();
+  },
+
+  // Relique de famille : une possession léguée à l'enfant, qui agit sans entretien. Par défaut, on garde
+  // la relique actuelle, sinon la possession la plus chère. null si la maison n'a rien à léguer.
+  reliques() {
+    const liste = ITEMS.filter(i => G.items[i.id] || i.id === G.relique);
+    if (!liste.length) return null;
+    const r = { choix: G.relique || liste[liste.length - 1].id, box: el('div', 'rituel-reliques') };
+    r.box.append(el('span', 'rituel-petit', 'Relique léguée'));
+    const boutons = liste.map(it => {
+      const b = el('button', 'btn small');
+      b.type = 'button';
+      b.append(icone(ICONES_OBJETS[it.id] || 'etoile'), ' ', it.name);
+      b.title = it.effects.map(e => describeEffect(e)).join(', ') + ' · sans entretien';
+      b.addEventListener('click', () => { r.choix = it.id; maj(); });
+      return [it.id, b];
+    });
+    const maj = () => { for (const [id, b] of boutons) b.setAttribute('aria-pressed', id === r.choix); };
+    maj();
+    r.box.append(...boutons.map(([, b]) => b));
+    return r;
   },
 
   // 2. La flamme passe à l'enfant
@@ -153,6 +182,8 @@ const Rituel = {
       const emb = el('div', 'carte-embleme');
       emb.append(icone(d.embleme));
       c.append(emb, el('h4', null, tr.name), el('div', 'carte-effet', tr.desc), el('div', 'carte-saveur', d.saveur ? `« ${d.saveur} »` : ''));
+      const h = G.traitHerite && G.traitHerite.trait === id;
+      if (h || tr.voie) c.append(el('div', 'carte-origine', h ? `Hérité de ${G.traitHerite.de}` : 'Don de l\'arbre'));
       c.addEventListener('click', () => this.choisir(id, c, cartes));
       cartes.append(c);
     });

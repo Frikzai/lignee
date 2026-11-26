@@ -47,3 +47,13 @@
   .maison-arbre { min-height: 240px; }
   .heritage-cols { grid-template-columns: 1fr; }
 }
+
+/* ---------------------------------------------- L'arbre en fleurs (Floraison) */
+.floraison { padding: 18px 22px; margin-bottom: 14px; }
+.floraison h3:first-child { margin-top: 0; color: var(--accent); }
+.floraison .maison-ins { margin-top: 0; padding-top: 4px; }
+.floraison .reb { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 12px 0 4px; }
+.voies-fleuries { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.voie-fleur { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px; border: 1px dashed var(--border); border-radius: 999px; font: 14px var(--font-titre-sc); color: var(--muted); opacity: .6; }
+.voie-fleur.fleurie { border-style: solid; border-color: var(--accent); color: var(--accent); opacity: 1; }
+.voie-fleur.atteinte { border-color: var(--accent); color: var(--text); opacity: .9; }   /* sommet atteint, pas encore fleuri */

@@ -76,3 +76,11 @@ body.rituel-ouvert { overflow: hidden; }
   #rituel, .rituel *, .carte-destin { animation: none !important; transition: none !important; }
   .rituel .lant-mourante .flamme { opacity: 0; }
 }
+
+/* Relique de famille : le choix de la possession léguée */
+.rituel-reliques { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 6px; margin-top: 16px; }
+.rituel-reliques .rituel-petit { flex-basis: 100%; }
+.rituel-reliques .btn[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); box-shadow: 0 0 10px rgba(217, 151, 58, .3); }
+
+/* Destin hérité du conjoint, ou don de l'arbre (Floraison) */
+.carte-origine { margin-top: 8px; font: 12px var(--font-titre-sc); color: var(--accent); letter-spacing: .04em; }

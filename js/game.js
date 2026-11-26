@@ -11,6 +11,7 @@ const ITEM_BY_ID = byId(ITEMS);
 const PERK_BY_ID = byId(PERKS);
 const TRAIT_BY_ID = byId(TRAITS);
 const CHALLENGE_BY_ID = byId(CHALLENGES);
+const RACINE_BY_ID = byId(RACINES);
 
 const SAVE_KEY = 'lignee_save_v1';
 let G = null;
@@ -83,6 +84,14 @@ function defaultState() {
     tutorial: 0,
     settings: { autoPromote: false, promoteMode: 'categorie', autoLearn: false, learnMode: 'lowest', offline: true, autoBuy: false, buyKeep: 30 },
     legacy: { points: 0, perks: {}, rebirths: 0, totalPoints: 0 },
+    relique: null,   // possession léguée : son effet s'applique sans entretien, de vie en vie
+    conjoint: null,  // alliance de la vie en cours (js/evenements.js) : { prenom, maison, trait } ou { refus: true }
+    traitHerite: null,   // destin du conjoint proposé à l'enfant : { trait, de }
+    recents: [],     // derniers événements tirés : ils ne reviennent pas tout de suite
+    suite: null,     // événement qui suit le précédent (chaîne)
+    // Floraison : base = points d'héritage cumulés à la dernière Floraison ; cycle = voies dont le sommet
+    // a été atteint depuis ; fleuries = voies qui ont fleuri pour toujours
+    floraison: { graines: 0, fois: 0, base: 0, racines: {}, cycle: {}, fleuries: {}, fin: false, epilogue: false },
     achievements: {},
     stats: { totalDays: 0, coinsEarned: 0, bestAge: START_AGE, events: 0, startedAt: Date.now() },
     log: [],
@@ -93,6 +102,7 @@ function defaultState() {
 // --------------------------------------------------------- Calculs
 const ageYears = () => G.days / DAYS_PER_YEAR;
 const perkRank = id => G.legacy.perks[id] || 0;
+const racineRank = id => G.floraison.racines[id] || 0;
 
 function getMult(stat) {
   let m = 1;
@@ -108,6 +118,9 @@ function getMult(stat) {
     if (!G.items[id]) continue;
     for (const e of ITEM_BY_ID[id].effects) if (e.stat === stat) m *= e.mult;
   }
+  const rel = G.relique && !G.items[G.relique] && !isForbidden('shop') && ITEM_BY_ID[G.relique];
+  if (rel) for (const e of rel.effects) if (e.stat === stat) m *= e.mult;
+  for (const r of RACINES) if (r.stat === stat) m *= 1 + r.per * racineRank(r.id);
   for (const p of PERKS) {
     if (p.stat !== stat) continue;
     const v = 1 + p.per * perkRank(p.id);
@@ -118,6 +131,8 @@ function getMult(stat) {
   for (const f of HOOKS.mult) m *= f(stat);
   const tr = currentTrait();
   if (tr) for (const e of tr.effects) if (e.stat === stat) m *= e.mult;
+  const cj = G.conjoint && TRAIT_BY_ID[G.conjoint.trait];   // le destin du conjoint compte comme un second trait
+  if (cj) for (const e of cj.effects) if (e.stat === stat) m *= e.mult;
   const ch = currentChallenge();
   if (ch && ch.penalty) for (const e of ch.penalty) if (e.stat === stat) m *= e.mult;
   for (const c of CHALLENGES) {
@@ -134,7 +149,9 @@ const happiness = () => getMult('happiness');
 function legacyMult(entry) {
   const ch = currentChallenge();
   if (ch && ch.noLegacy) return 1;
-  return 1 + entry.maxLevel / 10 * (1 + 0.1 * perkRank('destin') + (G.challengesDone.amnesique ? 0.2 : 0));
+  const bonus = 0.1 * perkRank('destin') + 0.25 * racineRank('ecorce')
+    + (G.challengesDone.amnesique ? 0.2 : 0) + (G.challengesDone.amnesique2 ? 0.2 : 0);
+  return 1 + entry.maxLevel / 10 * (1 + bonus);
 }
 const maxXp = (base, level) => Math.round(base * (level + 1) * Math.pow(1.01, level));
 
@@ -158,7 +175,13 @@ function rawExpenses() {
 }
 const expenses = () => rawExpenses() * getMult('expenses');
 const netIncome = () => income() - expenses();
-const lifespanYears = () => (BASE_LIFESPAN + 5 * perkRank('vigueur') + G.lifeBonusYears) * getMult('lifespan');
+// Au-delà de 100 ans, chaque année de plus compte de moins en moins (200 → 169, 500 → 261) : sinon les vies
+// dépassent 500 ans et durent des heures sans enjeu.
+const LIFESPAN_SOFTCAP = 100;
+function lifespanYears() {
+  const y = (BASE_LIFESPAN + 5 * perkRank('vigueur') + G.lifeBonusYears) * getMult('lifespan');
+  return y <= LIFESPAN_SOFTCAP ? y : LIFESPAN_SOFTCAP * (1 + Math.log(y / LIFESPAN_SOFTCAP));
+}
 let debugSpeed = 1;   // multiplicateur réglé par le panneau de debug (js/debug.js)
 const speed = () => BASE_SPEED * getMult('speed') * debugSpeed;
 const etaSeconds = (entry, base, xpPerDay) => (maxXp(base, entry.level) - entry.xp) / (xpPerDay * speed());
@@ -168,6 +191,7 @@ function reqProgress(r) {
   if (r.job) return { cur: G.jobs[r.job].level, need: r.level, label: JOB_BY_ID[r.job].name };
   if (r.skill) return { cur: G.skills[r.skill].level, need: r.level, label: SKILL_BY_ID[r.skill].name };
   if (r.corruption != null) return { cur: Math.floor(G.corruption), need: r.corruption, label: 'Corruption' };
+  if (r.foi != null) return { cur: Math.floor(G.foi || 0), need: r.foi, label: 'Foi' };
   return { cur: 0, need: 1, label: '?' };
 }
 const reqMet = r => { const p = reqProgress(r); return p.cur >= p.need; };
@@ -307,8 +331,11 @@ function autoShop() {
 }
 
 // --------------------------------------------------- Traits & défis
-function rollTraits() {
-  const pool = TRAITS.map(t => t.id), out = [];
+// Les dons de l'arbre (trait.voie) ne sont tirés qu'une fois leur voie fleurie. imposes : destins garantis.
+const traitOuvert = t => !t.voie || (!!G && (t.voie === 'couronne' ? G.floraison.fin : !!G.floraison.fleuries[t.voie]));
+function rollTraits(imposes = []) {
+  const out = [...new Set(imposes.filter(Boolean))];
+  const pool = TRAITS.filter(t => traitOuvert(t) && !out.includes(t.id)).map(t => t.id);
   while (out.length < 3 && pool.length) out.push(pool.splice(Math.floor(Math.random() * pool.length), 1)[0]);
   return out;
 }
@@ -317,11 +344,13 @@ function chooseTrait(id) {
   const t = TRAIT_BY_ID[id];
   G.trait = id;
   G.pendingTraits = null;
+  G.traitHerite = null;
   if (t.startCoins) G.coins += t.startCoins;
   log(`Trait de naissance : ${t.name} (${t.desc})`, 'gold');
 }
+const challengeOpen = c => !c.requires || !!G.challengesDone[c.requires];
 function startChallenge(id) {
-  if (G.challengesDone[id] || G.challenge === id) return;
+  if (G.challengesDone[id] || G.challenge === id || !challengeOpen(CHALLENGE_BY_ID[id])) return;
   rebirth(id);
 }
 function abandonChallenge() {
@@ -371,6 +400,11 @@ const ACHIEVEMENTS = [
   { id: 'corrompu',  name: 'Âme damnée',          desc: 'Atteindre 100 de corruption',  check: () => G.corruption >= 100 },
   { id: 'defi1',     name: 'Relever le gant',     desc: 'Réussir un défi',              check: () => Object.keys(G.challengesDone).length >= 1 },
   { id: 'defiAll',   name: 'Invaincu',            desc: 'Réussir tous les défis',       check: () => Object.keys(G.challengesDone).length >= CHALLENGES.length },
+  { id: 'saint',     name: 'En odeur de sainteté', desc: 'Devenir Saint',                check: () => !!G.unlocked['job:saint'] },
+  { id: 'foi100',    name: 'Âme pure',            desc: 'Atteindre 100 de foi',         check: () => (G.foi || 0) >= 100 },
+  { id: 'floraison1', name: 'Premières fleurs',   desc: 'Faire fleurir l\'arbre',        check: () => G.floraison.fois >= 1 },
+  { id: 'floraison5', name: 'Printemps éternel',  desc: 'Faire fleurir l\'arbre 5 fois', check: () => G.floraison.fois >= 5 },
+  { id: 'couronne',  name: 'L\'arbre couronné',   desc: 'Faire fleurir les quatre grandes voies', check: () => G.floraison.fin },
 ];
 function checkAchievements() {
   for (const a of ACHIEVEMENTS) {
@@ -494,14 +528,105 @@ const EVENTS = [
       { label: () => 'Le chasser (corruption +5)',
         run: () => { G.corruption = Math.min(100, G.corruption + 5); return ['Il s\'éloigne en priant pour vous.', '']; } },
     ] },
+  // --- voies : un événement propre à chaque métier exercé
+  { id: 'tournoi', title: 'Le tournoi du roi', weight: 2, cond: () => JOB_BY_ID[G.currentJob].cat === 'milice',
+    init: () => ({ cost: Math.max(50, refIncome() * 30) }),
+    text: d => `Les hérauts annoncent un grand tournoi. L'inscription coûte ${fmt(d.cost)} écus.`,
+    choices: [
+      { label: d => `S'inscrire (${fmt(d.cost)})`, can: d => G.coins >= d.cost,
+        run: d => { G.coins -= d.cost; G.suite = 'joute'; return ['Vous passez les qualifications. La finale approche…', 'good']; } },
+      { label: () => 'Regarder depuis les tribunes', run: () => ['Belle journée, beaux coups de lance.', ''] },
+    ] },
+  { id: 'joute', title: 'La finale du tournoi', weight: 0, cond: () => false,   // seulement à la suite du tournoi
+    init: () => { const f = G.skills.force.level + G.skills.tactique.level; return { chance: Math.min(0.85, (f + 10) / (f + 80)), reward: Math.max(200, refIncome() * 200) }; },
+    text: d => `Face à vous, le champion en titre. Chances de victoire : ${Math.round(d.chance * 100)} % (Force et Tactique).`,
+    choices: [
+      { label: () => 'Charger !',
+        run: d => {
+          if (Math.random() < d.chance) { G.coins += d.reward; addBuff('xp:milice', 2, 365, 'Gloire du tournoi'); return [`Victoire ! ${fmt(d.reward)} écus et XP Milice ×2 pendant 1 an.`, 'good']; }
+          addBuff('happiness', 0.8, 182, 'Orgueil blessé'); return ['Désarçonné devant toute la cour…', 'bad'];
+        } },
+      { label: () => 'Déclarer forfait', run: () => ['Vous rendez votre lance sous les sifflets.', ''] },
+    ] },
+  { id: 'experience', title: 'Une expérience interdite', weight: 2, cond: () => JOB_BY_ID[G.currentJob].cat === 'arcanes',
+    init: () => ({}),
+    text: () => 'Un vieux grimoire décrit un rituel qui ouvrirait l\'esprit… ou le brûlerait.',
+    choices: [
+      { label: () => 'Tenter (60 %) : XP Arcanes ×3 pendant 1 an',
+        run: () => {
+          if (Math.random() < 0.6) { addBuff('xp:arcanes', 3, 365, 'Esprit ouvert'); return ['Le monde vous apparaît soudain limpide.', 'good']; }
+          G.lifeBonusYears -= 3; return ['Le rituel tourne mal : −3 ans d\'espérance de vie.', 'bad'];
+        } },
+      { label: () => 'Refermer le grimoire', run: () => ['Certaines portes doivent rester closes.', ''] },
+    ] },
+  { id: 'casse', title: 'Le casse du siècle', weight: 2, cond: () => JOB_BY_ID[G.currentJob].cat === 'ombre',
+    init: () => ({ reward: Math.max(300, refIncome() * 300) }),
+    text: d => `Le trésor de l'évêché, ${fmt(d.reward)} écus, est mal gardé cette nuit.`,
+    choices: [
+      { label: () => 'Tenter le coup (65 %)',
+        run: d => {
+          G.corruption = Math.min(100, G.corruption + 10);
+          if (Math.random() < 0.65) { G.coins += d.reward; return [`Le coup parfait : +${fmt(d.reward)} écus. Corruption +10.`, 'good']; }
+          G.days += 365; return ['Pris la main dans le coffre : un an de cachot. Corruption +10.', 'bad'];
+        } },
+      { label: () => 'Trop risqué', run: () => ['Vous laissez le coup à d\'autres.', ''] },
+    ] },
+  // --- lignée : les ancêtres se rappellent à vous
+  { id: 'ancetre', title: 'Le fantôme d\'un ancêtre', weight: 1, cond: () => !!G.lignee && G.lignee.vies.length >= 3,
+    init: () => { const v = G.lignee.vies[Math.floor(Math.random() * G.lignee.vies.length)]; return { prenom: v.prenom, metier: v.metier }; },
+    text: d => `Une nuit, ${d.prenom}, qui fut ${d.metier}, apparaît au pied de votre lit et vous parle du métier.`,
+    choices: [
+      { label: () => 'L\'écouter : XP métiers ×2 pendant 1 an',
+        run: d => { addBuff('xp:jobs', 2, 365, 'Conseils de ' + d.prenom); return ['Ses conseils valent de l\'or.', 'good']; } },
+      { label: () => 'Lui demander où est le trésor de famille',
+        run: () => { const g = Math.max(100, refIncome() * 100); G.coins += g; return [`Il désigne une pierre descellée : +${fmt(g)} écus.`, 'good']; } },
+    ] },
+  { id: 'cousin', title: 'Un cousin réclame sa part', weight: 1, cond: () => G.legacy.rebirths >= 2 && G.coins >= 1000,
+    init: () => ({ part: G.coins * 0.1 }),
+    text: d => `Un lointain cousin brandit un testament et réclame ${fmt(d.part)} écus de l'héritage.`,
+    choices: [
+      { label: d => `Payer (${fmt(d.part)})`, run: d => { G.coins -= d.part; return ['Il repart satisfait.', '']; } },
+      { label: () => 'Plaider (50 % de perdre 30 % de la bourse)',
+        run: () => {
+          if (Math.random() < 0.5) return ['Le juge déchire le testament : un faux !', 'good'];
+          const l = G.coins * 0.3; G.coins -= l; return [`Procès perdu : −${fmt(l)} écus.`, 'bad'];
+        } },
+    ] },
+  // --- présages
+  { id: 'comete', title: 'Une comète', weight: 1, cond: () => ageYears() >= 20,
+    init: () => ({}),
+    text: () => 'Une comète flamboyante traverse le ciel pendant des semaines.',
+    choices: [
+      { label: () => 'L\'étudier : XP Mystique ×2 pendant 2 ans',
+        run: () => { addBuff('xp:mystique', 2, 730, 'Présage céleste'); return ['Vous noircissez des carnets entiers.', 'good']; } },
+      { label: () => 'Y voir un bon présage : bonheur ×1,3 pendant 2 ans',
+        run: () => { addBuff('happiness', 1.3, 730, 'Bon présage'); return ['Tout vous sourit.', 'good']; } },
+    ] },
+  { id: 'peste', title: 'La peste noire', weight: 1, cond: () => ageYears() >= 25,
+    init: () => ({ cost: Math.max(100, refIncome() * 80) }),
+    text: () => 'La peste ravage la région. Les charrettes ramassent les morts chaque matin.',
+    choices: [
+      { label: d => `Fuir à la campagne (${fmt(d.cost)})`, can: d => G.coins >= d.cost,
+        run: d => { G.coins -= d.cost; return ['Vous attendez la fin de l\'épidémie loin de la ville.', '']; } },
+      { label: () => 'Soigner les malades : foi +15, 30 % de perdre 5 ans de vie',
+        run: () => {
+          G.foi = Math.min(100, (G.foi || 0) + 15);
+          if (Math.random() < 0.3) { G.lifeBonusYears -= 5; return ['Vous survivez, mais la maladie vous a marqué : −5 ans.', 'bad']; }
+          return ['Votre dévouement est sur toutes les lèvres. Foi +15.', 'good'];
+        } },
+    ] },
 ];
 const EVENT_BY_ID = byId(EVENTS);
 
 function scheduleEvent() { G.nextEventIn = 90 + Math.random() * 150; }
 function spawnEvent() {
-  const pool = EVENTS.filter(e => e.cond());
+  const possibles = EVENTS.filter(e => e.cond());
+  const frais = possibles.filter(e => !G.recents.includes(e.id));
+  const pool = frais.length ? frais : possibles;
   let r = Math.random() * pool.reduce((s, e) => s + e.weight, 0);
-  const ev = pool.find(e => (r -= e.weight) < 0) || pool[0];
+  const ev = EVENT_BY_ID[G.suite] || pool.find(e => (r -= e.weight) < 0) || pool[0];
+  G.suite = null;
+  G.recents = [...G.recents, ev.id].slice(-5);
   G.event = { id: ev.id, data: ev.init(), expires: 60, uid: Date.now() };
   notify(`Événement : ${ev.title}`, 'event');
 }
@@ -526,6 +651,7 @@ function chooseEvent(i) {
   G.stats.events++;
   G.event = null;
   scheduleEvent();
+  if (G.suite) G.nextEventIn = 20;   // la suite arrive vite
 }
 
 // --------------------------------------------------------------- Boucle
@@ -557,6 +683,7 @@ function tick(dt, offline = false) {
   if (slowTimer >= 0.5) {
     slowTimer = 0;
     checkUnlocks(false);
+    for (const v in SOMMETS) if (G.unlocked['job:' + SOMMETS[v]]) G.floraison.cycle[v] = true;
     checkChallenge();
     autoManage();
     checkAchievements();
@@ -586,7 +713,7 @@ function sumLevels() {
   for (const id in G.skills) s += G.skills[id].level;
   return s;
 }
-const legacyPointsPreview = () => Math.floor(Math.pow(sumLevels() / 40, 0.85));
+const legacyPointsPreview = () => Math.floor(Math.pow(sumLevels() / 40, 0.85) * (1 + 0.5 * racineRank('fruits')));
 const startCoins = () => perkRank('fortune') ? 50 * Math.pow(10, perkRank('fortune')) : 0;
 const perkCost = p => Math.ceil(p.base * Math.pow(p.growth, perkRank(p.id)));
 
@@ -601,6 +728,10 @@ function die() {
 
 function rebirth(challengeId = null) {
   const pts = legacyPointsPreview();
+  // l'enfant peut hériter du destin du conjoint ; une fois une voie fleurie, un don de l'arbre est toujours proposé
+  const cj = G.conjoint && G.conjoint.trait ? G.conjoint : null;
+  const dons = TRAITS.filter(t => t.voie && traitOuvert(t));
+  const don = dons.length ? dons[Math.floor(Math.random() * dons.length)].id : null;
   G.legacy.points += pts;
   G.legacy.totalPoints += pts;
   G.legacy.rebirths++;
@@ -616,7 +747,8 @@ function rebirth(challengeId = null) {
     days: START_AGE * DAYS_PER_YEAR, coins: startCoins(), lifeBonusYears: 0,
     currentJob: 'glaneur', currentSkill: 'discipline', housing: 'etoile', items: {},
     unlocked: {}, buffs: [], event: null, dead: false,
-    trait: null, pendingTraits: rollTraits(), corruption: 0, challenge: challengeId,
+    trait: null, pendingTraits: rollTraits([cj && cj.trait, don]), corruption: 0, challenge: challengeId, suite: null,
+    conjoint: null, traitHerite: cj ? { trait: cj.trait, de: `${cj.prenom} ${cj.maison}` } : null,
   });
   for (const f of HOOKS.newLife) f();
   scheduleEvent();
@@ -633,6 +765,46 @@ function buyPerk(id) {
   G.legacy.perks[id] = perkRank(id) + 1;
   if (p.setting) G.settings[p.setting] = true;   // talent d'automatisation : activé d'office
   log(`Talent acquis : ${p.name} (rang ${perkRank(id)})`, 'gold');
+}
+
+// ---------------------------------------------------------- Floraison
+// Seconde couche de prestige : une fois un sommet atteint (SOMMETS, data.js), l'arbre peut fleurir.
+// La vie en cours s'achève, l'héritage (points, talents, meilleurs niveaux) repart de zéro, et la maison
+// gagne des graines pour acheter des racines, qui, elles, restent. Une seule voie fleurit à chaque fois
+// (au choix si plusieurs sommets sont atteints) : fleurir les 4 voies, en 4 Floraisons, termine l'histoire.
+const floraisonPossible = () => Object.keys(G.floraison.cycle).length > 0;
+const voiesAFleurir = () => Object.keys(G.floraison.cycle).filter(v => !G.floraison.fleuries[v]);
+const grainesPreview = () => Math.floor(Math.sqrt((G.legacy.totalPoints - G.floraison.base + legacyPointsPreview()) / 20));
+const racineCost = r => Math.ceil(r.base * Math.pow(r.growth, racineRank(r.id)));
+
+function floraison(voie) {
+  const F = G.floraison;
+  if (!floraisonPossible() || G.dead) return;
+  const g = grainesPreview(), choix = voiesAFleurir();
+  const v = choix.includes(voie) ? voie : choix[0];   // aucune si toutes les voies atteintes ont déjà fleuri
+  if (v) F.fleuries[v] = true;
+  F.graines += g; F.fois++; F.cycle = {};   // les autres sommets devront être atteints à nouveau
+  rebirth();
+  F.base = G.legacy.totalPoints;
+  G.legacy.points = 0;
+  const garder = racineRank('bourgeons') > 0;
+  for (const id in G.legacy.perks) if (!(garder && PERK_BY_ID[id].setting)) delete G.legacy.perks[id];
+  for (const group of [G.jobs, G.skills]) for (const id in group) group[id].maxLevel = 0;
+  G.coins = startCoins();   // le talent Fortune familiale a pu disparaître
+  notify(`L'arbre fleurit${v ? ` (${JOB_CATS[v].name})` : ''} ! +${g} graine${g > 1 ? 's' : ''}.`, 'gold');
+  if (!F.fin && Object.keys(SOMMETS).every(v => F.fleuries[v])) {
+    F.fin = true;
+    log('Les quatre grandes voies ont fleuri : l\'arbre est couronné.', 'gold');
+  }
+  save();
+}
+
+function buyRacine(id) {
+  const r = RACINE_BY_ID[id], cost = racineCost(r);
+  if (racineRank(id) >= r.max || G.floraison.graines < cost) return;
+  G.floraison.graines -= cost;
+  G.floraison.racines[id] = racineRank(id) + 1;
+  log(`Racine : ${r.name} (rang ${racineRank(id)})`, 'gold');
 }
 
 // ------------------------------------------------------- Journal
