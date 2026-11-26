@@ -113,6 +113,14 @@ const Debug = {
       ['Fin tutoriel', () => this.act(() => { G.tutorial = -1; })],
     ]);
 
+    section('Fin de partie', [
+      ['Foi +20', () => this.act(() => { G.foi = Math.min(100, (G.foi || 0) + 20); }, 'foi +20')],
+      ['+5 graines', () => this.act(() => { G.floraison.graines += 5; }, '+5 graines')],
+      ['4 sommets atteints', () => this.act(() => { for (const v in SOMMETS) G.floraison.cycle[v] = true; }, 'floraison possible')],
+      ['Fleurir', () => this.act(() => { floraison(); }, 'l\'arbre fleurit')],
+      ['Couronner l\'arbre', () => this.act(() => { for (const v in SOMMETS) { G.floraison.cycle[v] = true; floraison(v); } }, 'les 4 voies ont fleuri')],
+    ]);
+
     p.appendChild(el('h4', null, 'État'));
     this.info = el('div', 'dbg-info');
     p.appendChild(this.info);
@@ -134,6 +142,8 @@ const Debug = {
       `XP métiers ×${f(getMult('xp:jobs'))}`,
       `XP compét. ×${f(getMult('xp:skills'))}`,
       `corruption ${G.corruption.toFixed(1)}`,
+      `foi        ${(G.foi || 0).toFixed(1)}`,
+      `graines    ${G.floraison.graines} (+${grainesPreview()} à la floraison)`,
       `événement  ${G.event ? G.event.id : '—'} (${Math.round(G.nextEventIn)} s)`,
       `pts légués ${legacyPointsPreview()}`,
     ].join('\n');
